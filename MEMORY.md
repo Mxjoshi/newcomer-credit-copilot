@@ -6,6 +6,17 @@ Last updated: 2026-06-09 (folder restructure + Phase 1 fact-verification complet
 
 ---
 
+## START HERE (resume protocol for a fresh session)
+For accuracy, start a NEW session for each chunk of work rather than continuing a long one. The files
+are the source of truth, not chat history. To rebuild context, read these in order:
+1. This file (MEMORY.md), top to bottom.
+2. 01-scope-and-research/phase-1-signoff.md (what is locked and done).
+3. The specific file for the active task only (e.g. a deliverable, or the next phase README).
+Do not trust recall over the files. Re-open the file before relying on a fact. Writing style: no en or
+em dashes, plain human voice (saved in Claude memory). Project is on GitHub: Mxjoshi/newcomer-credit-copilot (private).
+
+---
+
 ## The project in one line
 A B2B AI tool for UAE digital banks that assesses whether a newcomer with no local credit
 history is safe to lend to, and explains the decision. PMCurve AI PM capstone (bring-your-own
