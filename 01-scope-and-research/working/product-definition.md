@@ -207,7 +207,7 @@ metric traceability is deliberate (what a sharp evaluator looks for).
 ---
 
 ## Open items to verify (per accuracy standard)  [RESOLVED 2026-06-07/09]
-- AECB credit score range → CONFIRMED 300–900. (market-and-domain-research.md)
+- AECB credit score range → CONFIRMED 300-900. (market-and-domain-research.md)
 - UAE expat population percentage → CONFIRMED ~88% (88.5% 2024). (market-and-domain-research.md)
 - List of active UAE lenders / digital banks / BNPL → CONFIRMED via Top-5 competitor research.
 All three are now sourced. Remaining peripheral unverified items + their Phase-1 disposition live in
