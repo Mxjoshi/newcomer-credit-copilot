@@ -1,0 +1,11 @@
+.DS_Store
+*.log
+.env
+.env.*
+node_modules/
+__pycache__/
+.venv/
+venv/
+
+# Local Claude Code settings (machine-specific)
+.claude/settings.local.json

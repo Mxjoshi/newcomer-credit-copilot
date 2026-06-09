@@ -1,0 +1,22 @@
+# Phase 3 — Build & AI Integration  ⬜ NOT STARTED
+
+**Brief deliverable:** *"A working build with at least one live LLM-powered use case."*
+
+## Tasks
+1. **Build the product** — frontend + backend to make the core flow work (officer enters applicant
+   data → rules-based score → policy check → recommendation).
+2. **Integrate an LLM API** — the brief permits OpenAI, Anthropic or Gemini. **Plan: Anthropic /
+   Claude.** Our live LLM use case is the **explanation / decision-reasoning layer** (and the
+   policy-check grounding) — the part we showcase.
+
+## Scope reminders (from Phase 1 decisions)
+- Score approach: **rules + LLM, no trained model** (D7) — a transparent judgmental scorecard.
+- Output: **APPROVE / DECLINE / REFER** (D8).
+- MVP cuts are engineering scaffolding only (no login, no real bank integration, synthetic data).
+  The credit substance stays real (D9).
+
+## Planned artifacts (to be created here)
+- The app (frontend + backend).
+- `deliverables/llm-integration.md` — input → prompt → structured output spec for the explanation layer.
+
+> Blocked until Phase 2 design is done.
