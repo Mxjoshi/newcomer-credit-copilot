@@ -14,13 +14,26 @@ given a database table later without redesign.
 
 ## The entities at a glance
 
-```
-Applicant ──1──> Application ──produces──> ScoreResult ────┐
-                     │                       (has many      │
-                     │                        ScoreFactors) ├──> Decision
-                     │                                      │
-                     └──checked against──> PolicyCheckResult┘
-                                            (one per PolicyRule)
+```mermaid
+flowchart LR
+    A["👤 <b>Applicant</b><br/>the core five fields"]
+    AP["📄 <b>Application</b><br/>product, amount, term"]
+    SR["📊 <b>ScoreResult</b><br/>5 ScoreFactors,<br/>total + risk band"]
+    PR["📜 <b>PolicyRule</b><br/>5 to 8 rules, v1"]
+    PCR["✅ <b>PolicyCheckResult</b><br/>one per rule,<br/>pass or fail + citation"]
+    D["⚖️ <b>Decision</b><br/>verdict, explanation,<br/>officer action"]
+    A -->|"has one"| AP
+    AP -->|"produces"| SR
+    AP -->|"checked against"| PCR
+    PR -->|"evaluated as"| PCR
+    SR -->|"feeds"| D
+    PCR -->|"feeds"| D
+    style A fill:#dbeafe,stroke:#2563eb,stroke-width:2px,color:#1e3a8a
+    style AP fill:#dbeafe,stroke:#2563eb,stroke-width:2px,color:#1e3a8a
+    style SR fill:#ede9fe,stroke:#7c3aed,stroke-width:2px,color:#4c1d95
+    style PR fill:#fce7f3,stroke:#db2777,stroke-width:2px,color:#831843
+    style PCR fill:#fce7f3,stroke:#db2777,stroke-width:2px,color:#831843
+    style D fill:#dcfce7,stroke:#16a34a,stroke-width:3px,color:#14532d
 ```
 
 In one sentence: an Applicant has one Application; the Application produces one ScoreResult
@@ -147,11 +160,33 @@ is what Phase 4's evals will do.
 1. Officer submits Applicant + Application (Screen 1, validated).
 2. Scoring step turns the 5 applicant fields into 5 ScoreFactors, sums to a ScoreResult.
 3. Policy step evaluates every PolicyRule condition, producing one PolicyCheckResult each.
-4. Combination logic: any hard_fail rule means DECLINE; any refer-severity fail caps the outcome
-   at REFER; otherwise the risk_band maps to the recommendation (low = approve, medium = refer,
-   high = decline; conservative stance per D6).
+4. Combination logic (the diagram below): any hard_fail rule means DECLINE; any refer-severity
+   fail caps the outcome at REFER; otherwise the risk_band maps to the recommendation
+   (conservative stance per D6).
 5. The LLM writes the explanation and reasons from (and only from) the data above.
 6. The officer accepts or overrides; the Decision records it. Session ends, nothing persists.
+
+```mermaid
+flowchart TD
+    IN["Score + all policy check results"] --> Q1{"Any hard_fail<br/>rule failed?"}
+    Q1 -->|"yes"| DEC["🔴 DECLINE"]
+    Q1 -->|"no"| Q2{"Any refer-severity<br/>rule failed?"}
+    Q2 -->|"yes"| REF["🟠 REFER"]
+    Q2 -->|"no"| Q3{"Risk band?"}
+    Q3 -->|"low"| APP["🟢 APPROVE"]
+    Q3 -->|"medium"| REF
+    Q3 -->|"high"| DEC
+    APP --> LLM["LLM writes the explanation,<br/>only from the data above"]
+    REF --> LLM
+    DEC --> LLM
+    LLM --> OFF["Officer accepts or overrides<br/>(human makes the final call, D2)"]
+    style IN fill:#e2e8f0,stroke:#475569,stroke-width:2px,color:#0f172a
+    style APP fill:#dcfce7,stroke:#16a34a,stroke-width:3px,color:#14532d
+    style REF fill:#fef3c7,stroke:#d97706,stroke-width:3px,color:#78350f
+    style DEC fill:#fee2e2,stroke:#dc2626,stroke-width:3px,color:#7f1d1d
+    style LLM fill:#dbeafe,stroke:#2563eb,stroke-width:2px,color:#1e3a8a
+    style OFF fill:#ede9fe,stroke:#7c3aed,stroke-width:2px,color:#4c1d95
+```
 
 ---
 

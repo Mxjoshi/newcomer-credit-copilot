@@ -16,15 +16,15 @@ assessment per session, no saved history.
 
 ## The journey at a glance
 
-```
-Screen 1: INTAKE            Screen 2: ASSESSING           Screen 3: DECISION (hero)
-+------------------+        +-------------------+         +----------------------+
-| Applicant form   |        | [done] Score      |         | APPROVE  (low risk)  |
-| (core 5 fields)  |  --->  | [busy] Policy chk |  --->   | Why: one paragraph   |
-| Application info |        | [    ] Explain    |         | Scorecard breakdown  |
-| [Load sample]    |        |                   |         | Policy checks, cited |
-| [Assess]         |        |                   |         | [Accept] [Override]  |
-+------------------+        +-------------------+         +----------------------+
+```mermaid
+flowchart LR
+    A["<b>Screen 1: INTAKE</b><br/>Applicant form, core 5 fields<br/>Application details<br/>Load sample · Assess"]
+    B["<b>Screen 2: ASSESSING</b><br/>Step 1: Score<br/>Step 2: Policy check<br/>Step 3: Explain"]
+    C["<b>Screen 3: DECISION, the hero</b><br/>Verdict + risk level<br/>Why paragraph<br/>Scorecard breakdown<br/>Policy checks, cited<br/>Accept · Override"]
+    A --> B --> C
+    style A fill:#dbeafe,stroke:#2563eb,stroke-width:2px,color:#1e3a8a
+    style B fill:#fef3c7,stroke:#d97706,stroke-width:2px,color:#78350f
+    style C fill:#dcfce7,stroke:#16a34a,stroke-width:2px,color:#14532d
 ```
 
 Three screens, one direction. The officer never needs to navigate sideways. The decision screen
@@ -37,26 +37,22 @@ this product (decision D9).
 
 **Job:** capture one newcomer applicant accurately, fast, with no training needed.
 
+```mermaid
+flowchart TD
+    HDR["<b>Newcomer Credit Copilot</b> · [Load sample] button"]
+    APP["👤 <b>APPLICANT block</b> (the core five)<br/>Full name · Months in UAE + Visa type<br/>Employment status · Job tenure<br/>Employer category · Monthly salary AED<br/>Rent payment history"]
+    REQ["📄 <b>APPLICATION block</b><br/>Product: personal loan or credit card<br/>Amount requested AED · Term in months"]
+    BTN["▶️ <b>[ Assess applicant ]</b> button<br/>runs only after validation passes"]
+    HDR --> APP --> REQ --> BTN
+    style HDR fill:#e2e8f0,stroke:#475569,stroke-width:2px,color:#0f172a
+    style APP fill:#dbeafe,stroke:#2563eb,stroke-width:2px,color:#1e3a8a
+    style REQ fill:#dbeafe,stroke:#2563eb,stroke-width:2px,color:#1e3a8a
+    style BTN fill:#dcfce7,stroke:#16a34a,stroke-width:2px,color:#14532d
 ```
-+--------------------------------------------------------------+
-|  Newcomer Credit Copilot                      [Load sample]  |
-|                                                              |
-|  APPLICANT                                                   |
-|  Full name            [____________________]                 |
-|  Months in UAE        [____]   Visa type   [Employment v]    |
-|  Employment status    [Employed v]                           |
-|  Job tenure (months)  [____]                                 |
-|  Employer category    [Mainland private v]                   |
-|  Monthly salary (AED) [________]                             |
-|  Rent payment history [On time, 6+ months v]                 |
-|                                                              |
-|  APPLICATION                                                 |
-|  Product   (o) Personal loan   ( ) Credit card               |
-|  Amount requested (AED) [________]   Term (months) [____]    |
-|                                                              |
-|                                    [ Assess applicant ]      |
-+--------------------------------------------------------------+
-```
+
+Dropdowns wherever a field has known options (visa type, employment status, employer category,
+rent history), free text or number only where it must be (name, salary, amounts). Less typing,
+fewer input mistakes.
 
 **The input fields (decision M1, the core five):**
 
@@ -88,20 +84,24 @@ their own block. One product per assessment (decision D3).
 reasoning architecture instead of a spinner. This screen IS the agent made visible (decision U2):
 the fixed 3-step flow, score then policy check then explain.
 
+A snapshot of the screen mid-assessment (step 1 finished, step 2 running, step 3 has not
+started yet):
+
+```mermaid
+flowchart LR
+    H["Assessing: A. Applicant<br/>Personal loan, AED 40,000"]
+    S1["✅ <b>Step 1: Score the applicant</b><br/>DONE: 62 / 100, medium risk"]
+    S2["⏳ <b>Step 2: Check lending policy</b><br/>RUNNING: checking 6 rules..."]
+    S3["⬜ <b>Step 3: Write the explanation</b><br/>NOT STARTED YET"]
+    H --> S1 --> S2 --> S3
+    style H fill:#e2e8f0,stroke:#475569,stroke-width:2px,color:#0f172a
+    style S1 fill:#dcfce7,stroke:#16a34a,stroke-width:2px,color:#14532d
+    style S2 fill:#fef3c7,stroke:#d97706,stroke-width:2px,color:#78350f
+    style S3 fill:#f8fafc,stroke:#94a3b8,stroke-dasharray: 5 5,color:#64748b
 ```
-+--------------------------------------------------------------+
-|  Assessing: A. Applicant, Personal loan, AED 40,000          |
-|                                                              |
-|  [done]  1. Score the applicant                              |
-|          Scorecard result: 62 / 100, medium risk             |
-|                                                              |
-|  [busy]  2. Check lending policy                             |
-|          Checking 6 policy rules...                          |
-|                                                              |
-|  [    ]  3. Write the explanation                            |
-|                                                              |
-+--------------------------------------------------------------+
-```
+
+On the real screen the three steps stack vertically as a checklist. Each starts grey (not
+started), turns amber while running, and turns green with a one-line result when done.
 
 **Behaviors:**
 - Each step ticks from pending to busy to done, with a one-line result when done (the score and
@@ -122,37 +122,51 @@ the fixed 3-step flow, score then policy check then explain.
 **Job:** give the officer a recommendation they can act on and defend, with every claim
 traceable. Ordered by what the officer needs first.
 
+The screen is five blocks, top to bottom:
+
+```mermaid
+flowchart TD
+    V["🟠 <b>VERDICT BANNER</b><br/>REFER TO MANUAL REVIEW · Risk: MEDIUM<br/>(green for APPROVE, red for DECLINE, amber for REFER)"]
+    W["💬 <b>WHY, ONE PARAGRAPH</b><br/>plain language, the officer can read it to a manager"]
+    S["📊 <b>SCORECARD BREAKDOWN</b><br/>every factor: value, threshold, points"]
+    P["📋 <b>POLICY CHECKS</b><br/>each rule pass or fail, failures show the cited rule text"]
+    ACT["🖱️ <b>OFFICER ACTIONS</b><br/>Accept recommendation · Override · New assessment"]
+    V --> W --> S --> P --> ACT
+    style V fill:#fef3c7,stroke:#d97706,stroke-width:3px,color:#78350f
+    style W fill:#dbeafe,stroke:#2563eb,stroke-width:2px,color:#1e3a8a
+    style S fill:#ede9fe,stroke:#7c3aed,stroke-width:2px,color:#4c1d95
+    style P fill:#fce7f3,stroke:#db2777,stroke-width:2px,color:#831843
+    style ACT fill:#e2e8f0,stroke:#475569,stroke-width:2px,color:#0f172a
 ```
-+--------------------------------------------------------------+
-|  RECOMMENDATION:  REFER TO MANUAL REVIEW        Risk: MEDIUM |
-|                                                              |
-|  WHY (read this to your manager)                             |
-|  The applicant earns a stable salary above the product       |
-|  minimum and has paid rent on time for 8 months, but has     |
-|  been in the UAE for only 4 months and in the current job    |
-|  for 3. Income is adequate; tenure is too short to confirm   |
-|  stability. Recommend manual review of employment contract   |
-|  and bank statements before a final decision.                |
-|                                                              |
-|  SCORECARD (62 / 100, medium)                                |
-|  Factor              Value          Threshold      Points    |
-|  Monthly salary      AED 12,000     >= 8,000       20/20     |
-|  Job tenure          3 months       >= 6 months     5/20     |
-|  Employer category   Free zone      tiered         12/20     |
-|  Months in UAE       4              >= 6            8/20     |
-|  Rent history        On time, 8 mo  on time 6+     17/20     |
-|                                                              |
-|  POLICY CHECKS (5 of 6 passed)                               |
-|  [pass] Minimum salary for personal loan ......... rule 1    |
-|  [pass] Debt burden ratio within cap .............. rule 2   |
-|  [FAIL] Minimum employment tenure ................. rule 4   |
-|         "Applicants must show 6 months of continuous         |
-|          employment" (Lending Policy, section 2.3)           |
-|  ... (each check expandable to show the cited rule text)     |
-|                                                              |
-|  [ Accept recommendation ]  [ Override ]  [ New assessment ] |
-+--------------------------------------------------------------+
-```
+
+**Worked example (a borderline REFER case), exactly as the officer would see it:**
+
+> **RECOMMENDATION: REFER TO MANUAL REVIEW · Risk: MEDIUM**
+>
+> **Why (read this to your manager):** The applicant earns a stable salary above the product
+> minimum and has paid rent on time for 8 months, but has been in the UAE for only 4 months and
+> in the current job for 3. Income is adequate; tenure is too short to confirm stability.
+> Recommend manual review of employment contract and bank statements before a final decision.
+
+**Scorecard (62 / 100, medium):**
+
+| Factor | Value | Threshold | Points |
+|---|---|---|---|
+| Monthly salary | AED 12,000 | >= 8,000 | 20/20 |
+| Job tenure | 3 months | >= 6 months | 5/20 |
+| Employer category | Free zone | tiered | 12/20 |
+| Months in UAE | 4 | >= 6 | 8/20 |
+| Rent history | On time, 8 months | on time 6+ | 17/20 |
+
+**Policy checks (5 of 6 passed):**
+
+- ✅ Minimum salary for personal loan (rule 1)
+- ✅ Debt burden ratio within cap (rule 2)
+- ❌ **Minimum employment tenure (rule 4):** "Applicants must show 6 months of continuous
+  employment" (Lending Policy, section 2.3)
+- ... each check expandable to show the cited rule text
+
+**Action row:** [ Accept recommendation ] [ Override ] [ New assessment ]
 
 **The four blocks, and why each exists:**
 
