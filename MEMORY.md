@@ -39,7 +39,13 @@ See 01-scope-and-research/phase-1-signoff.md. Three clean deliverables locked in
 01-scope-and-research/deliverables/ (problem-statement, competitor-analysis, success-metrics).
 Full web re-verification sweep done, every fact confirmed or confidence-flagged; nothing
 load-bearing is unverified. Folder structure restructured (phase-based; course material → 00-reference).
-Not building yet. Next: **Phase 2 (Design)**, end-to-end UI flow, then first-pass data model.
+Not building yet. **Phase 2 (Design) deliverables DRAFTED 2026-06-10:** 02-design/deliverables/
+01-ui-flow.md (3 screens: intake, live 3-step assessment, decision hero; wireframes + edge states)
+and 02-data-model.md (6 entities + candidate policy-rule list). Decisions called by Monika:
+U1 three-screen flow, M1 core five input fields (salary, employment+tenure, employer category,
+months in UAE+visa, rent history officer-entered; NO savings/home-country credit/education).
+Rest defaulted per 02-design/working/phase-2-plan.md decisions queue.
+Next: Monika reviews 01-ui-flow.md (the brief's REVIEW MILESTONE), then Phase 2 sign-off.
 
 ## Success metrics (locked, threshold format)
 Group A (credit): decision accuracy 80%+; false approval <10% (strictest, from D6); refer rate 10-25%.
