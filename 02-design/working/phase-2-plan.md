@@ -193,3 +193,14 @@ defaults (she can override any of them at the review milestone).
 | M3 | Score representation | Numeric points mapped to low/medium/high bands | Default adopted |
 
 With these set, both deliverables are unblocked.
+
+### Added at the review milestone (2026-06-11)
+
+Monika reviewed both deliverables on 2026-06-11 and called three further decisions. The scored
+set is untouched: M1 stays exactly five scored factors.
+
+| # | Decision | Outcome | How decided |
+|---|---|---|---|
+| M4 | Policy-only input fields | Three officer-entered fields feed policy rules only and are never scored: existing monthly obligations AED (default 0, stated assumption: a newcomer carries zero UAE debt unless documented), age in years, visa months remaining. | Called by Monika, 2026-06-11 |
+| M5 | Ground-truth labels locked before weight tuning | 24 labeled profiles (8 approve, 8 decline, 8 refer) locked in `../../04-evaluate-and-ship/ground-truth.md` before any scorecard weight exists. Phase 3 never edits the file; Phase 4 measures against it. | Called by Monika, 2026-06-11 |
+| M6 | Grounding validator, counterfactuals, impact view in v1 scope | A deterministic grounding validator after the LLM (retry once, then template fallback), a deterministic "what would change this" block on decline and refer, and an impact view tab on Screen 3 (champion vs challenger on the ground truth, no LLM calls). | Called by Monika, 2026-06-11 |

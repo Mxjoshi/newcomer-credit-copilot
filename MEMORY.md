@@ -2,7 +2,7 @@
 
 This is the index for the whole project. It stays short on purpose.
 Each line points to a detailed file you open only when that topic is the task.
-Last updated: 2026-06-09 (folder restructure + Phase 1 fact-verification complete)
+Last updated: 2026-06-11 (Phase 2 review: M4-M6 called, ground truth locked, metrics amendment)
 
 ---
 
@@ -45,7 +45,13 @@ and 02-data-model.md (6 entities + candidate policy-rule list). Decisions called
 U1 three-screen flow, M1 core five input fields (salary, employment+tenure, employer category,
 months in UAE+visa, rent history officer-entered; NO savings/home-country credit/education).
 Rest defaulted per 02-design/working/phase-2-plan.md decisions queue.
-Next: Monika reviews 01-ui-flow.md (the brief's REVIEW MILESTONE), then Phase 2 sign-off.
+**Phase 2 REVISED per Monika's review 2026-06-11 (M4-M6):** three policy-only inputs added (never
+scored, M1 stays exactly five scored factors); ground truth locked early (04-evaluate-and-ship/
+ground-truth.md, 24 cases, 8/8/8, Phase 3 must never edit it); grounding validator + counterfactual
+"what would change this" + impact view tab added to scope. Hallucination target restated: zero
+invented facts on the 24-case set (dated amendment in 03-success-metrics.md, locked text untouched).
+LLM integration spec drafted early (03-build/deliverables/llm-integration.md).
+Next: Monika signs off Phase 2.
 
 ## Success metrics (locked, threshold format)
 Group A (credit): decision accuracy 80%+; false approval <10% (strictest, from D6); refer rate 10-25%.
@@ -90,6 +96,14 @@ All Group A measured on synthetic sample data (stated honestly).
 - D8. Output: APPROVE / DECLINE / REFER (refer = borderline -> human).
 - D9. "Real but appropriately scoped": credit substance is real/bank-grade; only engineering
   scaffolding (login, real integration) is MVP-cut. Monika's directive: must be real + have impact.
+- M4 (2026-06-11). Three policy-only input fields (existing monthly obligations AED default 0,
+  age in years, visa months remaining): feed policy rules ONLY, never scored. Scored set stays
+  exactly the M1 five.
+- M5 (2026-06-11). Ground-truth labels locked BEFORE any scorecard weight exists
+  (04-evaluate-and-ship/ground-truth.md, 24 cases). Phase 3 never edits it; Phase 4 measures against it.
+- M6 (2026-06-11). Added to v1 scope: grounding validator after the LLM (retry once, then template
+  fallback), deterministic counterfactual block on decline/refer, impact view tab (champion vs
+  challenger on the ground truth, no LLM calls).
 
 ## Key framing (use in pitch + interviews) - CORRECTED 2026-06-07 after research
 Do NOT claim "ML is impossible on no-history borrowers" (research debunked this - ML on alt-data
