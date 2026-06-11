@@ -8,9 +8,18 @@ baseline."*
    one.
 2. **Define and build the MVP:** scope the smallest product that tests the key risks (STAR format),
    then build it.
-3. **Set up evals and measure:** build the evals benchmark, run v1 on about 20 diverse synthetic
-   applicant profiles, manually verify each output, compute the metrics, and compare to the Phase 1
-   targets.
+3. **Set up evals and measure:** build the evals benchmark, run v1 on the 24 locked synthetic
+   profiles in `ground-truth.md`, manually verify each output, compute the metrics, and compare
+   to the Phase 1 targets (the brief asks for about 20 diverse inputs; we lock 24).
+
+## The ground truth already lives here (locked early, on purpose)
+
+`ground-truth.md` holds the 24 labeled profiles (8 approve, 8 decline, 8 refer, every rule
+boundary covered). It was written and locked on 2026-06-11, during the Phase 2 review, BEFORE
+any scorecard weight or band cut-off exists (decision M5). The early lock is deliberate: if the
+labels were written after the weights, the exam would be graded by the student. Phase 3 must
+never edit that file; Phase 4 measures against it unchanged. The Screen 3 impact view
+(champion vs challenger) runs on the same 24 rows.
 
 ## The metrics to measure (defined in Phase 1, measured here)
 - Group A (credit): decision accuracy 80% or higher, false approval under 10%, refer rate vs review
