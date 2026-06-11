@@ -13,24 +13,22 @@ are the source of truth, not chat history. To rebuild context, read these in ord
 2. 01-scope-and-research/phase-1-signoff.md (what is locked and done).
 3. The specific file for the active task only (e.g. a deliverable, or the next phase README).
 Do not trust recall over the files. Re-open the file before relying on a fact. Writing style: no en or
-em dashes, plain human voice (saved in Claude memory). Project is on GitHub: Mxjoshi/newcomer-credit-copilot.
-PUBLIC temporarily (Monika, 2026-06-11) so Claude desktop can read it; revert to private when the
-capstone completes. Push after every committed chunk (standing rule 6) so the public copy is current.
+em dashes, plain human voice. Project is on GitHub: Mxjoshi/newcomer-credit-copilot.
+Push after every committed chunk (standing rule 6) so the GitHub copy stays current.
 
 ---
 
 ## The project in one line
 A B2B AI tool for UAE digital banks that assesses whether a newcomer with no local credit
 history is safe to lend to, and explains the decision. PMCurve AI PM capstone (bring-your-own
-project, allowed), aimed at a Dubai fintech job search. Must be a deployed, working MVP, presented.
+project, allowed), built as a portfolio project. Must be a deployed, working MVP, presented.
 
 ## The hard constraint (corrected 2026-06-07)
 **4-week build, one phase per week.** NOT 8 weeks (that was the learning portion). Self-paced
 phases. Solo by default. Disqualified if you stall on a phase or miss the quality bar.
 Full brief: 00-reference/capstone-brief.pdf (notes: 00-reference/capstone-brief-notes.md)
 TO DO (Monika, 2026-06-11): remove capstone-brief.pdf from the repo (course material, not ours to
-publish; the notes file covers every reference we make). The repo went PUBLIC on 2026-06-11, so the
-PDF is currently exposed; Monika chose to clean this later. Deleting the file alone leaves it in git
+publish; the notes file covers every reference we make). Deleting the file alone leaves it in git
 history; decide then whether to rewrite history.
 
 ## The 4 phases (each = one folder)
@@ -82,8 +80,8 @@ All Group A measured on synthetic sample data (stated honestly).
 
 ## Standing rules for this project
 1. **Accuracy standard:** every number/fact is sourced & cited, or flagged "NEEDS VERIFICATION." No confident unchecked figures. Model performance = real measured metrics, not adjectives.
-2. **Treat Monika as new to domain/tech/AI**, explain plainly, define terms. She is strong on PM craft.
-3. **Claude carries the technical build.** Monika makes product decisions and presents.
+2. **Plain language standard:** explain in plain language. Define every term on first use. No unexplained jargon.
+3. **Built with Claude Code as the engineering pair.** Monika owns every product decision, the scope, the review, and the sign-offs.
 4. **Scope discipline:** 4-week build alongside a full-time job. Protect the timeline. Cut, don't add. Over-building is the real disqualification risk.
 5. **Efficiency:** read this file first. Open a detailed file only when that topic is the active task.
 6. **Push after every committed chunk of work (Monika, 2026-06-11).** Work happens across multiple
@@ -114,7 +112,7 @@ All Group A measured on synthetic sample data (stated honestly).
   fallback), deterministic counterfactual block on decline/refer, impact view tab (champion vs
   challenger on the ground truth, no LLM calls).
 
-## Key framing (use in pitch + interviews) - CORRECTED 2026-06-07 after research
+## Key framing (use in the pitch) - CORRECTED 2026-06-07 after research
 Do NOT claim "ML is impossible on no-history borrowers" (research debunked this - ML on alt-data
 is growing; AECB+Nova Credit even imports home-country history). Correct positioning: judgmental
 scorecard + policy checks + EXPLAINABLE decisions is a transparent, regulator-ALIGNED baseline,

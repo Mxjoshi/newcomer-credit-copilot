@@ -57,7 +57,7 @@ and regulators expect transparency. Do NOT claim "ML is impossible." Differentia
 explainability + alternative-data + policy-check, AND on serving applicants NOT covered by Nova
 Credit (countries not on the network, or thin home-country files too).
 
-Interview answer to "why not ML": "ML on alternative data is viable and growing. We chose a
+The standing answer to "why not ML": "ML on alternative data is viable and growing. We chose a
 transparent, judgmental scorecard + policy-check + explainable-decision approach because for a
 v1 serving a regulated lending decision, explainability and defensibility matter more than a
 marginal accuracy gain, and we have thin applicant-level data to validate an ML model on."

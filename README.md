@@ -40,3 +40,7 @@ alter points, rules, or the recommendation.
 The approach is rules plus an LLM, with no trained model. We chose it because for a regulated v1
 lending decision, explainability and defensibility matter more than a marginal accuracy gain. The part
 we feature is the explanation and decision-reasoning layer.
+
+## How this is built
+Product decisions, scope, reviews, and sign-offs are Monika's. The engineering pair is Claude Code,
+the AI build tooling the course itself calls for.

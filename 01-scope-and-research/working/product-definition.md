@@ -98,7 +98,7 @@ regulated v1 lending decision, explainability and defensibility matter more than
 accuracy gain, and applicant-level data to validate an ML model is thin. Differentiate on
 explainability + alt-data + policy-check, AND on serving applicants NOT covered by Nova Credit.
 
-Interview answer to "why not ML": "ML on alternative data is viable and growing. We chose a
+The standing answer to "why not ML": "ML on alternative data is viable and growing. We chose a
 transparent judgmental scorecard + policy-check + explainable-decision approach because for a v1
 regulated lending decision, explainability and defensibility matter more than a marginal accuracy
 gain, and we have thin applicant-level data to validate an ML model on."
@@ -128,8 +128,8 @@ real-but-scoped framing (4c, D9) + cut list (4d).
 **Why this project:**
 - Solves a real, unsolved UAE problem: credit-invisible newcomers locked out of credit despite
   being reliable. [expat % + AECB context: CONFIRMED, see market-and-domain-research.md]
-- Uses Monika's FICO credit/risk depth = un-fakeable differentiator vs other cohort members.
-- Aimed at Dubai fintech job search (banking/fintech sector).
+- Builds on Monika's credit and risk domain depth, a genuine differentiator for this problem.
+- A portfolio project in the banking and fintech domain.
 - Hits Tier 1 / high complexity: score + RAG + agent + explanation. No preset project even
   requires a scoring step.
 
@@ -164,14 +164,14 @@ The two costs are not equal: a bad approval loses the whole loan, a missed custo
 the margin.
 - D6. Error stance: AVOID BAD LOANS (conservative). For a v1 newcomer model with no track
   record, lean conservative: rather decline a few good applicants than approve a defaulter.
-  Strongest lending-credibility story, easiest to defend to compliance/interviewers.
+  Strongest lending-credibility story, easiest to defend to compliance.
 
 **Q3. How often is it right? (checked against Q2)  [TARGET NOW, MEASURE LATER]**
 Accuracy alone is not the bar. The bar is: right often enough AND rarely wrong in the costly
 way (false approvals). Real numbers measured later on sample data. See 04-evaluate-and-ship.
 
 **Q4. Can we actually run it?  [ANSWERED]**
-Yes, buildable with available tools (Claude carries the build). Speed is NOT critical: an officer
+Yes, buildable with available tools (built with Claude Code as the engineering pair). Speed is NOT critical: an officer
 reviewing an application can wait a few seconds, so no expensive low-latency infrastructure
 needed. Lowers cost and build risk.
 
