@@ -144,6 +144,7 @@ access for newcomers and wins the bank good customers it would otherwise reject.
 - Bring-your-own project: allowed. Qualifies.
 - Phase 3 "at least one live LLM use case": explanation layer + policy check. Cleared.
 - Phase 4 evals: rules+LLM produces measurable, testable outputs -> real metrics on ~20 samples.
+  [UPDATE 2026-06-11: now 24 samples, locked early in 04-evaluate-and-ship/ground-truth.md (M5).]
 - Only real risk is timeline/stalling -> the scoping we are doing removes it. Over-building is
   the actual disqualification risk, not under-building.
 
@@ -193,7 +194,7 @@ data (stated plainly). Targets are starting points; tighten after Phase 4 baseli
   operational constraint. Good presentation point.]
 
 **Group B - Is the AI output trustworthy? (LLM-quality, mirrors brief's example)**
-- Explanation faithfulness / hallucination: explanation cites only facts present in applicant data + policy. Target: hallucination <2% (0 invented facts in sample set).
+- Explanation faithfulness / hallucination: explanation cites only facts present in applicant data + policy. Target: hallucination <2% (0 invented facts in sample set). [UPDATE 2026-06-11: restated as zero invented facts on the locked 24-case set; with n=24 anything above zero already exceeds 2%. Dated amendment in deliverables/03-success-metrics.md.]
 - Policy grounding: cited rules traceable to the real policy document. Target: 100% traceable.
 - Latency: time to produce a decision. Target: <15s per assessment. (Generous - speed not critical, per Q4.)
 
