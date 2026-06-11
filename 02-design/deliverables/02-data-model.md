@@ -232,5 +232,27 @@ flowchart TD
 ## Held for later (so the first pass stays first-pass)
 
 - Exact point weights, band cut-offs, and final rule text: Phase 3 build.
-- Persistence (decision history table, audit log): valid v2, deliberately cut from v1.
 - A second loan product, applicant-facing entities, user accounts: v2, per the cut list.
+
+---
+
+## Amendment (2026-06-11, decision M7): Entity 7, CaseRecord
+
+Added during Phase 3 planning; the signed-off text above is unchanged. Monika's call: a refer is
+a case that outlives the session, so v1 keeps decisions after all. One new entity:
+
+| Field | Type | Notes |
+|---|---|---|
+| case_id | text | Generated per assessment. |
+| created_at | timestamp | When the decision was produced. |
+| applicant | Applicant | Snapshot as entered. |
+| application | Application | Snapshot as entered. |
+| decision | Decision | The full decision, embedded (traceability as everywhere else). |
+| status | enum: awaiting_review, closed | Refers start awaiting_review; approve and decline start closed. |
+| closed_at | timestamp, optional | Set when the officer closes the case. |
+
+The review queue is all CaseRecords with status awaiting_review. The audit log is all
+CaseRecords ordered by created_at, with their officer actions. Storage in v1 is the browser's
+localStorage (engineering call B5): no server database, identical on screen, and the entity is
+shaped so v2 can lift it into a real table without redesign. This supersedes the "persistence
+cut from v1" line above for decision records only.

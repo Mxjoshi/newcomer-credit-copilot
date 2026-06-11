@@ -113,6 +113,8 @@ Engineering-scaffolding cuts only. None touch the credit logic. Each is a valid 
 - No real applicant personal data. Synthetic profiles only.
 - No login, accounts, or user management.
 - No saved history / database of past decisions. One assessment per session.
+  [UPDATE 2026-06-11, M7: partially superseded. Decisions persist in the browser as CaseRecords
+  (review queue + audit log); still no server database in v1. See the decision log.]
 - One loan product only (personal loan / credit card).
 - English only. No Arabic in v1.
 - Web only. No mobile app.

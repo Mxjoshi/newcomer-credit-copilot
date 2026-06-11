@@ -122,6 +122,11 @@ All Group A measured on synthetic sample data (stated honestly).
 - M6 (2026-06-11). Added to v1 scope: grounding validator after the LLM (retry once, then template
   fallback), deterministic counterfactual block on decline/refer, impact view tab (champion vs
   challenger on the ground truth, no LLM calls).
+- M7 (2026-06-11). Review queue + audit log are v1 features (Monika's call: a refer is a case that
+  outlives the session). Every decision becomes a stored CaseRecord; refers sit in a "waiting for
+  review" queue until closed; all decisions and officer actions show in an audit log view.
+  B5 (engineering): stored in the browser (localStorage) in v1, no server database; the same
+  records become real database tables in v2. Partially supersedes the "no saved history" cut.
 
 ## Key framing (use in the pitch) - CORRECTED 2026-06-07 after research
 Do NOT claim "ML is impossible on no-history borrowers" (research debunked this - ML on alt-data

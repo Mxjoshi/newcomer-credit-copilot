@@ -204,3 +204,9 @@ set is untouched: M1 stays exactly five scored factors.
 | M4 | Policy-only input fields | Three officer-entered fields feed policy rules only and are never scored: existing monthly obligations AED (default 0, stated assumption: a newcomer carries zero UAE debt unless documented), age in years, visa months remaining. | Called by Monika, 2026-06-11 |
 | M5 | Ground-truth labels locked before weight tuning | 24 labeled profiles (8 approve, 8 decline, 8 refer) locked in `../../04-evaluate-and-ship/ground-truth.md` before any scorecard weight exists. Phase 3 never edits the file; Phase 4 measures against it. | Called by Monika, 2026-06-11 |
 | M6 | Grounding validator, counterfactuals, impact view in v1 scope | A deterministic grounding validator after the LLM (retry once, then template fallback), a deterministic "what would change this" block on decline and refer, and an impact view tab on Screen 3 (champion vs challenger on the ground truth, no LLM calls). | Called by Monika, 2026-06-11 |
+
+### Added during Phase 3 planning (2026-06-11)
+
+| # | Decision | Outcome | How decided |
+|---|---|---|---|
+| M7 | Review queue and audit log in v1 | A refer is a case that outlives the session (Monika's catch). Every decision is kept as a CaseRecord; referred cases sit in a "waiting for review" queue until closed; all decisions and officer actions appear in an audit log view. B5 (engineering call): stored in browser localStorage in v1, no server database; the records are shaped to become real database tables in v2. | Called by Monika, 2026-06-11 |

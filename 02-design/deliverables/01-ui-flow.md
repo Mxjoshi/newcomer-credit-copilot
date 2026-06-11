@@ -282,3 +282,21 @@ screens is real (decision D9).
 
 Next deliverable: the data model behind these screens (`02-data-model.md`), designed after this
 flow per the brief's ordering.
+
+---
+
+## Amendment (2026-06-11, decision M7): review queue and audit log
+
+Added during Phase 3 planning; the signed-off text above is unchanged. Two additions to the flow:
+
+- **Review queue:** a list reachable from every screen ("Cases waiting for review"). Every REFER
+  decision lands here as a case and stays until the officer marks it closed, because a manual
+  review happens today or tomorrow, not in the same minute. Opening a queued case shows its full
+  Screen 3 decision again.
+- **Audit log:** a view listing every assessment this browser has produced (time, applicant,
+  verdict, officer action). Read-only, the defensibility story made visible.
+
+Both are fed by the CaseRecord entity (data model amendment M7) and stored in the browser in v1
+(engineering call B5): no server, no login, identical on screen to a database-backed queue, and
+the pitch states plainly that in production this exact list becomes the bank's review queue and
+audit tables.
