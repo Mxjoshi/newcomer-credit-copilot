@@ -20,6 +20,10 @@ baseline."*
 
 ## Also lives here
 - **Presentation / pitch:** the final demo script and slides (the capstone is ship plus present).
+- **Optional brand name for the pitch (decided 2026-06-11):** the repo and product keep the
+  functional name "newcomer-credit-copilot"; a brandable product name (Wio / Liv style) may be
+  layered on for the pitch deck only. If we do it, pick the word with a native Arabic speaker so
+  it means what we intend. Cosmetic, zero build impact, decide during pitch prep.
 - **Pre-presentation fact to-do:** if the deck cites the AECB 3.71M salary figure or the CBUAE
   minimum-salary removal, primary-source them (both currently rest on solid secondary reporting).
 
