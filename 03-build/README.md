@@ -1,4 +1,6 @@
-# Phase 3: Build & AI Integration. Not started
+# Phase 3: Build & AI Integration. In progress (started 2026-06-11)
+
+> Build plan and engineering defaults: [`working/phase-3-plan.md`](working/phase-3-plan.md).
 
 **Brief deliverable:** *"A working build with at least one live LLM-powered use case."*
 
@@ -21,4 +23,4 @@
   the explanation layer. EXISTS, drafted 2026-06-11 during the Phase 2 review (the revised data
   model fixed every shape it needs); the build implements it.
 
-> Blocked until Phase 2 design is done.
+
