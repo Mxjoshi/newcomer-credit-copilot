@@ -123,15 +123,18 @@ one real and testable, enough to make the policy gate meaningful.
 machine-checkable against the entities above; names in CAPS are constants whose values are set
 in Phase 3):**
 
-| # | Rule | Machine-checkable condition |
-|---|---|---|
-| 1 | Minimum salary for the product | monthly_salary_aed >= PRODUCT_MIN_SALARY |
-| 2 | Debt burden ratio cap | (existing_monthly_obligations_aed + new_installment) / monthly_salary_aed <= 0.50, where new_installment = amount_aed * (1 + FLAT_ANNUAL_RATE * term_months / 12) / term_months. The 50 percent cap is the UAE-standard debt burden ratio. |
-| 3 | Maximum age at loan maturity | age_years + term_months / 12 <= 65 |
-| 4 | Minimum employment tenure | job_tenure_months >= 6 (unchanged from the first draft) |
-| 5 | Valid residency for the loan term | visa_months_remaining >= term_months. Severity: refer. |
-| 6 | Maximum loan amount as a multiple of salary | amount_aed <= AMOUNT_SALARY_MULTIPLE * monthly_salary_aed |
-| 7 | (optional) Salary must be received in a bank account, not cash | Unchanged from the first draft; no v1 field backs it yet, keep or cut in Phase 3. |
+| # | Rule | Machine-checkable condition | Severity |
+|---|---|---|---|
+| 1 | Minimum salary for the product | monthly_salary_aed >= PRODUCT_MIN_SALARY | hard_fail |
+| 2 | Debt burden ratio cap | (existing_monthly_obligations_aed + new_installment) / monthly_salary_aed <= 0.50, where new_installment = amount_aed * (1 + FLAT_ANNUAL_RATE * term_months / 12) / term_months. The 50 percent cap is the UAE-standard debt burden ratio. | hard_fail |
+| 3 | Maximum age at loan maturity | age_years + term_months / 12 <= 65 | hard_fail |
+| 4 | Minimum employment tenure | job_tenure_months >= 6 (unchanged from the first draft) | refer |
+| 5 | Valid residency for the loan term | visa_months_remaining >= term_months | refer |
+| 6 | Maximum loan amount as a multiple of salary | amount_aed <= AMOUNT_SALARY_MULTIPLE * monthly_salary_aed | hard_fail |
+| 7 | (optional) Salary must be received in a bank account, not cash | Unchanged from the first draft; no v1 field backs it yet, keep or cut in Phase 3. | hard_fail if kept |
+
+Severities are product decisions: refer means the rule blocks an automatic approve but never
+rescues a failing score.
 
 Named constants: PRODUCT_MIN_SALARY (per product), FLAT_ANNUAL_RATE (the flat annual interest
 rate, used here only to estimate the installment for the debt burden check), and
