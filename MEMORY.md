@@ -13,7 +13,9 @@ are the source of truth, not chat history. To rebuild context, read these in ord
 2. 01-scope-and-research/phase-1-signoff.md (what is locked and done).
 3. The specific file for the active task only (e.g. a deliverable, or the next phase README).
 Do not trust recall over the files. Re-open the file before relying on a fact. Writing style: no en or
-em dashes, plain human voice (saved in Claude memory). Project is on GitHub: Mxjoshi/newcomer-credit-copilot (private).
+em dashes, plain human voice (saved in Claude memory). Project is on GitHub: Mxjoshi/newcomer-credit-copilot.
+PUBLIC temporarily (Monika, 2026-06-11) so Claude desktop can read it; revert to private when the
+capstone completes. Push after every committed chunk (standing rule 6) so the public copy is current.
 
 ---
 
@@ -26,9 +28,10 @@ project, allowed), aimed at a Dubai fintech job search. Must be a deployed, work
 **4-week build, one phase per week.** NOT 8 weeks (that was the learning portion). Self-paced
 phases. Solo by default. Disqualified if you stall on a phase or miss the quality bar.
 Full brief: 00-reference/capstone-brief.pdf (notes: 00-reference/capstone-brief-notes.md)
-TO DO (Monika, 2026-06-11): remove capstone-brief.pdf from the repo before it is shared publicly
-(course material, not ours to publish; the notes file covers every reference we make). Deleting
-the file alone leaves it in git history; decide then whether to rewrite history.
+TO DO (Monika, 2026-06-11): remove capstone-brief.pdf from the repo (course material, not ours to
+publish; the notes file covers every reference we make). The repo went PUBLIC on 2026-06-11, so the
+PDF is currently exposed; Monika chose to clean this later. Deleting the file alone leaves it in git
+history; decide then whether to rewrite history.
 
 ## The 4 phases (each = one folder)
 1. Scope & Research (01-scope-and-research): problem, 3-5 competitors, measurable success metrics.
