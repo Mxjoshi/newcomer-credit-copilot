@@ -60,12 +60,13 @@ explicit (1/2/3/6 hard_fail, 4/5 refer); combination logic corrected (refer down
 never rescues a failing score) and verified: all 24 ground-truth labels structurally reachable.
 **PHASE 3 (build) STARTED 2026-06-11.** Plan: 03-build/working/phase-3-plan.md (approved by Monika;
 app in 03-build/app, Next.js, Vercel deploy, two checkpoints, B1-B4 defaults confirmed).
-Chunks 1-3 DONE 2026-06-11: scaffold + types + locked constants; deterministic core (scorecard,
-6 policy rules, corrected combination logic, counterfactuals) with 18 boundary tests passing;
-ground-truth harness. Harness: 20/24 (83.3%) accuracy, 0 false approvals, 10 refers. 4 mismatches
-reported per M5 (GT-08, GT-12, GT-16, GT-21), never tuned away.
-**Next: CHECKPOINT 1, Monika reviews the harness report and rules on the 4 mismatches. Then chunk 4
-(LLM layer, needs her ANTHROPIC_API_KEY), chunk 5 (UI, checkpoint 2), chunk 6 (deploy).**
+**BUILD RESET 2026-06-11 by Monika:** a first pass at chunks 1-3 ran ahead of her without
+walkthroughs, so the app code was deleted (it remains in git history before this commit). The
+working mode is now: build together, one chunk at a time, each chunk explained in plain language
+and started only on Monika's go. A useful finding survives from the first pass: weights set from
+pure domain rationale scored 20/24 on the ground truth with 0 false approvals (mismatches GT-08,
+GT-12, GT-16, GT-21), so the design is sound; the rebuild is about Monika owning every step.
+**Next: rebuild chunk 1 (scaffold + types + constants) on Monika's go.**
 
 ## Success metrics (locked, threshold format)
 Group A (credit): decision accuracy 80%+; false approval <10% (strictest, from D6); refer rate 10-25%.
