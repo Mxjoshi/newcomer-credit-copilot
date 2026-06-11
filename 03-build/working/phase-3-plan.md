@@ -48,7 +48,32 @@ stands on its own without referencing the ground truth.
 API key handling: ANTHROPIC_API_KEY via environment variable only, `.env` is gitignored, never
 committed, never logged.
 
-## 5. Scope guard (standing rule 4)
+## 5. Primary-sourcing check (2026-06-11, per the ground truth's flag)
+
+The ground truth flagged the two UAE-standard caps for confirmation against regulation text
+during Phase 3. Checked 2026-06-11 against the CBUAE Rulebook and current market sources
+(ground-truth.md itself stays untouched per its own rule 2):
+
+| Value in code | Status | Source |
+|---|---|---|
+| DBR cap 50 percent (rule 2) | CONFIRMED regulatory | CBUAE Rulebook, Regulation 29/2011, Article 3 "Important Ratios": max DBR is 50 percent of gross salary plus regular income |
+| 20x salary cap (rule 6) | CONFIRMED regulatory | CBUAE Rulebook, Regulation 29/2011, Article 2 "Personal Loan": amount set at 20 times salary or total income |
+| Visa enum: employment, golden, green, other | CONFIRMED real categories | u.ae official portal: golden 10 years, green 5 years self-sponsored, employment 2 to 3 years employer-tied. Blue, family, student, remote-work visas fall under "other" in v1 |
+| Tenure minimum 6 months (rule 4) | CONFIRMED market practice | Standard UAE bank eligibility for expats (6 months minimum employment), matches the labour law probation maximum |
+| Salary-transfer rule (rule 7, cut) | CONFIRMED real, stays cut | Mandatory salary transfer is genuine UAE bank practice; no v1 field backs it, cut stands |
+| Product minimums 8,000 / 5,000 | Product assumption, in market range | CBUAE no longer mandates a minimum salary (removed 2025); banks set their own, roughly AED 3,000 to 10,000 |
+| Age 65 at maturity (rule 3) | Product assumption, lenient end of market | Common bank practice is 60 at maturity for expats and 65 for nationals; some banks allow 65 for expats. Our flat 65 is defensible but generous, documented here as a deliberate product assumption. Locked with the ground truth (B4), changing it needs a logged decision plus relabeling GT-05 and GT-14 |
+| Flat rate 8 percent | Product assumption, in market range | Stated as such in the ground truth |
+
+**One real gap found:** Regulation 29/2011 also caps the personal loan repayment period at
+48 months. No code enforces term_months <= 48 yet. The ground truth never exceeds 48, so no
+label is affected. Action: Step 5 form validation must cap personal loan terms at 48 months
+(the data model already assigns term limits to form validation).
+
+Sources: rulebook.centralbank.ae (Regulation 29/2011, Articles 2 and 3), u.ae (golden and
+green visa pages), Khaleej Times and UAE bank eligibility pages for market practice.
+
+## 6. Scope guard (standing rule 4)
 
 No login, no database, no saved history, no second product, no Arabic, no mobile, no
 applicant-facing anything. The cut list from Phase 1 is final for v1.
