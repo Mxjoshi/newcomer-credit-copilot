@@ -117,7 +117,7 @@ one real and testable, enough to make the policy gate meaningful.
 | rule_text | text | The exact sentence the decision screen cites. The 100% policy-grounding metric requires every citation to trace back to this field verbatim. |
 | source_section | text | e.g. "Lending Policy, section 2.3". |
 | condition | text (machine-checkable) | The check, e.g. job_tenure_months >= 6. |
-| severity | enum: hard_fail, refer | hard_fail forces DECLINE; refer forces at most REFER. How a good score gets gated by policy. |
+| severity | enum: hard_fail, refer | hard_fail forces DECLINE. refer downgrades an automatic approve to refer; it never rescues a failing score. How a good score gets gated by policy. |
 
 **Candidate v1 rule list (rewritten at the 2026-06-11 review so every condition is
 machine-checkable against the entities above; names in CAPS are constants whose values are set
@@ -180,9 +180,11 @@ is what Phase 4's evals will do.
 1. Officer submits Applicant + Application (Screen 1, validated).
 2. Scoring step turns the 5 applicant fields into 5 ScoreFactors, sums to a ScoreResult.
 3. Policy step evaluates every PolicyRule condition, producing one PolicyCheckResult each.
-4. Combination logic (the diagram below): any hard_fail rule means DECLINE; any refer-severity
-   fail caps the outcome at REFER; otherwise the risk_band maps to the recommendation
-   (conservative stance per D6).
+4. Combination logic (the diagram below): any hard_fail rule failed means DECLINE. Otherwise
+   the risk band maps to the recommendation: high means DECLINE, medium means REFER, low means
+   APPROVE, unless any refer-severity rule failed, in which case the approve becomes REFER.
+   The principle: a refer-severity failure downgrades an approve to refer, it never upgrades a
+   decline, conservative per D6.
 5. Counterfactual step (deterministic): for a decline or refer, compute the smallest input
    change that crosses each failed threshold (for example, "reaching 6 months tenure clears
    rule 4"). These become Decision.counterfactuals; an approve gets an empty list.
@@ -198,12 +200,12 @@ is what Phase 4's evals will do.
 flowchart TD
     IN["Score + all policy check results"] --> Q1{"Any hard_fail<br/>rule failed?"}
     Q1 -->|"yes"| DEC["🔴 DECLINE"]
-    Q1 -->|"no"| Q2{"Any refer-severity<br/>rule failed?"}
-    Q2 -->|"yes"| REF["🟠 REFER"]
-    Q2 -->|"no"| Q3{"Risk band?"}
-    Q3 -->|"low"| APP["🟢 APPROVE"]
-    Q3 -->|"medium"| REF
-    Q3 -->|"high"| DEC
+    Q1 -->|"no"| Q2{"Risk band?"}
+    Q2 -->|"high"| DEC
+    Q2 -->|"medium"| REF["🟠 REFER"]
+    Q2 -->|"low"| Q3{"Any refer-severity<br/>rule failed?"}
+    Q3 -->|"yes, downgrade"| REF
+    Q3 -->|"no"| APP["🟢 APPROVE"]
     REF --> CF["Counterfactual generator, deterministic:<br/>smallest input change that crosses<br/>each failed threshold"]
     DEC --> CF
     APP --> LLM["LLM writes the explanation,<br/>only from the data above"]
