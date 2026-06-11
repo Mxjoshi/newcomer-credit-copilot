@@ -63,3 +63,17 @@ measured on synthetic data and stated honestly.
 
 *Underlying feasibility analysis (the five model-feasibility questions) and the full decision log:
 `../working/product-definition.md`, Step 5.*
+
+---
+
+## Amendment (2026-06-11), appended; the locked text above is unchanged
+
+The Phase 2 review locked a 24-case ground-truth set
+(`../../04-evaluate-and-ship/ground-truth.md`). With n = 24, a single invented fact is already
+4.2 percent, so "hallucination under 2 percent" can only pass at zero. The target is therefore
+restated operationally: **zero invented facts across the locked 24-case set**. Same bar as
+before, honest arithmetic for the sample size we actually have.
+
+Grounding is also enforced at runtime by a deterministic validator (every cited rule and number
+checked against the inputs; retry once, then a template fallback), so this metric is engineered
+into the product, not only measured after the fact.
