@@ -14,7 +14,7 @@ to lend to, and explains the decision so a credit officer can defend it. PMCurve
 | Phase | Folder | Deliverable | Status |
 |---|---|---|---|
 | 1. Scope & Research | [`01-scope-and-research/`](01-scope-and-research/) | Problem statement, competitor notes, success metrics | **Complete (2026-06-09)** |
-| 2. Design | [`02-design/`](02-design/) | End-to-end UI flow plus first-pass data model | Not started |
+| 2. Design | [`02-design/`](02-design/) | End-to-end UI flow plus first-pass data model | Revised per review 2026-06-11, pending Monika sign-off |
 | 3. Build & AI Integration | [`03-build/`](03-build/) | Working build plus at least one live LLM use case | Not started |
 | 4. Evaluate & Iterate (ship) | [`04-evaluate-and-ship/`](04-evaluate-and-ship/) | MVP, evals benchmark, metrics vs baseline | Not started |
 
@@ -26,14 +26,16 @@ to lend to, and explains the decision so a credit officer can defend it. PMCurve
 - **`MEMORY.md`:** the working index (decisions, status, standing rules).
 
 ## Where the project stands (one line)
-Phase 1 is done, fact-verified, and signed off. Next: Phase 2, design the end-to-end UI flow, then the
-data model. See [`01-scope-and-research/phase-1-signoff.md`](01-scope-and-research/phase-1-signoff.md).
+Phase 1 is signed off; the Phase 2 design deliverables are drafted and revised per the 2026-06-11
+review, pending Monika's sign-off. See [`02-design/`](02-design/).
 
 ## How the product works (v1, locked in Phase 1)
 The officer enters a newcomer's details (employment, salary, tenure, rent history, a few alt-data
 fields). A rules-based judgmental scorecard assesses repay-vs-default risk. A policy check runs the
 applicant against UAE lending rules. An LLM writes a plain-language explanation the officer can read
-and defend. The output is approve, decline, or refer, and the human makes the final call.
+and defend. The output is approve, decline, or refer, and the human makes the final call. The score
+and the verdict are fully deterministic: the LLM writes the explanation only and has no ability to
+alter points, rules, or the recommendation.
 
 The approach is rules plus an LLM, with no trained model. We chose it because for a regulated v1
 lending decision, explainability and defensibility matter more than a marginal accuracy gain. The part
