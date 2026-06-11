@@ -15,9 +15,10 @@
 - MVP cuts are engineering scaffolding only (no login, no real bank integration, synthetic data). The
   credit substance stays real (D9).
 
-## Planned artifacts (to be created here)
-- The app (frontend and backend).
-- `deliverables/llm-integration.md`: input, prompt, and structured output spec for the explanation
-  layer.
+## Planned artifacts
+- The app (frontend and backend). To be created here.
+- `deliverables/llm-integration.md`: input, prompt, structured output, and validator spec for
+  the explanation layer. EXISTS, drafted 2026-06-11 during the Phase 2 review (the revised data
+  model fixed every shape it needs); the build implements it.
 
 > Blocked until Phase 2 design is done.
