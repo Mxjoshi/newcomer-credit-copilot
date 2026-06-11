@@ -83,6 +83,9 @@ All Group A measured on synthetic sample data (stated honestly).
 3. **Claude carries the technical build.** Monika makes product decisions and presents.
 4. **Scope discipline:** 4-week build alongside a full-time job. Protect the timeline. Cut, don't add. Over-building is the real disqualification risk.
 5. **Efficiency:** read this file first. Open a detailed file only when that topic is the active task.
+6. **Push after every committed chunk of work (Monika, 2026-06-11).** Work happens across multiple
+   sessions and tools, so origin/main on GitHub must always hold the current copy. Commit, then push,
+   same session, no local-only pileups.
 
 ---
 
