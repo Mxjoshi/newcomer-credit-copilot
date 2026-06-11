@@ -14,8 +14,8 @@ to lend to, and explains the decision so a credit officer can defend it. PMCurve
 | Phase | Folder | Deliverable | Status |
 |---|---|---|---|
 | 1. Scope & Research | [`01-scope-and-research/`](01-scope-and-research/) | Problem statement, competitor notes, success metrics | **Complete (2026-06-09)** |
-| 2. Design | [`02-design/`](02-design/) | End-to-end UI flow plus first-pass data model | Revised per review 2026-06-11, pending Monika sign-off |
-| 3. Build & AI Integration | [`03-build/`](03-build/) | Working build plus at least one live LLM use case | Not started |
+| 2. Design | [`02-design/`](02-design/) | End-to-end UI flow plus first-pass data model | **Complete (2026-06-11)** |
+| 3. Build & AI Integration | [`03-build/`](03-build/) | Working build plus at least one live LLM use case | In progress |
 | 4. Evaluate & Iterate (ship) | [`04-evaluate-and-ship/`](04-evaluate-and-ship/) | MVP, evals benchmark, metrics vs baseline | Not started |
 
 ## Repository map
@@ -26,8 +26,8 @@ to lend to, and explains the decision so a credit officer can defend it. PMCurve
 - **`MEMORY.md`:** the working index (decisions, status, standing rules).
 
 ## Where the project stands (one line)
-Phase 1 is signed off; the Phase 2 design deliverables are drafted and revised per the 2026-06-11
-review, pending Monika's sign-off. See [`02-design/`](02-design/).
+Phases 1 and 2 are signed off; Phase 3 (build and AI integration) is underway. See
+[`02-design/phase-2-signoff.md`](02-design/phase-2-signoff.md) and [`03-build/`](03-build/).
 
 ## How the product works (v1, locked in Phase 1)
 The officer enters a newcomer's details (employment, salary, tenure, rent history, a few alt-data

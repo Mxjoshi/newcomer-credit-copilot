@@ -2,7 +2,7 @@
 
 This is the index for the whole project. It stays short on purpose.
 Each line points to a detailed file you open only when that topic is the task.
-Last updated: 2026-06-11 (Phase 2 review: M4-M6 called, ground truth locked, metrics amendment)
+Last updated: 2026-06-11 (Phase 2 signed off, Phase 3 started)
 
 ---
 
@@ -55,7 +55,11 @@ ground-truth.md, 24 cases, 8/8/8, Phase 3 must never edit it); grounding validat
 "what would change this" + impact view tab added to scope. Hallucination target restated: zero
 invented facts on the 24-case set (dated amendment in 03-success-metrics.md, locked text untouched).
 LLM integration spec drafted early (03-build/deliverables/llm-integration.md).
-Next: Monika signs off Phase 2.
+**PHASE 2 COMPLETE & SIGNED OFF (2026-06-11),** see 02-design/phase-2-signoff.md. Rule severities
+explicit (1/2/3/6 hard_fail, 4/5 refer); combination logic corrected (refer downgrades an approve,
+never rescues a failing score) and verified: all 24 ground-truth labels structurally reachable.
+**PHASE 3 (build) STARTED 2026-06-11.** Plan: 03-build/working/phase-3-plan.md.
+Next: build the deterministic core, then the LLM layer, then the UI, then deploy.
 
 ## Success metrics (locked, threshold format)
 Group A (credit): decision accuracy 80%+; false approval <10% (strictest, from D6); refer rate 10-25%.

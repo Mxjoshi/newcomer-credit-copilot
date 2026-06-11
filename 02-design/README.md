@@ -1,7 +1,8 @@
-# Phase 2: Design. Reviewed and revised, pending sign-off
+# Phase 2: Design. Complete (signed off 2026-06-11)
 
-**Status (2026-06-11):** Monika reviewed both deliverables (the brief's review milestone) and
-called decisions M4-M6; both files are revised accordingly. Sign-off is next.
+**Status (2026-06-11):** Monika reviewed both deliverables (the brief's review milestone), called
+decisions M4-M6, the revisions were applied and verified, and the phase is signed off. The
+verdict lives in [`phase-2-signoff.md`](phase-2-signoff.md).
 
 > Planning and brainstorm: `working/phase-2-plan.md` (flow options, hero-screen contents, entity
 > sketch, candidate input fields, decisions queue U1-U4 / M1-M3 resolved 2026-06-10, review
