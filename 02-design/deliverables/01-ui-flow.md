@@ -2,7 +2,8 @@
 
 The full credit-officer journey, screen by screen. This is the brief's review milestone for
 Phase 2, and per the brief it can change later (Phase 3 build reality may adjust details).
-Written 2026-06-10. Decisions behind it: U1-U4 in `../working/phase-2-plan.md`.
+Written 2026-06-10, revised 2026-06-11 per Monika's review (M4, M6). Decisions behind it:
+U1-U4 and M4-M6 in `../working/phase-2-plan.md`.
 
 **The product in one line, for orientation:** a credit officer at a UAE digital bank enters a
 newcomer applicant's details, the system scores the risk, checks lending policy, and returns an
@@ -18,9 +19,9 @@ assessment per session, no saved history.
 
 ```mermaid
 flowchart LR
-    A["<b>Screen 1: INTAKE</b><br/>Applicant form, core 5 fields<br/>Application details<br/>Load sample · Assess"]
+    A["<b>Screen 1: INTAKE</b><br/>Applicant form, core 5 fields<br/>Policy inputs, 3 fields never scored<br/>Application details<br/>Load sample · Assess"]
     B["<b>Screen 2: ASSESSING</b><br/>Step 1: Score<br/>Step 2: Policy check<br/>Step 3: Explain"]
-    C["<b>Screen 3: DECISION, the hero</b><br/>Verdict + risk level<br/>Why paragraph<br/>Scorecard breakdown<br/>Policy checks, cited<br/>Accept · Override"]
+    C["<b>Screen 3: DECISION, the hero</b><br/>Verdict + risk level<br/>Why paragraph<br/>Scorecard breakdown<br/>Policy checks, cited<br/>What would change this<br/>Accept · Override<br/>+ Impact view, a tab on this screen"]
     A --> B --> C
     style A fill:#dbeafe,stroke:#2563eb,stroke-width:2px,color:#1e3a8a
     style B fill:#fef3c7,stroke:#d97706,stroke-width:2px,color:#78350f
@@ -41,11 +42,13 @@ this product (decision D9).
 flowchart TD
     HDR["<b>Newcomer Credit Copilot</b> · [Load sample] button"]
     APP["👤 <b>APPLICANT block</b> (the core five)<br/>Full name · Months in UAE + Visa type<br/>Employment status · Job tenure<br/>Employer category · Monthly salary AED<br/>Rent payment history"]
+    POL["🛡️ <b>POLICY INPUTS group</b> (never scored)<br/>Existing monthly obligations AED, default 0<br/>Age in years · Visa months remaining"]
     REQ["📄 <b>APPLICATION block</b><br/>Product: personal loan or credit card<br/>Amount requested AED · Term in months"]
     BTN["▶️ <b>[ Assess applicant ]</b> button<br/>runs only after validation passes"]
-    HDR --> APP --> REQ --> BTN
+    HDR --> APP --> POL --> REQ --> BTN
     style HDR fill:#e2e8f0,stroke:#475569,stroke-width:2px,color:#0f172a
     style APP fill:#dbeafe,stroke:#2563eb,stroke-width:2px,color:#1e3a8a
+    style POL fill:#fce7f3,stroke:#db2777,stroke-width:2px,color:#831843
     style REQ fill:#dbeafe,stroke:#2563eb,stroke-width:2px,color:#1e3a8a
     style BTN fill:#dcfce7,stroke:#16a34a,stroke-width:2px,color:#14532d
 ```
@@ -63,6 +66,16 @@ fewer input mistakes.
 | Employer category | dropdown (government, mainland private, free zone, SME, other) | Real UAE underwriting signal: employer stability tiers. |
 | Months in UAE + visa type | number + dropdown | Defines the newcomer segment and residency standing. |
 | Rent payment history | dropdown (on time 6+ months, on time under 6 months, late payments, no rent history) | Alt-data standing in for the missing credit file. Officer-entered from applicant documents. This does NOT come from AECB or Ejari (not live there, verified Phase 1). |
+
+**The policy inputs (decision M4, 2026-06-11): three fields the policy rules need and the
+scorecard never sees.** They sit in their own labelled group so the boundary is visible on the
+form itself.
+
+| Field | Format | Why it is on the form |
+|---|---|---|
+| Existing monthly obligations (AED) | number, default 0 | Feeds the debt burden ratio rule only, never scored. Defaults to 0 under the stated assumption that a newcomer carries zero UAE debt unless documented. |
+| Age (years) | number | Feeds the age-at-maturity rule only, never scored. |
+| Visa months remaining | number | Officer-entered from the visa. Feeds the residency-term rule only, never scored. |
 
 Application details (product, amount, term) are about the request, not the person, so they sit in
 their own block. One product per assessment (decision D3).
@@ -122,7 +135,8 @@ started), turns amber while running, and turns green with a one-line result when
 **Job:** give the officer a recommendation they can act on and defend, with every claim
 traceable. Ordered by what the officer needs first.
 
-The screen is five blocks, top to bottom:
+The screen is six blocks, top to bottom (the "What would change this" block appears only for a
+decline or refer):
 
 ```mermaid
 flowchart TD
@@ -130,12 +144,14 @@ flowchart TD
     W["💬 <b>WHY, ONE PARAGRAPH</b><br/>plain language, the officer can read it to a manager"]
     S["📊 <b>SCORECARD BREAKDOWN</b><br/>every factor: value, threshold, points"]
     P["📋 <b>POLICY CHECKS</b><br/>each rule pass or fail, failures show the cited rule text"]
+    CFB["🔁 <b>WHAT WOULD CHANGE THIS</b><br/>deterministic counterfactuals,<br/>shown only for decline or refer"]
     ACT["🖱️ <b>OFFICER ACTIONS</b><br/>Accept recommendation · Override · New assessment"]
-    V --> W --> S --> P --> ACT
+    V --> W --> S --> P --> CFB --> ACT
     style V fill:#fef3c7,stroke:#d97706,stroke-width:3px,color:#78350f
     style W fill:#dbeafe,stroke:#2563eb,stroke-width:2px,color:#1e3a8a
     style S fill:#ede9fe,stroke:#7c3aed,stroke-width:2px,color:#4c1d95
     style P fill:#fce7f3,stroke:#db2777,stroke-width:2px,color:#831843
+    style CFB fill:#fef3c7,stroke:#d97706,stroke-width:2px,color:#78350f
     style ACT fill:#e2e8f0,stroke:#475569,stroke-width:2px,color:#0f172a
 ```
 
@@ -166,9 +182,12 @@ flowchart TD
   employment" (Lending Policy, section 2.3)
 - ... each check expandable to show the cited rule text
 
+**What would change this:** reaching 6 months tenure removes the only failed rule and moves the
+score to low risk.
+
 **Action row:** [ Accept recommendation ] [ Override ] [ New assessment ]
 
-**The four blocks, and why each exists:**
+**The five content blocks, and why each exists:**
 
 1. **Verdict banner:** APPROVE / DECLINE / REFER (decision D8) plus risk level. Color-coded
    (green / red / amber). REFER is a first-class outcome, not an error: it is the system saying
@@ -184,6 +203,10 @@ flowchart TD
 4. **Policy checks with citations:** each rule pass/fail, failures always expanded with the
    rule's actual text and its section reference. This is the 100% policy-grounding metric
    (every cited rule traceable to the policy document) made visible.
+5. **What would change this (decision M6):** shown only for a decline or refer, never for an
+   approve. One line per failed threshold, computed deterministically from the thresholds
+   themselves (the smallest input change that crosses each one), never written by the LLM. It
+   gives the officer a concrete, defensible next step for the applicant instead of a bare no.
 
 **Officer actions (decision U4, D2):**
 - **Accept recommendation:** confirms the human decision matches the system's. Shown on screen
@@ -191,6 +214,28 @@ flowchart TD
 - **Override:** the officer picks a different outcome and must type a one-line reason. The
   human-makes-the-final-call decision (D2) as a working control, not a slogan.
 - **New assessment:** clears everything, back to Screen 1.
+
+---
+
+## Impact view (a tab on Screen 3, decision M6)
+
+A second tab on the decision screen, next to the case result. It runs the 24 locked
+ground-truth profiles (`../../04-evaluate-and-ship/ground-truth.md`) through two strategies and
+shows the totals side by side:
+
+- **Champion (the status quo):** no AECB file means decline. Every newcomer profile is declined.
+- **Challenger (this product):** the scorecard plus policy rules, exactly as on the case screens.
+
+It makes no LLM calls: both strategies are deterministic, so the tab computes instantly and
+gives the same numbers every time. For each strategy it shows three numbers:
+
+1. Creditworthy newcomers approved (of the profiles labelled approve).
+2. False approvals (profiles labelled decline that the strategy approves, the costly error, D6).
+3. Cases referred to a human.
+
+Said plainly: this tab doubles as the Phase 4 metrics-vs-baseline deliverable made visible. The
+champion run IS the baseline, the challenger run IS the v1 measurement, both on the same locked
+ground truth Phase 4 measures against.
 
 ---
 
@@ -203,6 +248,7 @@ flowchart TD
 | Invalid or missing input | Caught on Screen 1 by validation, inline messages, nothing runs. |
 | LLM slow | Screen 2 "taking longer than usual" state. |
 | LLM failure | Screen 2 plain failure message + retry. No fabricated result, no silent hang. |
+| Explanation fails the grounding check | Nothing visible to the officer: the validator rejects the text, the system rewrites once automatically, and if that also fails a deterministic template explanation renders instead. The officer never sees ungrounded text. |
 
 ---
 
@@ -229,6 +275,10 @@ screens is real (decision D9).
 | Policy citations | Policy-grounding metric, 100% traceable |
 | Accept / Override row | D2 (human makes the final call), U4 |
 | Synthetic sample profiles | Cut list (no real personal data); also feeds Phase 4 evals |
+| Policy inputs group, 3 fields never scored | M4 (Monika, 2026-06-11) |
+| What-would-change block, deterministic counterfactuals | M6 (Monika, 2026-06-11) |
+| Impact view tab, champion vs challenger | M6 (Monika, 2026-06-11); doubles as Phase 4 metrics vs baseline |
+| Grounding validator behind the Why paragraph | M6 (Monika, 2026-06-11); makes the hallucination metric engineered, not only measured |
 
 Next deliverable: the data model behind these screens (`02-data-model.md`), designed after this
 flow per the brief's ordering.
