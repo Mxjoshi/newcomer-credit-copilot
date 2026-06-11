@@ -26,6 +26,9 @@ project, allowed), aimed at a Dubai fintech job search. Must be a deployed, work
 **4-week build, one phase per week.** NOT 8 weeks (that was the learning portion). Self-paced
 phases. Solo by default. Disqualified if you stall on a phase or miss the quality bar.
 Full brief: 00-reference/capstone-brief.pdf (notes: 00-reference/capstone-brief-notes.md)
+TO DO (Monika, 2026-06-11): remove capstone-brief.pdf from the repo before it is shared publicly
+(course material, not ours to publish; the notes file covers every reference we make). Deleting
+the file alone leaves it in git history; decide then whether to rewrite history.
 
 ## The 4 phases (each = one folder)
 1. Scope & Research (01-scope-and-research): problem, 3-5 competitors, measurable success metrics.
