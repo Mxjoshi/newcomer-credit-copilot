@@ -58,8 +58,14 @@ LLM integration spec drafted early (03-build/deliverables/llm-integration.md).
 **PHASE 2 COMPLETE & SIGNED OFF (2026-06-11),** see 02-design/phase-2-signoff.md. Rule severities
 explicit (1/2/3/6 hard_fail, 4/5 refer); combination logic corrected (refer downgrades an approve,
 never rescues a failing score) and verified: all 24 ground-truth labels structurally reachable.
-**PHASE 3 (build) STARTED 2026-06-11.** Plan: 03-build/working/phase-3-plan.md.
-Next: build the deterministic core, then the LLM layer, then the UI, then deploy.
+**PHASE 3 (build) STARTED 2026-06-11.** Plan: 03-build/working/phase-3-plan.md (approved by Monika;
+app in 03-build/app, Next.js, Vercel deploy, two checkpoints, B1-B4 defaults confirmed).
+Chunks 1-3 DONE 2026-06-11: scaffold + types + locked constants; deterministic core (scorecard,
+6 policy rules, corrected combination logic, counterfactuals) with 18 boundary tests passing;
+ground-truth harness. Harness: 20/24 (83.3%) accuracy, 0 false approvals, 10 refers. 4 mismatches
+reported per M5 (GT-08, GT-12, GT-16, GT-21), never tuned away.
+**Next: CHECKPOINT 1, Monika reviews the harness report and rules on the 4 mismatches. Then chunk 4
+(LLM layer, needs her ANTHROPIC_API_KEY), chunk 5 (UI, checkpoint 2), chunk 6 (deploy).**
 
 ## Success metrics (locked, threshold format)
 Group A (credit): decision accuracy 80%+; false approval <10% (strictest, from D6); refer rate 10-25%.
