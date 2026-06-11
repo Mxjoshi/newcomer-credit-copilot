@@ -2,7 +2,7 @@
 
 The entities and relationships behind the UI flow, designed after the flow was set (the brief's
 required ordering). First pass, per the brief's own words: Phase 3 build may adjust field
-details. Written 2026-06-10.
+details. Written 2026-06-10, revised 2026-06-11 per Monika's review (M4, M6).
 
 **A note on "data model" for this product:** v1 keeps no database (cut list: one assessment per
 session, no saved history). The data model still matters: it defines every shape the app passes
@@ -16,12 +16,12 @@ given a database table later without redesign.
 
 ```mermaid
 flowchart LR
-    A["👤 <b>Applicant</b><br/>the core five fields"]
+    A["👤 <b>Applicant</b><br/>core five scored fields<br/>plus three policy-only"]
     AP["📄 <b>Application</b><br/>product, amount, term"]
     SR["📊 <b>ScoreResult</b><br/>5 ScoreFactors,<br/>total + risk band"]
     PR["📜 <b>PolicyRule</b><br/>5 to 8 rules, v1"]
     PCR["✅ <b>PolicyCheckResult</b><br/>one per rule,<br/>pass or fail + citation"]
-    D["⚖️ <b>Decision</b><br/>verdict, explanation,<br/>officer action"]
+    D["⚖️ <b>Decision</b><br/>verdict, explanation,<br/>counterfactuals, officer action"]
     A -->|"has one"| AP
     AP -->|"produces"| SR
     AP -->|"checked against"| PCR
@@ -45,7 +45,8 @@ PolicyCheckResults together produce one Decision.
 ## Entity 1: Applicant
 
 The synthetic person being assessed. Fields are exactly the intake form's applicant block
-(decision M1, the core five, plus identity basics).
+(decision M1, the core five, plus identity basics, plus three policy-only inputs added at the
+2026-06-11 review, decision M4).
 
 | Field | Type | Notes |
 |---|---|---|
@@ -57,6 +58,12 @@ The synthetic person being assessed. Fields are exactly the intake form's applic
 | employer_category | enum: government, mainland_private, free_zone, sme, other | UAE employer-stability tiers. |
 | monthly_salary_aed | number | |
 | rent_history | enum: on_time_6plus, on_time_under_6, late_payments, none | Officer-entered from applicant documents. NOT sourced from AECB or Ejari (rent reporting there is emerging only, verified Phase 1). |
+| existing_monthly_obligations_aed | number | Policy input only, never scored. Officer-entered, defaults to 0 under the stated assumption that a newcomer carries zero UAE debt unless documented. Feeds rule 2 (debt burden ratio) only. |
+| age_years | number | Policy input only, never scored. Feeds rule 3 (age at maturity) only. |
+| visa_months_remaining | number | Policy input only, never scored. Officer-entered from the visa. Feeds rule 5 (residency term) only. |
+
+The scorecard is unchanged by these three additions: it still uses exactly the five M1 factors,
+and the policy-only fields can never move the score (M4).
 
 Deliberately absent, by Phase 1 decision: remittance data (do-not-claim list), home-country
 credit standing (overlaps Nova Credit; our positioning serves applicants Nova does not cover),
@@ -112,14 +119,23 @@ one real and testable, enough to make the policy gate meaningful.
 | condition | text (machine-checkable) | The check, e.g. job_tenure_months >= 6. |
 | severity | enum: hard_fail, refer | hard_fail forces DECLINE; refer forces at most REFER. How a good score gets gated by policy. |
 
-**Candidate v1 rule list (titles now, exact text and thresholds drafted in Phase 3):**
-1. Minimum salary for the product
-2. Debt burden ratio cap (UAE-standard concept: repayments vs income)
-3. Minimum age and maximum age at loan maturity
-4. Minimum employment tenure
-5. Valid residency for the loan term
-6. Maximum loan amount as a multiple of salary
-7. (optional) Salary must be received in a bank account, not cash
+**Candidate v1 rule list (rewritten at the 2026-06-11 review so every condition is
+machine-checkable against the entities above; names in CAPS are constants whose values are set
+in Phase 3):**
+
+| # | Rule | Machine-checkable condition |
+|---|---|---|
+| 1 | Minimum salary for the product | monthly_salary_aed >= PRODUCT_MIN_SALARY |
+| 2 | Debt burden ratio cap | (existing_monthly_obligations_aed + new_installment) / monthly_salary_aed <= 0.50, where new_installment = amount_aed * (1 + FLAT_ANNUAL_RATE * term_months / 12) / term_months. The 50 percent cap is the UAE-standard debt burden ratio. |
+| 3 | Maximum age at loan maturity | age_years + term_months / 12 <= 65 |
+| 4 | Minimum employment tenure | job_tenure_months >= 6 (unchanged from the first draft) |
+| 5 | Valid residency for the loan term | visa_months_remaining >= term_months. Severity: refer. |
+| 6 | Maximum loan amount as a multiple of salary | amount_aed <= AMOUNT_SALARY_MULTIPLE * monthly_salary_aed |
+| 7 | (optional) Salary must be received in a bank account, not cash | Unchanged from the first draft; no v1 field backs it yet, keep or cut in Phase 3. |
+
+Named constants: PRODUCT_MIN_SALARY (per product), FLAT_ANNUAL_RATE (the flat annual interest
+rate, used here only to estimate the installment for the debt burden check), and
+AMOUNT_SALARY_MULTIPLE. Their values are set in Phase 3.
 
 ## Entity 5: PolicyCheckResult
 
@@ -144,6 +160,7 @@ the system, then finalized by the officer (D2).
 | risk_band | enum: low, medium, high | Carried from ScoreResult. |
 | explanation | text | The Why paragraph. May reference ONLY applicant fields, score factors, and cited policy text (hallucination metric: zero invented facts). |
 | reasons | list of text | Bullet-form drivers of the outcome. |
+| counterfactuals | list of text | Populated only for decline or refer, empty for approve. Generated deterministically from the failed thresholds (the smallest input change that crosses each one), never by the LLM. |
 | score_result | ScoreResult | Embedded, for traceability. |
 | policy_results | list of PolicyCheckResult | Embedded, for traceability. |
 | officer_action | enum: accepted, overridden, none | U4. Set when the officer clicks. |
@@ -163,8 +180,16 @@ is what Phase 4's evals will do.
 4. Combination logic (the diagram below): any hard_fail rule means DECLINE; any refer-severity
    fail caps the outcome at REFER; otherwise the risk_band maps to the recommendation
    (conservative stance per D6).
-5. The LLM writes the explanation and reasons from (and only from) the data above.
-6. The officer accepts or overrides; the Decision records it. Session ends, nothing persists.
+5. Counterfactual step (deterministic): for a decline or refer, compute the smallest input
+   change that crosses each failed threshold (for example, "reaching 6 months tenure clears
+   rule 4"). These become Decision.counterfactuals; an approve gets an empty list.
+6. The LLM writes the explanation and reasons from (and only from) the data above, including
+   the counterfactuals.
+7. Grounding validator (deterministic): every rule_id the explanation cites must exist in the
+   policy check results, and every number it states must exist in the inputs or the score
+   output. On failure the LLM retries once; if the retry also fails, a deterministic template
+   explanation is used instead. The officer never sees ungrounded text.
+8. The officer accepts or overrides; the Decision records it. Session ends, nothing persists.
 
 ```mermaid
 flowchart TD
@@ -176,15 +201,24 @@ flowchart TD
     Q3 -->|"low"| APP["🟢 APPROVE"]
     Q3 -->|"medium"| REF
     Q3 -->|"high"| DEC
+    REF --> CF["Counterfactual generator, deterministic:<br/>smallest input change that crosses<br/>each failed threshold"]
+    DEC --> CF
     APP --> LLM["LLM writes the explanation,<br/>only from the data above"]
-    REF --> LLM
-    DEC --> LLM
-    LLM --> OFF["Officer accepts or overrides<br/>(human makes the final call, D2)"]
+    CF --> LLM
+    CF -.->|"counterfactuals stored on the Decision"| OFF
+    LLM --> VAL{"Grounding validator:<br/>every cited rule_id exists?<br/>every number traceable?"}
+    VAL -->|"pass"| OFF["Officer accepts or overrides<br/>(human makes the final call, D2)"]
+    VAL -->|"fail, retry once"| LLM
+    VAL -->|"fails twice"| TPL["Deterministic template<br/>explanation"]
+    TPL --> OFF
     style IN fill:#e2e8f0,stroke:#475569,stroke-width:2px,color:#0f172a
     style APP fill:#dcfce7,stroke:#16a34a,stroke-width:3px,color:#14532d
     style REF fill:#fef3c7,stroke:#d97706,stroke-width:3px,color:#78350f
     style DEC fill:#fee2e2,stroke:#dc2626,stroke-width:3px,color:#7f1d1d
+    style CF fill:#fce7f3,stroke:#db2777,stroke-width:2px,color:#831843
     style LLM fill:#dbeafe,stroke:#2563eb,stroke-width:2px,color:#1e3a8a
+    style VAL fill:#fef3c7,stroke:#d97706,stroke-width:2px,color:#78350f
+    style TPL fill:#e2e8f0,stroke:#475569,stroke-width:2px,color:#0f172a
     style OFF fill:#ede9fe,stroke:#7c3aed,stroke-width:2px,color:#4c1d95
 ```
 
