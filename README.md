@@ -43,4 +43,4 @@ we feature is the explanation and decision-reasoning layer.
 
 ## How this is built
 Product decisions, scope, reviews, and sign-offs are Monika's. The engineering pair is Claude Code,
-the AI build tooling the course itself calls for.
+the build tool the course brief itself directs students to (capstone brief, page 14).
