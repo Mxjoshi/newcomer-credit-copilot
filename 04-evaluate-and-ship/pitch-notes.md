@@ -43,9 +43,17 @@ The slide exists to prove the architecture point from section 1, not to claim Sa
 
 ## 3. Market context: Oscilar
 
-Oscilar launched Agent Hub in June 2026, including a Credit Explainability Agent. That is the
-category being validated at enterprise scale: AI agents that explain credit decisions with
-governance attached.
+Oscilar launched Agent Hub on June 3, 2026, a suite of 30+ AI agents for risk operations,
+including a Credit Explainability Agent that generates regulator-ready rationale for credit
+decisions and policy changes. That is the category being validated at enterprise scale: AI
+agents that explain credit decisions with governance attached.
+
+Sources (verified 2026-06-12): the claim traces to Oscilar's own press release and syndicated
+coverage, so the launch is fact but everything quantitative in it is vendor-claimed.
+
+- Press release: https://www.prnewswire.com/news-releases/oscilar-launches-agent-hub-the-first-unified-ai-agent-platform-spanning-fraud-compliance-credit-and-onboarding-302789709.html
+- Oscilar blog: https://oscilar.com/blog/oscilar-agent-hub
+- Coverage: https://www.cpapracticeadvisor.com/2026/06/04/oscilar-launches-agent-hub-a-unified-ai-agent-platform-spanning-fraud-compliance-credit-and-onboarding/184574/
 
 Positioning: this product is the focused newcomer-lending slice of that category, with the same
 governance instincts (grounded explanations, audit trail, versioned rules) at demo scale. We are
