@@ -63,8 +63,11 @@ demo-scale version of each:
 The pitch line: the hard part of lending AI is not the model, it is being able to stand behind
 the decision afterward. That is what this architecture is shaped around.
 
-Build status (2026-06-12): `ruleset_version` is stamped on every decision. The grounding
-validator is Step 4 work; confirm it exists before promising it in Q&A.
+Build status (2026-06-12, updated after Step 4): `ruleset_version` is stamped on every
+decision, and the grounding validator is built and tested: it catches a seeded ungrounded
+explanation, retries once, and falls back to a deterministic template, with the outcome
+(`validation_outcome`) recorded on the decision for the Phase 4 evals. All four Q&A items are
+now real.
 
 ## 4. Officer time, the illustration
 

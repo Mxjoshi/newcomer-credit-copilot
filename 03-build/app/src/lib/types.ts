@@ -100,6 +100,9 @@ export interface Decision {
   policy_results: PolicyCheckResult[];
   officer_action: OfficerAction;
   override_reason?: string;
+  // Amendment (2026-06-12, llm-integration.md logging): how the explanation was produced.
+  // Unset until the explanation layer has run. Feeds the Phase 4 hallucination eval directly.
+  validation_outcome?: ValidationOutcome;
 }
 
 // Entity 7 (M7 amendment): a kept decision. Refers start awaiting_review and sit in the review
