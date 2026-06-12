@@ -5,9 +5,13 @@
 
 import { GROUND_TRUTH } from "../src/lib/groundTruth";
 import { assess } from "../src/lib/decision";
-import { POLICY_RULES } from "../src/lib/policy";
+import { CURRENT_RULESET } from "../src/lib/ruleset";
 
-const severityOf = (id: string) => POLICY_RULES.find((r) => r.rule_id === id)!.severity;
+const severityOf = (id: string) => CURRENT_RULESET.rules.find((r) => r.rule_id === id)!.severity;
+
+console.log(
+  `Ruleset: ${CURRENT_RULESET.ruleset_version} (${CURRENT_RULESET.market_name}, ${CURRENT_RULESET.rules.length} rules enabled)\n`,
+);
 
 let matches = 0;
 const mismatches: string[] = [];

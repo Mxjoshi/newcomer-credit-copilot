@@ -3,6 +3,12 @@ import type { Applicant, Application } from "../src/lib/types";
 import { checkPolicy, debtBurdenRatio } from "../src/lib/policy";
 import { assess, combine } from "../src/lib/decision";
 import { score } from "../src/lib/scorecard";
+import { CURRENT_RULESET, UAE_V1, buildRuleset } from "../src/lib/ruleset";
+import uaeV1Json from "../config/uae/policy-rules.v1.0.json";
+
+// The boundary tests pin to the LOCKED v1.0 pack, not the editable live file, so an edited
+// live ruleset (the demo changes it) can never make the locked edges look broken.
+const V1 = UAE_V1;
 
 // A strong baseline applicant; tests override single fields to probe one boundary at a time.
 const base: Applicant = {
@@ -22,7 +28,7 @@ const base: Applicant = {
 const loan: Application = { product: "personal_loan", amount_aed: 40000, term_months: 12 };
 
 const ruleResult = (a: Applicant, app: Application, id: string) =>
-  checkPolicy(a, app).find((r) => r.rule_id === id)!;
+  checkPolicy(a, app, V1).find((r) => r.rule_id === id)!;
 
 describe("rule boundaries (the locked ground-truth edges)", () => {
   it("rule 1: salary exactly at the product minimum passes; one dirham below fails", () => {
@@ -40,7 +46,7 @@ describe("rule boundaries (the locked ground-truth edges)", () => {
     // installment = 30,000 * 1.08 / 12 = 2,700; (2,300 + 2,700) / 10,000 = 0.50 exactly
     const a = { ...base, monthly_salary_aed: 10000, existing_monthly_obligations_aed: 2300 };
     const app: Application = { product: "personal_loan", amount_aed: 30000, term_months: 12 };
-    expect(debtBurdenRatio(a, app)).toBeCloseTo(0.5, 10);
+    expect(debtBurdenRatio(a, app, V1.parameters)).toBeCloseTo(0.5, 10);
     expect(ruleResult(a, app, "rule-2").passed).toBe(true);
     expect(
       ruleResult({ ...a, existing_monthly_obligations_aed: 2301 }, app, "rule-2").passed,
@@ -49,7 +55,7 @@ describe("rule boundaries (the locked ground-truth edges)", () => {
 
   it("rule 2: zero salary fails safely, no division blowup (GT-11 guard)", () => {
     const a = { ...base, monthly_salary_aed: 0, employment_status: "unemployed" as const };
-    expect(debtBurdenRatio(a, loan)).toBe(Infinity);
+    expect(debtBurdenRatio(a, loan, V1.parameters)).toBe(Infinity);
     expect(ruleResult(a, loan, "rule-2").passed).toBe(false);
     expect(ruleResult(a, loan, "rule-2").finding).toContain("not computable");
   });
@@ -136,6 +142,89 @@ describe("combination logic (corrected per the 2026-06-11 review)", () => {
     expect(combine(lowBand, [...allPass.slice(0, 4), fail("rule-5"), pass("rule-6")])).toBe(
       "refer",
     );
+  });
+});
+
+describe("market pack (policy is configuration, not code)", () => {
+  type DraftPack = {
+    ruleset_version: string;
+    parameters: { dbr_cap: number };
+    rules: Array<{ rule_id: string; enabled: boolean; [key: string]: unknown }>;
+  };
+  const draftPack = (): DraftPack => structuredClone(uaeV1Json) as unknown as DraftPack;
+
+  it("the live pack matches the locked v1.0 pack (nobody edited current without a decision)", () => {
+    expect(CURRENT_RULESET.ruleset_version).toBe(V1.ruleset_version);
+    expect(CURRENT_RULESET.parameters).toEqual(V1.parameters);
+    expect(CURRENT_RULESET.band_cutoffs).toEqual(V1.band_cutoffs);
+    expect(CURRENT_RULESET.rules.map((r) => [r.rule_id, r.rule_text, r.severity])).toEqual(
+      V1.rules.map((r) => [r.rule_id, r.rule_text, r.severity]),
+    );
+  });
+
+  it("rule text and condition render the configured number (citation cannot disagree)", () => {
+    const rule2 = V1.rules.find((r) => r.rule_id === "rule-2")!;
+    expect(rule2.rule_text).toBe(
+      "Total monthly debt obligations including the new installment must not exceed 50 percent of monthly salary.",
+    );
+    expect(rule2.condition).toContain("<= 0.50");
+  });
+
+  it("the demo edit: dbr_cap 0.45 flips the GT-04 boundary AND the citation follows", () => {
+    const draft = draftPack();
+    draft.parameters.dbr_cap = 0.45;
+    draft.ruleset_version = "uae-v1.1-draft";
+    const challenger = buildRuleset(draft);
+
+    // DBR exactly 0.50: passes the locked pack, fails the tightened one
+    const a = { ...base, monthly_salary_aed: 10000, existing_monthly_obligations_aed: 2300 };
+    const app: Application = { product: "personal_loan", amount_aed: 30000, term_months: 12 };
+    expect(checkPolicy(a, app, V1).find((r) => r.rule_id === "rule-2")!.passed).toBe(true);
+    const tightened = checkPolicy(a, app, challenger).find((r) => r.rule_id === "rule-2")!;
+    expect(tightened.passed).toBe(false);
+    expect(tightened.cited_text).toContain("45 percent");
+    expect(tightened.finding).toContain("45 percent cap");
+
+    // The full decision flips, stamps the draft version, and the counterfactual cites 45
+    const d = assess(a, app, challenger);
+    expect(d.recommendation).toBe("decline");
+    expect(d.ruleset_version).toBe("uae-v1.1-draft");
+    expect(d.counterfactuals.join(" ")).toContain("45 percent cap");
+    expect(assess(a, app, V1).recommendation).toBe("approve");
+  });
+
+  it("the rule count comes from the pack: disable one rule, get one fewer result", () => {
+    const draft = draftPack();
+    draft.rules.find((r) => r.rule_id === "rule-5")!.enabled = false;
+    const pack = buildRuleset(draft);
+    expect(pack.rules).toHaveLength(5);
+    const results = checkPolicy(base, loan, pack);
+    expect(results).toHaveLength(5);
+    expect(results.some((r) => r.rule_id === "rule-5")).toBe(false);
+  });
+
+  it("a pack rule with no check implementation refuses to load (no silent skips)", () => {
+    const draft = draftPack();
+    draft.rules.push({
+      rule_id: "rule-99",
+      enabled: true,
+      title: "Imaginary rule",
+      rule_text: "Some sentence.",
+      source_section: "Nowhere, section 0",
+      condition: "true",
+      severity: "refer",
+    });
+    expect(() => buildRuleset(draft)).toThrow(/no check implementation/);
+  });
+
+  it("an unknown placeholder in rule text refuses to load (config typos fail loudly)", () => {
+    const draft = draftPack();
+    draft.rules.find((r) => r.rule_id === "rule-2")!.rule_text = "Cap is {dbr_capp} percent.";
+    expect(() => buildRuleset(draft)).toThrow(/unknown placeholder/);
+  });
+
+  it("every decision is stamped with the ruleset version", () => {
+    expect(assess(base, loan).ruleset_version).toBe(CURRENT_RULESET.ruleset_version);
   });
 });
 

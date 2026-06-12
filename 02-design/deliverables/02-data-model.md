@@ -256,3 +256,17 @@ CaseRecords ordered by created_at, with their officer actions. Storage in v1 is 
 localStorage (engineering call B5): no server database, identical on screen, and the entity is
 shaped so v2 can lift it into a real table without redesign. This supersedes the "persistence
 cut from v1" line above for decision records only.
+
+---
+
+## Amendment (2026-06-12): Decision.ruleset_version and the market pack
+
+During Phase 3 the policy values, rule sentences, citations, and band cut-offs moved out of
+code into a market pack: `03-build/app/config/uae/policy-rules.json` (the live, editable file)
+with `policy-rules.v1.0.json` as the locked reference, carrying the M5/B4 lock note. The
+signed-off text above is unchanged. Two effects on the entities:
+
+| Change | Detail |
+|---|---|
+| Decision gains one field | ruleset_version (text): which pack version produced the decision, so "why did we decline this person in June" stays answerable after the rules change. |
+| PolicyRule count is pack-driven | The engine runs every enabled rule in the pack, in pack order. uae v1.0 enables six; the screens render one element per enabled rule, never a fixed six. Rule semantics (the check functions) stay in code keyed by rule_id; a pack can only enable a rule the engine has semantics for, and it refuses to load otherwise (no silent skips). Rule text placeholders like {dbr_cap_pct} are rendered from the same parameter the check enforces, so the cited sentence and the enforced number cannot disagree. |

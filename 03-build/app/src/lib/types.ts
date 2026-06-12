@@ -85,9 +85,12 @@ export interface PolicyCheckResult {
 
 // Entity 6: what the decision screen renders. It physically contains the score and policy
 // results it rests on, so the explanation can be checked against them line by line.
+// Amendment (2026-06-12): ruleset_version records which market pack produced the decision, so
+// "why did we decline this person in June" is answerable after the rules change.
 export interface Decision {
   recommendation: Recommendation;
   risk_band: RiskBand;
+  ruleset_version: string;
   explanation: string;
   reasons: string[];
   counterfactuals: string[]; // decline or refer only, deterministic, never LLM-written

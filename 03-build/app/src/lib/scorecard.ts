@@ -6,10 +6,10 @@
 // rationale that stands on its own.
 
 import type { Applicant, Application, ScoreFactor, ScoreResult } from "./types";
-import { PRODUCT_MIN_SALARY, bandFor } from "./constants";
+import { CURRENT_RULESET, bandFor, type Ruleset, type RulesetParameters } from "./ruleset";
 
-function salaryFactor(a: Applicant, app: Application): ScoreFactor {
-  const min = PRODUCT_MIN_SALARY[app.product];
+function salaryFactor(a: Applicant, app: Application, p: RulesetParameters): ScoreFactor {
+  const min = p.product_min_salary[app.product];
   const ratio = min > 0 ? a.monthly_salary_aed / min : 0;
   // Rationale: capacity is about headroom over the product minimum, not the absolute number.
   // Double the minimum is a strong cushion; at the minimum the applicant passes policy but has
@@ -152,14 +152,18 @@ function rentFactor(a: Applicant): ScoreFactor {
   };
 }
 
-export function score(applicant: Applicant, application: Application): ScoreResult {
+export function score(
+  applicant: Applicant,
+  application: Application,
+  ruleset: Ruleset = CURRENT_RULESET,
+): ScoreResult {
   const factors = [
-    salaryFactor(applicant, application),
+    salaryFactor(applicant, application, ruleset.parameters),
     employmentFactor(applicant),
     employerFactor(applicant),
     settlednessFactor(applicant),
     rentFactor(applicant),
   ];
   const total = factors.reduce((s, f) => s + f.points_awarded, 0);
-  return { factors, total_points: total, risk_band: bandFor(total) };
+  return { factors, total_points: total, risk_band: bandFor(total, ruleset.band_cutoffs) };
 }

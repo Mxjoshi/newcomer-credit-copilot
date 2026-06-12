@@ -11,8 +11,8 @@ Exact steps, in order:
 
 1. Have the app open on the impact tab, showing the current approval, decline, and refer split
    across the 24 ground-truth profiles under uae v1.0.
-2. Switch to the editor, open `config/uae/policy-rules`, and scroll to the DBR rule so the cap is
-   visible on screen.
+2. Switch to the editor, open `config/uae/policy-rules.json` (the live ruleset; the v1.0 file
+   next to it stays locked), and scroll to the parameters block so the cap is visible on screen.
 3. Change the DBR cap from 0.50 to 0.45. Say what you are doing while you type it: "the regulator
    tightens the debt burden ceiling, this is the whole change."
 4. Rerun the impact tab.
@@ -20,11 +20,14 @@ Exact steps, in order:
    decision still carries its policy citation, now pointing at the 0.45 rule.
 6. Close with the line: **policy is configuration, a new market is a pack, not a project.**
 
-Build dependency, flag before pitch prep: the demo as scripted needs the rules in a
-`config/uae/policy-rules` file. Today the cap lives in code (`DBR_CAP = 0.5` in
-`03-build/app/src/lib/constants.ts`, rule text in `src/lib/policy.ts`) and the impact tab is
-Step 5 work. Either extract the rules into the config pack before the pitch or rewrite step 2 to
-open the actual file. Do not script a file that does not exist.
+Build status (2026-06-12): the pack exists. The engine reads
+`03-build/app/config/uae/policy-rules.json`; values, rule sentences, citations, and band
+cut-offs all live there, and the cited rule text is rendered from the same number the check
+enforces, so changing dbr_cap to 0.45 rewrites the citation to 45 percent automatically (tests
+prove the flip and that the locked v1.0 pack still scores 20/24 on the ground truth). The rule
+count is also pack-driven: the screens render one element per enabled rule, 10 rules means 10,
+5 means 5. Still pending for this demo: the impact tab itself and its re-read-from-disk rerun
+(Step 5 UI work).
 
 ## 2. Saudi pack roadmap slide spec
 
@@ -41,28 +44,7 @@ illustrative. Nothing on this slide claims verified Saudi policy.
 
 The slide exists to prove the architecture point from section 1, not to claim Saudi readiness.
 
-## 3. Market context: Oscilar
-
-Oscilar launched Agent Hub on June 3, 2026, a suite of 30+ AI agents for risk operations,
-including a Credit Explainability Agent that generates regulator-ready rationale for credit
-decisions and policy changes. That is the category being validated at enterprise scale: AI
-agents that explain credit decisions with governance attached.
-
-Sources (verified 2026-06-12): the claim traces to Oscilar's own press release and syndicated
-coverage, so the launch is fact but everything quantitative in it is vendor-claimed.
-
-- Press release: https://www.prnewswire.com/news-releases/oscilar-launches-agent-hub-the-first-unified-ai-agent-platform-spanning-fraud-compliance-credit-and-onboarding-302789709.html
-- Oscilar blog: https://oscilar.com/blog/oscilar-agent-hub
-- Coverage: https://www.cpapracticeadvisor.com/2026/06/04/oscilar-launches-agent-hub-a-unified-ai-agent-platform-spanning-fraud-compliance-credit-and-onboarding/184574/
-
-Positioning: this product is the focused newcomer-lending slice of that category, with the same
-governance instincts (grounded explanations, audit trail, versioned rules) at demo scale. We are
-not competing with Oscilar; their launch is evidence the category is real.
-
-Sourcing rule: any Oscilar performance figure is vendor-claimed. If the deck cites one, label it
-"vendor-claimed" on the slide. Same standard we hold our own numbers to.
-
-## 4. Buy versus build, the Q&A answer
+## 3. Buy versus build, the Q&A answer
 
 Likely question: "couldn't a bank just prompt an LLM to do this?"
 
@@ -80,16 +62,17 @@ demo-scale version of each:
 The pitch line: the hard part of lending AI is not the model, it is being able to stand behind
 the decision afterward. That is what this architecture is shaped around.
 
-Build dependency: `ruleset_version` on the decision record and the grounding validator are
-Step 4-5 work. Confirm both exist before promising them in Q&A.
+Build status (2026-06-12): `ruleset_version` is stamped on every decision. The grounding
+validator is Step 4 work; confirm it exists before promising it in Q&A.
 
-## 5. Officer time, the illustration
+## 4. Officer time, the illustration
 
 Status quo: a manual newcomer review means an officer assembles salary, visa, obligations, and
 bureau status by hand, checks each against policy from memory or a PDF, and writes up the
 rationale. Call it the better part of an hour per file.
 
-With the copilot: intake is structured, the six policy rules run instantly with citations, the
+With the copilot: intake is structured, the market pack's policy rules run instantly with
+citations, the
 officer reviews the recommendation and the counterfactuals, and spends their judgment only on
 the refer queue. Minutes, not an hour.
 
@@ -97,7 +80,7 @@ State it exactly this way in the pitch: **this is an illustration of where the t
 measured claim.** Phase 4 produces the measured numbers; until then the deck says "illustrative"
 on this slide too. If a Phase 4 timing run happens, swap the illustration for the measurement.
 
-## 6. v2 roadmap, parked on purpose
+## 5. v2 roadmap, parked on purpose
 
 Things that are deliberately not in the MVP, kept here so the pitch can answer "what's next"
 without scope-creeping the build:

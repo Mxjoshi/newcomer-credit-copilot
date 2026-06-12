@@ -1,0 +1,91 @@
+{
+  "_readme": "UAE market pack, the LIVE ruleset the engine reads. It starts as an exact copy of policy-rules.v1.0.json (the locked reference). Edit THIS file to change policy: the plug and play demo changes dbr_cap here from 0.5 to 0.45 and reruns. Placeholders like {dbr_cap_pct} in rule_text are rendered from the parameters block, so the cited sentence and the enforced number can never disagree. Adding a rule entry needs a matching check implementation in src/lib/policy.ts (the engine refuses to run a rule it has no semantics for, no silent skips).",
+  "market": "uae",
+  "market_name": "United Arab Emirates",
+  "ruleset_version": "uae-v1.0",
+  "currency": "AED",
+  "regulator": "CBUAE",
+  "bureau": "AECB",
+  "parameters": {
+    "_notes": {
+      "product_min_salary": "product assumption, stated in the ground truth",
+      "flat_annual_rate": "used ONLY to estimate the monthly installment for the DBR check (rule 2); product assumption locked with the ground truth",
+      "dbr_cap": "UAE-standard cap, flagged in the ground truth for primary-sourcing: total repayments may not exceed half of income",
+      "amount_salary_multiple": "UAE-standard cap: a personal loan may not exceed 20 times monthly salary",
+      "max_age_at_maturity": "the borrower must be 65 or younger when the last installment falls due (rule 3)",
+      "min_tenure_months": "minimum months in the current job (rule 4); matches one full probation period",
+      "personal_loan_max_term_months": "48-month personal loan term cap (Phase 3 primary-sourcing); Step 5 form validation enforces it"
+    },
+    "product_min_salary": {
+      "personal_loan": 8000,
+      "credit_card": 5000
+    },
+    "flat_annual_rate": 0.08,
+    "dbr_cap": 0.5,
+    "amount_salary_multiple": 20,
+    "max_age_at_maturity": 65,
+    "min_tenure_months": 6,
+    "personal_loan_max_term_months": 48
+  },
+  "band_cutoffs": {
+    "_note": "decision M3: numeric points mapped to bands; the cut-offs are Phase 3's call. 70+ means strong on at least four of the five factors, the profile a conservative v1 (D6) can recommend approving. Under 45 means weakness is the pattern, not the exception. The middle goes to a human (D8).",
+    "low": 70,
+    "high": 45
+  },
+  "rules": [
+    {
+      "rule_id": "rule-1",
+      "enabled": true,
+      "title": "Minimum salary for the product",
+      "rule_text": "Applicants must earn at least the minimum monthly salary set for the product applied for.",
+      "source_section": "Lending Policy, section 1.1",
+      "condition": "monthly_salary_aed >= product_min_salary[product]",
+      "severity": "hard_fail"
+    },
+    {
+      "rule_id": "rule-2",
+      "enabled": true,
+      "title": "Debt burden ratio cap",
+      "rule_text": "Total monthly debt obligations including the new installment must not exceed {dbr_cap_pct} percent of monthly salary.",
+      "source_section": "Lending Policy, section 2.1",
+      "condition": "(existing_monthly_obligations_aed + new_installment) / monthly_salary_aed <= {dbr_cap}",
+      "severity": "hard_fail"
+    },
+    {
+      "rule_id": "rule-3",
+      "enabled": true,
+      "title": "Maximum age at loan maturity",
+      "rule_text": "The applicant must be no older than {max_age_at_maturity} at the end of the loan term.",
+      "source_section": "Lending Policy, section 3.1",
+      "condition": "age_years + term_months / 12 <= {max_age_at_maturity}",
+      "severity": "hard_fail"
+    },
+    {
+      "rule_id": "rule-4",
+      "enabled": true,
+      "title": "Minimum employment tenure",
+      "rule_text": "Applicants must show {min_tenure_months} months of continuous employment.",
+      "source_section": "Lending Policy, section 2.3",
+      "condition": "job_tenure_months >= {min_tenure_months}",
+      "severity": "refer"
+    },
+    {
+      "rule_id": "rule-5",
+      "enabled": true,
+      "title": "Valid residency for the loan term",
+      "rule_text": "The applicant's residency visa must remain valid for the full loan term.",
+      "source_section": "Lending Policy, section 3.2",
+      "condition": "visa_months_remaining >= term_months",
+      "severity": "refer"
+    },
+    {
+      "rule_id": "rule-6",
+      "enabled": true,
+      "title": "Maximum loan amount as a multiple of salary",
+      "rule_text": "The requested amount must not exceed {amount_salary_multiple} times the applicant's monthly salary.",
+      "source_section": "Lending Policy, section 1.2",
+      "condition": "amount_aed <= {amount_salary_multiple} * monthly_salary_aed",
+      "severity": "hard_fail"
+    }
+  ]
+}
