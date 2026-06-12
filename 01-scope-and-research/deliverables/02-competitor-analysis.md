@@ -106,3 +106,16 @@ the officer can defend, for the applicants the others leave invisible.
 - CRIF: https://www.crif.com/business/services/platforms/lending-journey-platform/ , https://www.ae.crif.digital/
 
 *Full research notes, alt-data sources and regulatory detail: `../working/market-and-domain-research.md`.*
+
+---
+
+## Amendment (2026-06-12): "configurable" vs "a generic engine"
+
+During Phase 3 the build moved policy and scorecard values into market packs (config files, not
+code): caps, rule text, citations, scorecard tiers, and band cut-offs, with the UAE pack locked
+at v1.0. That does not contradict the positioning above; it sharpens it. The weakness of the
+generic platforms (Newgen, CRIF, FICO) is that a bank must spend months configuring credit
+logic from a blank slate. This product ships the newcomer-lending logic complete and
+opinionated; the pack only makes its values portable, so a policy change is an edit and a
+second market is a config folder, not a rebuild. Configurable values inside an opinionated
+product, not a configure-it-yourself toolkit.
