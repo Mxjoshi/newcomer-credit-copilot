@@ -27,8 +27,13 @@ enforces, so changing dbr_cap to 0.45 rewrites the citation to 45 percent automa
 prove the flip and that the locked v1.0 pack still scores 20/24 on the ground truth). The
 scorecard is in the pack too: factor tiers, points, and rationales, so a market can carry a
 different scorecard, not just different rules. Rule and factor counts are pack-driven: the
-screens render one element per enabled rule or factor, 10 rules means 10, 5 means 5. Still
-pending for this demo: the impact tab itself and its re-read-from-disk rerun (Step 5 UI work).
+screens render one element per enabled rule or factor, 10 rules means 10, 5 means 5.
+
+Demo verified working (2026-06-13, Step 5 done): the impact tab re-reads the pack from disk on
+every rerun. Editing dbr_cap to 0.45 and clicking Rerun moves GT-04 and GT-24 from approve and
+refer to decline (rule-2), approvals drop from 7 of 8 to 6 of 8, and every citation reads 45
+percent. Restoring 0.50 brings the baseline back exactly. Narrate GT-04: it sits at a debt
+burden of exactly 50 percent, the boundary case the regulator's tightening catches first.
 
 ## 2. Saudi pack roadmap slide spec
 

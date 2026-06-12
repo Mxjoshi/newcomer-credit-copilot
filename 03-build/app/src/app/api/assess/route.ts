@@ -4,14 +4,10 @@
 // that is the plug and play demo working end to end.
 
 import { NextResponse } from "next/server";
-import { promises as fs } from "fs";
-import path from "path";
 import type { Applicant, Application } from "@/lib/types";
-import { buildRuleset } from "@/lib/ruleset";
 import { assess } from "@/lib/decision";
 import { explainDecision } from "@/lib/explain";
-
-const LIVE_PACK_PATH = path.join(process.cwd(), "config", "uae", "policy-rules.json");
+import { loadLiveRuleset } from "@/lib/livePack";
 
 export async function POST(request: Request) {
   let applicant: Applicant;
@@ -28,8 +24,7 @@ export async function POST(request: Request) {
     );
   }
 
-  const raw = await fs.readFile(LIVE_PACK_PATH, "utf8");
-  const ruleset = buildRuleset(JSON.parse(raw));
+  const ruleset = await loadLiveRuleset();
   const decision = assess(applicant, application, ruleset);
 
   try {
