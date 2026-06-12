@@ -303,11 +303,12 @@ audit tables.
 
 ---
 
-## Amendment (2026-06-12): the rule count comes from the market pack
+## Amendment (2026-06-12): rule and factor counts come from the market pack
 
 The Screen 2 snapshot above says "checking 6 rules..." because uae v1.0 enables six. The count
 is not a constant: it is the enabled-rule count of the loaded ruleset
 (`config/uae/policy-rules.json`). Screen 2 says "checking N rules" from the pack, and Screen 3
 renders one policy row per enabled rule: a pack with 10 rules shows 10 rows, a pack with 5
-shows 5. The impact view's champion is the locked v1.0 pack; the challenger is the live,
-editable pack file.
+shows 5. The same holds for the scorecard: the score table renders one row per enabled factor
+in the pack's scorecard block (uae v1.0 enables five). The impact view's champion is the locked
+v1.0 pack; the challenger is the live, editable pack file.

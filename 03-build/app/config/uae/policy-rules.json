@@ -87,5 +87,188 @@
       "condition": "amount_aed <= {amount_salary_multiple} * monthly_salary_aed",
       "severity": "hard_fail"
     }
-  ]
+  ],
+  "scorecard": {
+    "_note": "M5 guardrail, moved here with the values: every tier below is set from the domain rationale written next to it, never from the ground-truth labels. Changing a tier requires a rationale that stands on its own. Factor semantics live in code (src/lib/scorecard.ts FACTOR_IMPLS) keyed by factor_id; points, tiers, names, and rationales live here. Each factor awards 0 to 20 points (decision M3); the screens render one row per enabled factor. Tier tables are ordered descending and end with a catch-all at 0.",
+    "factors": [
+      {
+        "factor_id": "salary_headroom",
+        "enabled": true,
+        "factor_name": "Monthly salary",
+        "_rationale": "capacity is about headroom over the product minimum, not the absolute number. Double the minimum is a strong cushion; at the minimum the applicant passes policy but has no buffer for shocks, which matters more for a newcomer with no local safety net.",
+        "ratio_tiers": [
+          {
+            "min_ratio": 2.0,
+            "points": 20,
+            "rationale": "salary is at least double the product minimum, strong repayment cushion"
+          },
+          {
+            "min_ratio": 1.5,
+            "points": 16,
+            "rationale": "salary is well above the product minimum"
+          },
+          {
+            "min_ratio": 1.2,
+            "points": 12,
+            "rationale": "salary is moderately above the product minimum"
+          },
+          {
+            "min_ratio": 1.0,
+            "points": 8,
+            "rationale": "salary meets the product minimum with little headroom"
+          },
+          {
+            "min_ratio": 0,
+            "points": 0,
+            "rationale": "salary is below the product minimum"
+          }
+        ]
+      },
+      {
+        "factor_id": "employment_tenure",
+        "enabled": true,
+        "factor_name": "Employment and tenure",
+        "threshold_label": "tiers at 3, 6 and 12 months; self-employed capped",
+        "_rationale": "6 months tenure matches the policy threshold (one full probation period); 12 months is a completed review cycle. Self-employment is capped lower not because the income is worse but because v1 cannot verify drawings the way it can a salary letter.",
+        "unemployed": {
+          "points": 0,
+          "rationale": "no current employment income"
+        },
+        "self_employed_tiers": [
+          {
+            "min_months": 12,
+            "points": 12,
+            "rationale": "established self-employment, but income is harder to verify than a salary"
+          },
+          {
+            "min_months": 6,
+            "points": 8,
+            "rationale": "self-employed past probation length, income verification still limited"
+          },
+          {
+            "min_months": 0,
+            "points": 4,
+            "rationale": "young self-employment with limited verifiable income history"
+          }
+        ],
+        "employed_tiers": [
+          {
+            "min_months": 12,
+            "points": 20,
+            "rationale": "a full year in the current job, stable income"
+          },
+          {
+            "min_months": 6,
+            "points": 16,
+            "rationale": "past the typical probation period"
+          },
+          {
+            "min_months": 3,
+            "points": 8,
+            "rationale": "tenure under 6 months, stability not yet confirmed"
+          },
+          {
+            "min_months": 0,
+            "points": 4,
+            "rationale": "very short tenure, income stability unproven"
+          }
+        ]
+      },
+      {
+        "factor_id": "employer_category",
+        "enabled": true,
+        "factor_name": "Employer category",
+        "threshold_label": "tiered: government > mainland > free zone > SME > other",
+        "_rationale": "standard UAE underwriting tiers. Government employment is the most stable; SME and uncategorized employers carry the most income-continuity risk.",
+        "categories": {
+          "government": {
+            "points": 20,
+            "rationale": "government employer, highest stability tier"
+          },
+          "mainland_private": {
+            "points": 16,
+            "rationale": "established mainland private employer"
+          },
+          "free_zone": {
+            "points": 12,
+            "rationale": "free zone employer, mid stability tier"
+          },
+          "sme": {
+            "points": 8,
+            "rationale": "SME employer, higher income-continuity risk"
+          },
+          "other": {
+            "points": 4,
+            "rationale": "uncategorized employer, stability unknown"
+          }
+        }
+      },
+      {
+        "factor_id": "settledness",
+        "enabled": true,
+        "factor_name": "Months in UAE and visa",
+        "threshold_label": "tiers at 3, 6 and 12 months, plus long-term visa bonus",
+        "_rationale": "time in country builds a verifiable footprint (address, banking, employer record). A long-term visa (golden, green) reduces the leave-the-country risk that drives newcomer defaults, so it earns a bonus on top.",
+        "month_tiers": [
+          {
+            "min_months": 12,
+            "points": 16,
+            "rationale": "a full year in the UAE, established local footprint"
+          },
+          {
+            "min_months": 6,
+            "points": 12,
+            "rationale": "settling in, footprint forming"
+          },
+          {
+            "min_months": 3,
+            "points": 6,
+            "rationale": "recent arrival, little local footprint yet"
+          },
+          {
+            "min_months": 0,
+            "points": 2,
+            "rationale": "recent arrival, little local footprint yet"
+          }
+        ],
+        "visa_bonus": {
+          "golden": 4,
+          "green": 4,
+          "employment": 2,
+          "other": 0
+        },
+        "long_term_visas": [
+          "golden",
+          "green"
+        ],
+        "long_term_bonus_rationale": "long-term visa materially lowers departure risk",
+        "max_points": 20
+      },
+      {
+        "factor_id": "rent_history",
+        "enabled": true,
+        "factor_name": "Rent payment history",
+        "threshold_label": "on time 6+ months is full points; late payments is zero",
+        "_rationale": "rent is the behavioral anchor, the alt-data standing in for the missing credit file. Sustained on-time payment is the strongest available repayment evidence; late payments are adverse evidence, worse than no history at all.",
+        "categories": {
+          "on_time_6plus": {
+            "points": 20,
+            "rationale": "6+ months of on-time rent, the strongest available behavioral evidence"
+          },
+          "on_time_under_6": {
+            "points": 12,
+            "rationale": "on-time so far, but the record is shorter than 6 months"
+          },
+          "none": {
+            "points": 6,
+            "rationale": "no rent history available, behavioral evidence missing"
+          },
+          "late_payments": {
+            "points": 0,
+            "rationale": "late rent payments, adverse behavioral evidence"
+          }
+        }
+      }
+    ]
+  }
 }

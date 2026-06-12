@@ -57,9 +57,11 @@ export interface ScoreFactor {
 }
 
 // Entity 3b: the whole scorecard result.
+// Amendment (2026-06-12): the factor list comes from the market pack, one entry per enabled
+// factor, never silently skipped. uae v1.0 enables five (0 to 100 points total).
 export interface ScoreResult {
-  factors: ScoreFactor[]; // always all 5, never silently skipped
-  total_points: number; // 0 to 100
+  factors: ScoreFactor[];
+  total_points: number;
   risk_band: RiskBand;
 }
 

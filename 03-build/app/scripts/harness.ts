@@ -10,7 +10,8 @@ import { CURRENT_RULESET } from "../src/lib/ruleset";
 const severityOf = (id: string) => CURRENT_RULESET.rules.find((r) => r.rule_id === id)!.severity;
 
 console.log(
-  `Ruleset: ${CURRENT_RULESET.ruleset_version} (${CURRENT_RULESET.market_name}, ${CURRENT_RULESET.rules.length} rules enabled)\n`,
+  `Ruleset: ${CURRENT_RULESET.ruleset_version} (${CURRENT_RULESET.market_name}, ` +
+    `${CURRENT_RULESET.rules.length} rules, ${CURRENT_RULESET.scorecard.length} score factors)\n`,
 );
 
 let matches = 0;

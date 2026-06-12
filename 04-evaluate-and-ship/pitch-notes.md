@@ -24,10 +24,11 @@ Build status (2026-06-12): the pack exists. The engine reads
 `03-build/app/config/uae/policy-rules.json`; values, rule sentences, citations, and band
 cut-offs all live there, and the cited rule text is rendered from the same number the check
 enforces, so changing dbr_cap to 0.45 rewrites the citation to 45 percent automatically (tests
-prove the flip and that the locked v1.0 pack still scores 20/24 on the ground truth). The rule
-count is also pack-driven: the screens render one element per enabled rule, 10 rules means 10,
-5 means 5. Still pending for this demo: the impact tab itself and its re-read-from-disk rerun
-(Step 5 UI work).
+prove the flip and that the locked v1.0 pack still scores 20/24 on the ground truth). The
+scorecard is in the pack too: factor tiers, points, and rationales, so a market can carry a
+different scorecard, not just different rules. Rule and factor counts are pack-driven: the
+screens render one element per enabled rule or factor, 10 rules means 10, 5 means 5. Still
+pending for this demo: the impact tab itself and its re-read-from-disk rerun (Step 5 UI work).
 
 ## 2. Saudi pack roadmap slide spec
 

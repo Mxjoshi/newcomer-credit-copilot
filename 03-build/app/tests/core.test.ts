@@ -92,8 +92,8 @@ describe("rule boundaries (the locked ground-truth edges)", () => {
 });
 
 describe("scorecard shape", () => {
-  it("always returns exactly 5 factors, each 0 to 20, total equals the sum", () => {
-    const s = score(base, loan);
+  it("returns one factor per enabled pack factor (5 in uae v1.0), each 0 to 20", () => {
+    const s = score(base, loan, V1);
     expect(s.factors).toHaveLength(5);
     for (const f of s.factors) {
       expect(f.points_awarded).toBeGreaterThanOrEqual(0);
@@ -103,10 +103,11 @@ describe("scorecard shape", () => {
   });
 
   it("policy-only fields never move the score (M4)", () => {
-    const s1 = score(base, loan);
+    const s1 = score(base, loan, V1);
     const s2 = score(
       { ...base, existing_monthly_obligations_aed: 9999, age_years: 64, visa_months_remaining: 1 },
       loan,
+      V1,
     );
     expect(s2.total_points).toBe(s1.total_points);
   });
@@ -150,6 +151,14 @@ describe("market pack (policy is configuration, not code)", () => {
     ruleset_version: string;
     parameters: { dbr_cap: number };
     rules: Array<{ rule_id: string; enabled: boolean; [key: string]: unknown }>;
+    scorecard: {
+      factors: Array<{
+        factor_id: string;
+        enabled: boolean;
+        categories?: Record<string, { points: number; rationale: string }>;
+        [key: string]: unknown;
+      }>;
+    };
   };
   const draftPack = (): DraftPack => structuredClone(uaeV1Json) as unknown as DraftPack;
 
@@ -225,6 +234,32 @@ describe("market pack (policy is configuration, not code)", () => {
 
   it("every decision is stamped with the ruleset version", () => {
     expect(assess(base, loan).ruleset_version).toBe(CURRENT_RULESET.ruleset_version);
+  });
+
+  it("scorecard points come from the pack: lowering a tier moves the total", () => {
+    const draft = draftPack();
+    const rent = draft.scorecard.factors.find((f) => f.factor_id === "rent_history")!;
+    rent.categories!.on_time_6plus.points = 10;
+    const pack = buildRuleset(draft);
+    expect(score(base, loan, pack).total_points).toBe(score(base, loan, V1).total_points - 10);
+  });
+
+  it("the factor count comes from the pack: disable one factor, get one fewer row", () => {
+    const draft = draftPack();
+    draft.scorecard.factors.find((f) => f.factor_id === "rent_history")!.enabled = false;
+    const pack = buildRuleset(draft);
+    expect(pack.scorecard).toHaveLength(4);
+    expect(score(base, loan, pack).factors).toHaveLength(4);
+  });
+
+  it("a pack factor with no implementation refuses to load (no silent skips)", () => {
+    const draft = draftPack();
+    draft.scorecard.factors.push({
+      factor_id: "astrology_sign",
+      enabled: true,
+      factor_name: "Star sign",
+    });
+    expect(() => buildRuleset(draft)).toThrow(/no factor implementation/);
   });
 });
 

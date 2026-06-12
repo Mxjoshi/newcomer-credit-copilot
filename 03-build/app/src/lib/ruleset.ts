@@ -1,12 +1,15 @@
-// Market packs: every policy value, rule sentence, citation, and band cut-off the engine uses,
-// loaded from config/<market>/ JSON instead of code. The engine's rule semantics (the check
-// functions in policy.ts) stay in code, keyed by rule_id; the pack decides which rules run,
-// with which numbers, citing which sentences. rule_text placeholders like {dbr_cap_pct} are
-// rendered here from the same parameters the checks enforce, so the citation and the
-// enforcement cannot disagree. A new market is a new config folder, not a fork of the engine.
+// Market packs: every policy value, rule sentence, citation, scorecard tier, and band cut-off
+// the engine uses, loaded from config/<market>/ JSON instead of code. The engine keeps only
+// semantics: rule checks (policy.ts RULE_CHECKS) and factor computations (scorecard.ts
+// FACTOR_IMPLS), both keyed by id. The pack decides which rules and factors run, with which
+// numbers, citing which sentences. rule_text placeholders like {dbr_cap_pct} are rendered here
+// from the same parameters the checks enforce, so the citation and the enforcement cannot
+// disagree. A new market is a new config folder, not a fork of the engine.
 
-import type { PolicyRule, Product, RiskBand, Severity } from "./types";
+import type { Applicant, Application, PolicyRule, Product, ScoreFactor, Severity } from "./types";
 import { RULE_CHECKS, pctOf } from "./policy";
+import { FACTOR_IMPLS } from "./scorecard";
+import { asObject, invalid, num, str } from "./packValidate";
 import uaeV1Json from "../../config/uae/policy-rules.v1.0.json";
 import uaeCurrentJson from "../../config/uae/policy-rules.json";
 
@@ -25,6 +28,12 @@ export interface BandCutoffs {
   high: number; // total_points < high -> high risk; otherwise medium
 }
 
+export interface ScorecardFactor {
+  factor_id: string;
+  factor_name: string;
+  compute: (a: Applicant, app: Application) => ScoreFactor;
+}
+
 export interface Ruleset {
   market: string;
   market_name: string;
@@ -35,27 +44,7 @@ export interface Ruleset {
   parameters: RulesetParameters;
   band_cutoffs: BandCutoffs;
   rules: PolicyRule[]; // enabled rules only, text rendered, checks attached, pack order kept
-}
-
-function invalid(msg: string): never {
-  throw new Error(`invalid market pack: ${msg}`);
-}
-
-function asObject(v: unknown, where: string): Record<string, unknown> {
-  if (typeof v !== "object" || v === null || Array.isArray(v)) invalid(`${where} must be an object`);
-  return v as Record<string, unknown>;
-}
-
-function num(obj: Record<string, unknown>, key: string, where: string): number {
-  const v = obj[key];
-  if (typeof v !== "number" || !Number.isFinite(v)) invalid(`${where}.${key} must be a number`);
-  return v;
-}
-
-function str(obj: Record<string, unknown>, key: string, where: string): string {
-  const v = obj[key];
-  if (typeof v !== "string" || v.length === 0) invalid(`${where}.${key} must be a non-empty string`);
-  return v;
+  scorecard: ScorecardFactor[]; // enabled factors only, pack order kept
 }
 
 // Replaces {placeholder} tokens; an unknown placeholder is a config typo and must fail loudly,
@@ -85,8 +74,8 @@ export function templateValues(p: RulesetParameters): Record<string, string> {
 }
 
 // Builds a typed, validated Ruleset from raw pack JSON. Throws on anything malformed: a pack
-// that half-loads would silently skip rules, and silent skips are the one thing this engine
-// promises never to do. Keys starting with "_" are documentation and ignored.
+// that half-loads would silently skip rules or factors, and silent skips are the one thing
+// this engine promises never to do. Keys starting with "_" are documentation and ignored.
 export function buildRuleset(json: unknown): Ruleset {
   const pack = asObject(json, "pack");
 
@@ -116,13 +105,13 @@ export function buildRuleset(json: unknown): Ruleset {
   if (!Array.isArray(pack.rules) || pack.rules.length === 0)
     invalid("rules must be a non-empty array");
   const values = templateValues(parameters);
-  const seen = new Set<string>();
+  const seenRules = new Set<string>();
   const rules: PolicyRule[] = [];
   for (const entry of pack.rules) {
     const r = asObject(entry, "rules[]");
     const rule_id = str(r, "rule_id", "rules[]");
-    if (seen.has(rule_id)) invalid(`duplicate rule_id ${rule_id}`);
-    seen.add(rule_id);
+    if (seenRules.has(rule_id)) invalid(`duplicate rule_id ${rule_id}`);
+    seenRules.add(rule_id);
     if (typeof r.enabled !== "boolean") invalid(`${rule_id}.enabled must be true or false`);
     if (!r.enabled) continue;
     const severity = str(r, "severity", rule_id);
@@ -146,6 +135,35 @@ export function buildRuleset(json: unknown): Ruleset {
   }
   if (rules.length === 0) invalid("every rule is disabled; the pack must enable at least one");
 
+  const scorecardRaw = asObject(pack.scorecard, "scorecard");
+  if (!Array.isArray(scorecardRaw.factors) || scorecardRaw.factors.length === 0)
+    invalid("scorecard.factors must be a non-empty array");
+  const seenFactors = new Set<string>();
+  const scorecard: ScorecardFactor[] = [];
+  for (const entry of scorecardRaw.factors) {
+    const f = asObject(entry, "scorecard.factors[]");
+    const factor_id = str(f, "factor_id", "scorecard.factors[]");
+    if (seenFactors.has(factor_id)) invalid(`duplicate factor_id ${factor_id}`);
+    seenFactors.add(factor_id);
+    if (typeof f.enabled !== "boolean") invalid(`${factor_id}.enabled must be true or false`);
+    if (!f.enabled) continue;
+    const factor_name = str(f, "factor_name", factor_id);
+    const impl = FACTOR_IMPLS[factor_id];
+    if (!impl)
+      invalid(
+        `no factor implementation registered for ${factor_id}; factor semantics live in code ` +
+          `(src/lib/scorecard.ts FACTOR_IMPLS), add one before enabling it in config`,
+      );
+    const body = impl(f, parameters, `scorecard.${factor_id}`);
+    scorecard.push({
+      factor_id,
+      factor_name,
+      compute: (a, app) => ({ factor_name, ...body(a, app) }),
+    });
+  }
+  if (scorecard.length === 0)
+    invalid("every scorecard factor is disabled; the pack must enable at least one");
+
   return {
     market: str(pack, "market", "pack"),
     market_name: str(pack, "market_name", "pack"),
@@ -156,13 +174,8 @@ export function buildRuleset(json: unknown): Ruleset {
     parameters,
     band_cutoffs,
     rules,
+    scorecard,
   };
-}
-
-export function bandFor(totalPoints: number, cutoffs: BandCutoffs): RiskBand {
-  if (totalPoints >= cutoffs.low) return "low";
-  if (totalPoints < cutoffs.high) return "high";
-  return "medium";
 }
 
 // The packs the app knows at import time. UAE_V1 is the locked reference (the impact view's

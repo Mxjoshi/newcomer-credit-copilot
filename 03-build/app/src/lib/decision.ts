@@ -96,13 +96,14 @@ export function counterfactuals(
   // and the two factors with the most ground to make up.
   if (scoreResult.risk_band !== "low") {
     const target = ruleset.band_cutoffs.low;
+    const maxTotal = ruleset.scorecard.length * 20;
     const gap = target - scoreResult.total_points;
     const weakest = [...scoreResult.factors]
       .sort((x, y) => x.points_awarded - y.points_awarded)
       .slice(0, 2)
       .map((f) => `${f.factor_name} (${f.points_awarded} of 20)`);
     lines.push(
-      `the score is ${scoreResult.total_points} of 100; reaching ${target} (low risk) needs ${gap} more points, with the largest gaps on ${weakest.join(" and ")}`,
+      `the score is ${scoreResult.total_points} of ${maxTotal}; reaching ${target} (low risk) needs ${gap} more points, with the largest gaps on ${weakest.join(" and ")}`,
     );
   }
   return lines;
