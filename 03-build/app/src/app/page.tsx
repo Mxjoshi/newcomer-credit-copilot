@@ -20,6 +20,7 @@ type View =
   | { kind: "intake" }
   | { kind: "assessing"; applicant: Applicant; application: Application }
   | { kind: "decision"; record: CaseRecord }
+  | { kind: "impact" }
   | { kind: "queue" }
   | { kind: "audit" };
 
@@ -111,6 +112,9 @@ export default function Home() {
             {navButton("New assessment", view.kind === "intake", () =>
               setView({ kind: "intake" }),
             )}
+            {navButton("Policy impact", view.kind === "impact", () =>
+              setView({ kind: "impact" }),
+            )}
             {navButton(`Review queue (${queueCount})`, view.kind === "queue", () =>
               setView({ kind: "queue" }),
             )}
@@ -162,6 +166,19 @@ export default function Home() {
             ) : (
               <ImpactView />
             )}
+          </div>
+        )}
+
+        {view.kind === "impact" && (
+          <div className="flex flex-col gap-4">
+            <div>
+              <h2 className="text-lg font-semibold text-slate-900">Policy impact</h2>
+              <p className="text-sm text-slate-500">
+                Champion vs challenger on the 24 locked profiles. Move a policy value and watch
+                the decisions shift, live.
+              </p>
+            </div>
+            <ImpactView />
           </div>
         )}
 
