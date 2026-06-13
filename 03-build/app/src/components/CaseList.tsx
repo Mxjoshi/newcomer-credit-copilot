@@ -19,46 +19,53 @@ const VERDICT_TONE: Record<string, string> = {
 };
 
 export default function CaseList({ cases, mode, onOpen }: Props) {
-  const shown =
-    mode === "queue" ? cases.filter((c) => c.status === "awaiting_review") : cases;
+  const shown = mode === "queue" ? cases.filter((c) => c.status === "awaiting_review") : cases;
 
   return (
-    <div className="flex flex-col gap-3">
-      <h2 className="text-lg font-semibold text-slate-900">
-        {mode === "queue"
-          ? `Cases waiting for review (${shown.length})`
-          : `Audit log (${shown.length} assessments in this browser)`}
-      </h2>
-      {shown.length === 0 && (
+    <div className="flex flex-col gap-4">
+      <div>
+        <h2 className="text-lg font-semibold text-slate-900">
+          {mode === "queue" ? "Review queue" : "Audit log"}
+        </h2>
         <p className="text-sm text-slate-500">
-          {mode === "queue" ? "No cases waiting." : "No assessments recorded yet."}
+          {mode === "queue"
+            ? `${shown.length} ${shown.length === 1 ? "case" : "cases"} awaiting a human decision.`
+            : `${shown.length} ${shown.length === 1 ? "assessment" : "assessments"} recorded in this browser, every officer action included.`}
         </p>
+      </div>
+
+      {shown.length === 0 && (
+        <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center text-sm text-slate-400">
+          {mode === "queue" ? "No cases waiting for review." : "No assessments recorded yet."}
+        </div>
       )}
-      {shown.map((c) => (
-        <button
-          key={c.case_id}
-          onClick={() => onOpen(c)}
-          className="flex flex-wrap items-center gap-3 rounded-lg border border-slate-200 bg-white p-3 text-left text-sm hover:border-slate-400"
-        >
-          <span className="text-xs text-slate-500">
-            {new Date(c.created_at).toLocaleString("en-GB")}
-          </span>
-          <span className="font-medium">{c.applicant.full_name}</span>
-          <span className="text-slate-600">
-            {c.application.product.replace("_", " ")} · AED{" "}
-            {c.application.amount_aed.toLocaleString("en-US")}
-          </span>
-          <span
-            className={`rounded px-2 py-0.5 text-xs font-semibold ${VERDICT_TONE[c.decision.recommendation]}`}
+
+      <div className="flex flex-col gap-2.5">
+        {shown.map((c) => (
+          <button
+            key={c.case_id}
+            onClick={() => onOpen(c)}
+            className="animate-fade-up flex flex-wrap items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4 text-left text-sm shadow-sm transition hover:border-indigo-300 hover:shadow-md"
           >
-            {c.decision.recommendation.toUpperCase()}
-          </span>
-          <span className="text-xs text-slate-500">
-            officer: {c.decision.officer_action} · {c.status.replace("_", " ")} · ruleset{" "}
-            {c.decision.ruleset_version}
-          </span>
-        </button>
-      ))}
+            <span
+              className={`rounded-full px-2.5 py-1 text-xs font-bold ${VERDICT_TONE[c.decision.recommendation]}`}
+            >
+              {c.decision.recommendation.toUpperCase()}
+            </span>
+            <span className="font-semibold text-slate-800">{c.applicant.full_name}</span>
+            <span className="text-slate-600">
+              {c.application.product.replace("_", " ")} · AED{" "}
+              {c.application.amount_aed.toLocaleString("en-US")}
+            </span>
+            <span className="ml-auto text-right text-xs text-slate-400">
+              <span className="block">{new Date(c.created_at).toLocaleString("en-GB")}</span>
+              <span className="block">
+                officer: {c.decision.officer_action} · {c.status.replace("_", " ")}
+              </span>
+            </span>
+          </button>
+        ))}
+      </div>
     </div>
   );
 }

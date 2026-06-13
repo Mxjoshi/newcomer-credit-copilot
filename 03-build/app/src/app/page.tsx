@@ -2,12 +2,14 @@
 
 // The app shell: three screens, one direction (intake -> assessing -> decision), plus the
 // review queue and audit log reachable from every screen (M7), and the impact view as a tab on
-// the decision screen (M6). The header shows the live ruleset identity from /api/ruleset.
+// the decision screen (M6). Sticky brand header with the live ruleset identity.
 
 import { useCallback, useEffect, useState } from "react";
 import type { Applicant, Application, CaseRecord, Decision } from "@/lib/types";
 import { createCase, loadCases, recordOfficerAction } from "@/lib/cases";
 import type { RulesetSummary } from "@/components/summary";
+import Brand from "@/components/Brand";
+import Hero from "@/components/Hero";
 import IntakeForm from "@/components/IntakeForm";
 import AssessmentProgress from "@/components/AssessmentProgress";
 import DecisionView from "@/components/DecisionView";
@@ -70,27 +72,42 @@ export default function Home() {
   const navButton = (label: string, active: boolean, onClick: () => void) => (
     <button
       onClick={onClick}
-      className={`rounded px-3 py-1.5 text-sm font-medium ${
-        active ? "bg-slate-800 text-white" : "text-slate-700 hover:bg-slate-200"
+      className={`rounded-full px-4 py-2 text-sm font-medium transition ${
+        active
+          ? "bg-slate-900 text-white shadow-sm"
+          : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
       }`}
     >
       {label}
     </button>
   );
 
+  const openCase = (record: CaseRecord) => {
+    setTab("case");
+    setView({ kind: "decision", record });
+  };
+
   return (
-    <div className="min-h-screen bg-slate-100 font-sans text-slate-900">
-      <header className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-3 px-6 py-4">
-          <div>
-            <h1 className="text-xl font-bold">Newcomer Credit Copilot</h1>
-            <p className="text-xs text-slate-500">
-              {summary
-                ? `${summary.market_name} pack ${summary.ruleset_version} · ${summary.rule_count} rules · ${summary.factor_count} score factors · bureau ${summary.bureau} · regulator ${summary.regulator}`
-                : "loading ruleset..."}
-            </p>
-          </div>
-          <nav className="flex gap-2">
+    <div className="min-h-screen">
+      <header className="sticky top-0 z-20 border-b border-slate-200/70 bg-white/80 backdrop-blur-md">
+        <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-3 px-6 py-3.5">
+          <button
+            onClick={() => setView({ kind: "intake" })}
+            className="flex items-center gap-3 text-left"
+          >
+            <Brand />
+            <span>
+              <span className="block text-base font-bold leading-tight text-slate-900">
+                Newcomer Credit Copilot
+              </span>
+              <span className="block text-xs text-slate-500">
+                {summary
+                  ? `${summary.market_name} · ${summary.ruleset_version} · ${summary.rule_count} rules · ${summary.factor_count} factors`
+                  : "loading ruleset..."}
+              </span>
+            </span>
+          </button>
+          <nav className="flex items-center gap-1.5">
             {navButton("New assessment", view.kind === "intake", () =>
               setView({ kind: "intake" }),
             )}
@@ -103,7 +120,12 @@ export default function Home() {
       </header>
 
       <main className="mx-auto max-w-5xl px-6 py-8">
-        {view.kind === "intake" && <IntakeForm summary={summary} onAssess={onAssess} />}
+        {view.kind === "intake" && (
+          <div className="flex flex-col gap-7">
+            <Hero summary={summary} />
+            <IntakeForm summary={summary} onAssess={onAssess} />
+          </div>
+        )}
 
         {view.kind === "assessing" && (
           <AssessmentProgress
@@ -115,16 +137,16 @@ export default function Home() {
         )}
 
         {view.kind === "decision" && (
-          <div className="flex flex-col gap-4">
-            <div className="flex gap-2 border-b border-slate-200">
+          <div className="flex flex-col gap-5">
+            <div className="flex gap-1 rounded-full bg-slate-200/60 p-1 self-start">
               {(["case", "impact"] as const).map((t) => (
                 <button
                   key={t}
                   onClick={() => setTab(t)}
-                  className={`px-4 py-2 text-sm font-medium ${
+                  className={`rounded-full px-5 py-2 text-sm font-medium transition ${
                     tab === t
-                      ? "border-b-2 border-slate-800 text-slate-900"
-                      : "text-slate-500 hover:text-slate-800"
+                      ? "bg-white text-slate-900 shadow-sm"
+                      : "text-slate-600 hover:text-slate-900"
                   }`}
                 >
                   {t === "case" ? "Case result" : "Impact view"}
@@ -144,27 +166,17 @@ export default function Home() {
         )}
 
         {view.kind === "queue" && (
-          <CaseList
-            cases={cases}
-            mode="queue"
-            onOpen={(record) => {
-              setTab("case");
-              setView({ kind: "decision", record });
-            }}
-          />
+          <CaseList cases={cases} mode="queue" onOpen={openCase} />
         )}
 
         {view.kind === "audit" && (
-          <CaseList
-            cases={cases}
-            mode="audit"
-            onOpen={(record) => {
-              setTab("case");
-              setView({ kind: "decision", record });
-            }}
-          />
+          <CaseList cases={cases} mode="audit" onOpen={openCase} />
         )}
       </main>
+
+      <footer className="mx-auto max-w-5xl px-6 py-8 text-center text-xs text-slate-400">
+        Synthetic data only. A capstone demo of explainable, policy-grounded newcomer lending.
+      </footer>
     </div>
   );
 }

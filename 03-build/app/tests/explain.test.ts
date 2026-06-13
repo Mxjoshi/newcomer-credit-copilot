@@ -164,6 +164,14 @@ describe("explainDecision pipeline (stubbed client, no network)", () => {
     expect(validateGrounding(result.output, ctx)).toEqual([]);
   });
 
+  it("no client configured (no API key) falls back to the template, no error", async () => {
+    const { decision, input, ctx } = contextFor(referApplicant, loan);
+    const result = await explainDecision(referApplicant, loan, decision, UAE_V1, null);
+    expect(result.validation_outcome).toBe("fell_back_to_template");
+    expect(result.output).toEqual(templateExplanation(input));
+    expect(validateGrounding(result.output, ctx)).toEqual([]);
+  });
+
   it("an API failure throws instead of fabricating a result", async () => {
     const { decision } = contextFor(referApplicant, loan);
     const failingClient: ExplanationClient = {

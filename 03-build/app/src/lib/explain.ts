@@ -94,7 +94,12 @@ export interface ExplanationClient {
   };
 }
 
-export function defaultExplanationClient(): ExplanationClient {
+// Returns null when no API key is configured: a deploy-time condition, not a runtime failure.
+// In that case explainDecision uses the deterministic template (works offline, no error), and
+// upgrades to the LLM paragraph the moment a key is present. A key that IS set but whose call
+// fails mid-flight is a different case and still throws ("nothing was decided").
+export function defaultExplanationClient(): ExplanationClient | null {
+  if (!process.env.ANTHROPIC_API_KEY) return null;
   return new Anthropic({ timeout: LLM_TIMEOUT_MS, maxRetries: 1 });
 }
 
@@ -190,10 +195,15 @@ export async function explainDecision(
   app: Application,
   decision: Decision,
   ruleset: Ruleset,
-  client: ExplanationClient = defaultExplanationClient(),
+  client: ExplanationClient | null = defaultExplanationClient(),
 ): Promise<ExplainResult> {
   const input = buildExplainInput(a, app, decision, ruleset);
   const ctx = buildGroundingContext(input);
+
+  // No key configured: the deterministic template is the explanation. Always grounded.
+  if (!client) {
+    return { output: templateExplanation(input), validation_outcome: "fell_back_to_template" };
+  }
 
   const first = await requestExplanation(client, input);
   const firstIssues = first

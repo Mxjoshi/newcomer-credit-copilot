@@ -7,18 +7,25 @@ that survives into the deck gets fact-checked and styled there.
 
 The point of this beat: the audience watches policy change without a code change.
 
-Exact steps, in order:
+There are now two ways to run it. The on-stage version (option A) is fully in-app, safe, and
+repeatable; the file version (option B) shows that the policy really is just a config file.
 
-1. Have the app open on the impact tab, showing the current approval, decline, and refer split
-   across the 24 ground-truth profiles under uae v1.0.
-2. Switch to the editor, open `config/uae/policy-rules.json` (the live ruleset; the v1.0 file
-   next to it stays locked), and scroll to the parameters block so the cap is visible on screen.
-3. Change the DBR cap from 0.50 to 0.45. Say what you are doing while you type it: "the regulator
-   tightens the debt burden ceiling, this is the whole change."
-4. Rerun the impact tab.
-5. Narrate the shift: which profiles moved from approve to refer or decline, and that every moved
-   decision still carries its policy citation, now pointing at the 0.45 rule.
-6. Close with the line: **policy is configuration, a new market is a pack, not a project.**
+**Option A, the in-app what-if (recommended for the live demo):**
+1. Open the impact tab. The "Policy what-if" panel sits at the top, the locked v1.0 baseline
+   showing the approval, decline, and refer split across the 24 profiles.
+2. Drag the debt burden ratio cap slider from 50 percent down to 45. The 24-profile run
+   re-computes live as you drag; the panel badge flips from "locked v1.0 baseline" to "what-if".
+3. Narrate the shift: approvals drop from 7 of 8 to 6 of 8, GT-04 and GT-24 move to decline, and
+   every moved decision still carries its policy citation, now reading 45 percent.
+4. Click "Reset to locked v1.0 baseline" to snap back. Nothing was written to disk; the locked
+   pack is untouched, so the demo is repeatable on the spot.
+5. Close with the line: **policy is configuration, a new market is a pack, not a project.**
+
+**Option B, the config file (use to prove it is genuinely just config):**
+1. Show the impact tab baseline.
+2. Open `config/uae/policy-rules.json` (the live ruleset; the v1.0 file next to it stays locked),
+   change dbr_cap from 0.50 to 0.45, save.
+3. Rerun the impact tab. Same shift, driven by an actual file edit. Restore 0.50 after.
 
 Build status (2026-06-12): the pack exists. The engine reads
 `03-build/app/config/uae/policy-rules.json`; values, rule sentences, citations, and band

@@ -312,3 +312,22 @@ renders one policy row per enabled rule: a pack with 10 rules shows 10 rows, a p
 shows 5. The same holds for the scorecard: the score table renders one row per enabled factor
 in the pack's scorecard block (uae v1.0 enables five). The impact view's champion is the locked
 v1.0 pack; the challenger is the live, editable pack file.
+
+---
+
+## Amendment (2026-06-13, Step 5 build): two UI additions beyond the signed-off flow
+
+The signed-off screens above are unchanged in intent. The build added two things, both fair
+Phase 3 build-reality adjustments (the doc allows this), recorded here so the design and the app
+stay in sync:
+
+- **Screen 2 gains a "what was submitted" summary card** at the top: a compact read-only echo of
+  the applicant, policy inputs, and the request. It reinforces the transparency story (these are
+  the exact inputs, nothing hidden) while the three reasoning steps run. The full data still
+  lives on Screen 3's scorecard; this is a summary, not a re-render.
+- **The impact tab gains a live "policy what-if" control.** A slider for the debt burden cap plus
+  number inputs for the amount multiple, max age, and min tenure. Moving any of them re-runs the
+  24-profile champion-vs-challenger live, with the cited rule text re-rendered from the new
+  value. Overrides are applied in memory only (never written to the pack file), so the locked
+  v1.0 baseline is one click away. This makes the "policy is configuration" demo clickable on
+  stage without editing a file.
