@@ -313,24 +313,32 @@ export default function ImpactView() {
         </div>
       </div>
 
-      <p className="text-sm text-slate-700">
-        Decision accuracy vs the locked labels:{" "}
-        <strong>
-          {data.accuracy} of {data.total}
-        </strong>{" "}
-        ({((data.accuracy / data.total) * 100).toFixed(1)}%, target 80%+).
-      </p>
+      <div>
+        <p className="text-sm text-slate-700">
+          Decision accuracy vs the locked labels:{" "}
+          <strong>
+            {data.accuracy} of {data.total}
+          </strong>{" "}
+          ({((data.accuracy / data.total) * 100).toFixed(1)}%, target 80%+).
+        </p>
+        <p className="mt-1 text-xs text-slate-500">
+          Below are the 24 test profiles in the benchmark: synthetic applicants, each with a known
+          correct outcome (the &ldquo;label&rdquo;), locked before the model was built so the
+          model cannot grade its own exam. &ldquo;Match&rdquo; is whether the model agreed with
+          the label.
+        </p>
+      </div>
 
       <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
         <table className="w-full text-xs">
           <thead>
             <tr className="border-b border-slate-200 bg-slate-50 text-left text-slate-500">
-              <th className="px-3 py-2">Profile</th>
+              <th className="px-3 py-2">Test applicant</th>
               <th className="px-3 py-2">Score</th>
               <th className="px-3 py-2">Band</th>
               <th className="px-3 py-2">Rules failed</th>
-              <th className="px-3 py-2">Outcome</th>
-              <th className="px-3 py-2">Label</th>
+              <th className="px-3 py-2">Model says</th>
+              <th className="px-3 py-2">Correct answer</th>
               <th className="px-3 py-2">Match</th>
             </tr>
           </thead>
@@ -345,7 +353,8 @@ export default function ImpactView() {
                   }`}
                 >
                   <td className="px-3 py-2 font-medium text-slate-700">
-                    {row.id}
+                    {row.applicant_name}
+                    <span className="ml-1.5 text-[10px] text-slate-400">{row.id}</span>
                     {moved && (
                       <span className="ml-1.5 rounded bg-indigo-200 px-1.5 py-0.5 text-[10px] font-semibold text-indigo-800">
                         moved

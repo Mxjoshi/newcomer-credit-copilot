@@ -186,22 +186,108 @@ export default function PolicyView() {
   );
 }
 
-// Renders one scorecard factor: name, rationale, and any tier tables or category maps it
-// carries. Generic, so it copes with whatever shape a factor's tiers take.
+// Renders one scorecard factor: name, rationale, and its tiers. A factor block can hold four
+// shapes, so each is detected and rendered on its own terms: tier tables (arrays of
+// {points, rationale}), point maps (category -> {points, rationale}), point bonuses
+// (category -> number, e.g. visa_bonus), and plain lists (arrays of strings, e.g. which visas
+// count as long-term). This is what fixes the "undefinedpt" rendering.
+
+const sectionLabel = (k: string) => k.replace(/_/g, " ");
+const titleWord = (k: string) => k.replace(/_/g, " ");
+
+function Section({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div>
+      <div className="mb-1 text-[11px] font-medium uppercase tracking-wide text-slate-400">
+        {label}
+      </div>
+      <div className="flex flex-col gap-1">{children}</div>
+    </div>
+  );
+}
+
+function pointRow(points: unknown, text: string, key: string | number) {
+  const p = typeof points === "number" ? `${points >= 0 ? "+" : ""}${points}` : "";
+  return (
+    <div key={key} className="flex gap-2 text-xs">
+      <span className="w-10 shrink-0 font-mono font-semibold text-indigo-700">{p}</span>
+      <span className="text-slate-600">{text}</span>
+    </div>
+  );
+}
+
 function FactorCard({ factor }: { factor: Record<string, unknown> }) {
-  const skip = new Set(["factor_id", "enabled", "factor_name", "_rationale", "threshold_label"]);
-  const tierBlocks: Array<[string, Array<Record<string, unknown>>]> = [];
-  const categoryBlocks: Array<[string, Record<string, unknown>]> = [];
+  const skip = new Set([
+    "factor_id",
+    "enabled",
+    "factor_name",
+    "_rationale",
+    "threshold_label",
+    "max_points",
+    "long_term_bonus_rationale",
+  ]);
+
+  const sections: React.ReactNode[] = [];
 
   for (const [key, value] of Object.entries(factor)) {
     if (skip.has(key)) continue;
+
     if (Array.isArray(value)) {
-      tierBlocks.push([key, value as Array<Record<string, unknown>>]);
-    } else if (value && typeof value === "object" && "points" in (value as object)) {
-      // single entry like "unemployed": {points, rationale}
-      categoryBlocks.push([key, { [key]: value }]);
+      const arr = value as unknown[];
+      if (arr.length > 0 && typeof arr[0] === "object" && arr[0] !== null) {
+        // Tier table: rows of { points, rationale, threshold }.
+        sections.push(
+          <Section key={key} label={sectionLabel(key)}>
+            {(arr as Array<Record<string, unknown>>).map((row, i) =>
+              pointRow(row.points, String(row.rationale ?? ""), i),
+            )}
+          </Section>,
+        );
+      } else {
+        // Plain list of strings, e.g. which visa types count as long-term.
+        sections.push(
+          <Section key={key} label={sectionLabel(key)}>
+            <div className="text-xs text-slate-600">
+              {arr.map((v) => titleWord(String(v))).join(", ")}
+            </div>
+          </Section>,
+        );
+      }
     } else if (value && typeof value === "object") {
-      categoryBlocks.push([key, value as Record<string, unknown>]);
+      const entries = Object.entries(value as Record<string, unknown>);
+      const isPointMap = entries.every(
+        ([, v]) => v !== null && typeof v === "object" && "points" in (v as object),
+      );
+      if (isPointMap) {
+        sections.push(
+          <Section key={key} label={sectionLabel(key)}>
+            {entries.map(([name, raw]) => {
+              const v = raw as { points?: number; rationale?: string };
+              return pointRow(
+                v.points,
+                `${titleWord(name)}${v.rationale ? ` · ${v.rationale}` : ""}`,
+                name,
+              );
+            })}
+          </Section>,
+        );
+      } else {
+        // Numeric bonus map, e.g. visa_bonus { golden: 4, green: 4, ... }.
+        sections.push(
+          <Section key={key} label={sectionLabel(key)}>
+            {entries
+              .filter(([, v]) => typeof v === "number")
+              .map(([name, v]) => pointRow(v, titleWord(name), name))}
+          </Section>,
+        );
+      }
+    } else if (typeof value === "number") {
+      // A scalar like a single bonus value.
+      sections.push(
+        <Section key={key} label={sectionLabel(key)}>
+          {pointRow(value, "", key)}
+        </Section>,
+      );
     }
   }
 
@@ -218,48 +304,7 @@ function FactorCard({ factor }: { factor: Record<string, unknown> }) {
       {!!factor._rationale && (
         <p className="mt-1 text-xs text-slate-500">{String(factor._rationale)}</p>
       )}
-      <div className="mt-2.5 flex flex-col gap-2">
-        {tierBlocks.map(([key, rows]) => (
-          <div key={key}>
-            <div className="mb-1 text-[11px] font-medium uppercase tracking-wide text-slate-400">
-              {key.replace(/_/g, " ")}
-            </div>
-            <div className="flex flex-col gap-1">
-              {rows.map((row, i) => (
-                <div key={i} className="flex gap-2 text-xs">
-                  <span className="w-10 shrink-0 font-mono font-semibold text-indigo-700">
-                    {String(row.points)}pt
-                  </span>
-                  <span className="text-slate-600">{String(row.rationale ?? "")}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        ))}
-        {categoryBlocks.map(([key, map]) => (
-          <div key={key}>
-            <div className="mb-1 text-[11px] font-medium uppercase tracking-wide text-slate-400">
-              {key.replace(/_/g, " ")}
-            </div>
-            <div className="flex flex-col gap-1">
-              {Object.entries(map).map(([name, raw]) => {
-                const v = (raw ?? {}) as { points?: number; rationale?: string };
-                return (
-                  <div key={name} className="flex gap-2 text-xs">
-                    <span className="w-10 shrink-0 font-mono font-semibold text-indigo-700">
-                      {typeof v.points === "number" ? `${v.points}pt` : ""}
-                    </span>
-                    <span className="text-slate-600">
-                      <strong>{name.replace(/_/g, " ")}</strong>
-                      {v.rationale ? ` · ${v.rationale}` : ""}
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        ))}
-      </div>
+      <div className="mt-2.5 flex flex-col gap-2.5">{sections}</div>
     </div>
   );
 }
