@@ -346,6 +346,7 @@ export default function Home() {
                   record={view.record}
                   onAction={onOfficerAction}
                   onNew={() => setView({ kind: "intake" })}
+                  onViewAudit={() => setView({ kind: "audit" })}
                 />
               ) : (
                 <ImpactView />

@@ -13,6 +13,7 @@ interface Props {
   record: CaseRecord;
   onAction: (action: "accepted" | "overridden", overrideReason?: string) => void;
   onNew: () => void;
+  onViewAudit: () => void;
 }
 
 const VERDICT: Record<
@@ -45,7 +46,7 @@ const VALIDATION_LABEL: Record<string, string> = {
   fell_back_to_template: "deterministic explanation",
 };
 
-export default function DecisionView({ record, onAction, onNew }: Props) {
+export default function DecisionView({ record, onAction, onNew, onViewAudit }: Props) {
   const { decision, applicant, application } = record;
   const verdict = VERDICT[decision.recommendation];
   const overrideOptions = (["approve", "decline", "refer"] as const).filter(
@@ -201,6 +202,24 @@ export default function DecisionView({ record, onAction, onNew }: Props) {
           New assessment
         </button>
       </section>
+
+      {decision.officer_action !== "none" && (
+        <div className="flex flex-wrap items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-emerald-600">
+            <path d="M5 12l5 5 9-11" />
+          </svg>
+          <span className="text-slate-700">
+            Saved to the audit log{" "}
+            <span className="text-slate-400">· ruleset {decision.ruleset_version}</span>
+          </span>
+          <button
+            onClick={onViewAudit}
+            className="ml-auto rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-slate-100"
+          >
+            View in audit log
+          </button>
+        </div>
+      )}
 
       {overriding && decision.officer_action === "none" && (
         <section className="animate-scale-in rounded-2xl border border-slate-300 bg-slate-50 p-5">
