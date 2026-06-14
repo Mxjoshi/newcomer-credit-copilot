@@ -79,14 +79,6 @@ export default function PolicyView() {
 
   return (
     <div className="flex flex-col gap-5">
-      <div>
-        <h2 className="text-lg font-semibold text-slate-900">Policy</h2>
-        <p className="text-sm text-slate-500">
-          The live ruleset, exactly as the engine runs it. This is the file behind every
-          decision.
-        </p>
-      </div>
-
       <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
         <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm">
           <span className="rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-800">

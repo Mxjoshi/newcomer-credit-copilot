@@ -16,7 +16,7 @@ import {
 } from "@/lib/policyVersions";
 import type { RulesetSummary } from "@/components/summary";
 import Brand from "@/components/Brand";
-import Hero from "@/components/Hero";
+import WelcomeView from "@/components/WelcomeView";
 import IntakeForm from "@/components/IntakeForm";
 import AssessmentProgress from "@/components/AssessmentProgress";
 import DecisionView from "@/components/DecisionView";
@@ -26,6 +26,7 @@ import VersionsView from "@/components/VersionsView";
 import CaseList from "@/components/CaseList";
 
 type ViewKind =
+  | "home"
   | "intake"
   | "assessing"
   | "decision"
@@ -35,6 +36,7 @@ type ViewKind =
   | "queue"
   | "audit";
 type View =
+  | { kind: "home" }
   | { kind: "intake" }
   | { kind: "assessing"; applicant: Applicant; application: Application }
   | { kind: "decision"; record: CaseRecord }
@@ -46,6 +48,12 @@ type View =
 
 // Stroke icons, 18px, for the rail.
 const icons: Record<string, React.ReactNode> = {
+  home: (
+    <>
+      <path d="M3 11l9-7 9 7" />
+      <path d="M5 10v10h14V10" />
+    </>
+  ),
   intake: (
     <path d="M12 5v14M5 12h14" />
   ),
@@ -82,7 +90,7 @@ const icons: Record<string, React.ReactNode> = {
 };
 
 export default function Home() {
-  const [view, setView] = useState<View>({ kind: "intake" });
+  const [view, setView] = useState<View>({ kind: "home" });
   const [tab, setTab] = useState<"case" | "impact">("case");
   const [cases, setCases] = useState<CaseRecord[]>([]);
   const [summary, setSummary] = useState<RulesetSummary | null>(null);
@@ -141,6 +149,44 @@ export default function Home() {
     setView({ kind: "decision", record });
   };
 
+  // The persistent top bar shows the current screen's name and a one-line description.
+  const screenMeta: Record<ViewKind, { title: string; description: string }> = {
+    home: {
+      title: "Overview",
+      description: "What this console does and where to start.",
+    },
+    intake: {
+      title: "New assessment",
+      description: "Enter a newcomer applicant, or load a prepared scenario.",
+    },
+    assessing: {
+      title: "Assessment in progress",
+      description: "Scoring, checking lending policy, and writing the explanation.",
+    },
+    decision: {
+      title: "Decision",
+      description: "The recommendation, the evidence behind it, and the officer's call.",
+    },
+    policy: { title: "Policy", description: "The live ruleset, exactly as the engine runs it." },
+    versions: {
+      title: "Policy versions",
+      description: "Create, activate, and roll back ruleset versions, each with a rationale.",
+    },
+    impact: {
+      title: "Policy impact",
+      description: "Champion vs challenger on the 24 locked profiles, with a live what-if.",
+    },
+    queue: { title: "Review queue", description: "Refers awaiting a human decision." },
+    audit: { title: "Audit log", description: "Every assessment and the officer action taken." },
+  };
+  const screen =
+    view.kind === "decision"
+      ? {
+          title: `Decision · ${view.record.applicant.full_name}`,
+          description: screenMeta.decision.description,
+        }
+      : screenMeta[view.kind];
+
   const navItem = (kind: ViewKind, label: string, badge?: number) => {
     const active = view.kind === kind || (kind === "intake" && view.kind === "assessing");
     return (
@@ -179,7 +225,7 @@ export default function Home() {
     <div className="flex min-h-screen">
       <aside className="sticky top-0 flex h-screen w-16 shrink-0 flex-col bg-[#0b1a2e] md:w-60">
         <button
-          onClick={() => setView({ kind: "intake" })}
+          onClick={() => setView({ kind: "home" })}
           className="flex items-center gap-3 px-4 py-5 text-left"
         >
           <Brand size={34} />
@@ -191,7 +237,8 @@ export default function Home() {
           </span>
         </button>
 
-        <nav className="flex flex-1 flex-col gap-1 px-2.5">
+        <nav className="flex flex-1 flex-col gap-1 px-2.5 pt-2">
+          {navItem("home", "Overview")}
           <div className="hidden px-3 pb-1 pt-3 text-[10px] font-semibold uppercase tracking-wider text-slate-500 md:block">
             Assess
           </div>
@@ -232,13 +279,40 @@ export default function Home() {
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <main className="mx-auto w-full max-w-5xl flex-1 px-6 py-8">
-          {view.kind === "intake" && (
-            <div className="flex flex-col gap-7">
-              <Hero summary={summary} />
-              <IntakeForm summary={summary} onAssess={onAssess} />
+        <header className="sticky top-0 z-10 border-b border-slate-200/70 bg-white/85 backdrop-blur-md">
+          <div className="mx-auto flex w-full max-w-5xl items-center justify-between gap-3 px-6 py-3.5">
+            <div>
+              <h1 className="text-base font-semibold leading-tight text-slate-900">
+                {screen.title}
+              </h1>
+              <p className="text-xs text-slate-500">{screen.description}</p>
             </div>
+            {summary && (
+              <span className="flex items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs">
+                <span className="text-slate-500">Ruleset</span>
+                <span className="font-mono font-semibold text-slate-800">
+                  {activeVersion?.label ?? summary.ruleset_version}
+                </span>
+                {activeVersion && !activeVersion.is_base && (
+                  <span className="rounded bg-amber-100 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-amber-700">
+                    active
+                  </span>
+                )}
+              </span>
+            )}
+          </div>
+        </header>
+
+        <main className="mx-auto w-full max-w-5xl flex-1 px-6 py-8">
+          {view.kind === "home" && (
+            <WelcomeView
+              summary={summary}
+              queueCount={queueCount}
+              onNavigate={(kind) => setView({ kind } as View)}
+            />
           )}
+
+          {view.kind === "intake" && <IntakeForm summary={summary} onAssess={onAssess} />}
 
           {view.kind === "assessing" && (
             <AssessmentProgress
@@ -289,18 +363,7 @@ export default function Home() {
             />
           )}
 
-          {view.kind === "impact" && (
-            <div className="flex flex-col gap-4">
-              <div>
-                <h2 className="text-lg font-semibold text-slate-900">Policy impact</h2>
-                <p className="text-sm text-slate-500">
-                  Champion vs challenger on the 24 locked profiles. Move a policy value and watch
-                  the decisions shift, live.
-                </p>
-              </div>
-              <ImpactView />
-            </div>
-          )}
+          {view.kind === "impact" && <ImpactView />}
 
           {view.kind === "queue" && <CaseList cases={cases} mode="queue" onOpen={openCase} />}
 

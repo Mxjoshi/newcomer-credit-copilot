@@ -182,13 +182,7 @@ export default function IntakeForm({ summary, onAssess }: Props) {
 
   return (
     <div className="flex flex-col gap-5">
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h2 className="text-lg font-semibold text-slate-900">New assessment</h2>
-          <p className="text-sm text-slate-500">
-            Enter a newcomer applicant, or load a prepared scenario to see the flow.
-          </p>
-        </div>
+      <div className="flex flex-wrap items-end justify-end gap-3">
         <label className="flex flex-col gap-1 text-sm">
           <span className="font-medium text-slate-600">Load a sample scenario</span>
           <select

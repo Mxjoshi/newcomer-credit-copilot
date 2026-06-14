@@ -92,14 +92,11 @@ export default function VersionsView({ summary, activeLabel, onActivate }: Props
 
   return (
     <div className="flex flex-col gap-5">
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h2 className="text-lg font-semibold text-slate-900">Policy versions</h2>
-          <p className="text-sm text-slate-500">
-            Every policy change is a version, with a rationale, switchable and reversible. The
-            active version drives every assessment.
-          </p>
-        </div>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <p className="max-w-2xl text-sm text-slate-500">
+          Every policy change is a version, with a rationale, switchable and reversible. The
+          active version drives every assessment.
+        </p>
         {!creating && (
           <button
             onClick={startCreate}

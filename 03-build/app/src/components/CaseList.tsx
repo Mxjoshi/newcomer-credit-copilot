@@ -23,16 +23,11 @@ export default function CaseList({ cases, mode, onOpen }: Props) {
 
   return (
     <div className="flex flex-col gap-4">
-      <div>
-        <h2 className="text-lg font-semibold text-slate-900">
-          {mode === "queue" ? "Review queue" : "Audit log"}
-        </h2>
-        <p className="text-sm text-slate-500">
-          {mode === "queue"
-            ? `${shown.length} ${shown.length === 1 ? "case" : "cases"} awaiting a human decision.`
-            : `${shown.length} ${shown.length === 1 ? "assessment" : "assessments"} recorded in this browser, every officer action included.`}
-        </p>
-      </div>
+      <p className="text-sm text-slate-500">
+        {mode === "queue"
+          ? `${shown.length} ${shown.length === 1 ? "case" : "cases"} awaiting a human decision.`
+          : `${shown.length} ${shown.length === 1 ? "assessment" : "assessments"} recorded in this browser, every officer action included.`}
+      </p>
 
       {shown.length === 0 && (
         <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center text-sm text-slate-400">
