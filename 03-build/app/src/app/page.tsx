@@ -14,12 +14,14 @@ import IntakeForm from "@/components/IntakeForm";
 import AssessmentProgress from "@/components/AssessmentProgress";
 import DecisionView from "@/components/DecisionView";
 import ImpactView from "@/components/ImpactView";
+import PolicyView from "@/components/PolicyView";
 import CaseList from "@/components/CaseList";
 
 type View =
   | { kind: "intake" }
   | { kind: "assessing"; applicant: Applicant; application: Application }
   | { kind: "decision"; record: CaseRecord }
+  | { kind: "policy" }
   | { kind: "impact" }
   | { kind: "queue" }
   | { kind: "audit" };
@@ -112,6 +114,7 @@ export default function Home() {
             {navButton("New assessment", view.kind === "intake", () =>
               setView({ kind: "intake" }),
             )}
+            {navButton("Policy", view.kind === "policy", () => setView({ kind: "policy" }))}
             {navButton("Policy impact", view.kind === "impact", () =>
               setView({ kind: "impact" }),
             )}
@@ -168,6 +171,8 @@ export default function Home() {
             )}
           </div>
         )}
+
+        {view.kind === "policy" && <PolicyView />}
 
         {view.kind === "impact" && (
           <div className="flex flex-col gap-4">
