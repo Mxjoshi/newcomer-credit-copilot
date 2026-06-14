@@ -9,12 +9,14 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Applicant, Application, Decision } from "@/lib/types";
 import { SLOW_NOTICE_MS } from "@/lib/constants";
+import type { PolicyVersion } from "@/lib/policyVersions";
 import type { RulesetSummary } from "./summary";
 
 interface Props {
   applicant: Applicant;
   application: Application;
   summary: RulesetSummary | null;
+  activeVersion: PolicyVersion | null;
   onComplete: (decision: Decision) => void;
 }
 
@@ -23,7 +25,13 @@ type StepState = "pending" | "busy" | "done";
 const fmtAed = (n: number) => `AED ${n.toLocaleString("en-US")}`;
 const titleCase = (s: string) => s.replace(/_/g, " ");
 
-export default function AssessmentProgress({ applicant, application, summary, onComplete }: Props) {
+export default function AssessmentProgress({
+  applicant,
+  application,
+  summary,
+  activeVersion,
+  onComplete,
+}: Props) {
   const [steps, setSteps] = useState<[StepState, StepState, StepState]>([
     "busy",
     "pending",
@@ -40,7 +48,13 @@ export default function AssessmentProgress({ applicant, application, summary, on
     running.current = true;
     const slowTimer = setTimeout(() => setSlow(true), SLOW_NOTICE_MS);
     try {
-      const body = JSON.stringify({ applicant, application });
+      // When a non-base version is active, run the assessment under its values and stamp the
+      // decision with its label.
+      const overrides =
+        activeVersion && !activeVersion.is_base
+          ? { params: activeVersion.params, ruleset_version: activeVersion.label }
+          : undefined;
+      const body = JSON.stringify({ applicant, application, overrides });
       const headers = { "Content-Type": "application/json" };
 
       const decideRes = await fetch("/api/decide", { method: "POST", headers, body });
@@ -79,7 +93,7 @@ export default function AssessmentProgress({ applicant, application, summary, on
     } finally {
       running.current = false;
     }
-  }, [applicant, application, summary, onComplete]);
+  }, [applicant, application, summary, activeVersion, onComplete]);
 
   useEffect(() => {
     const kickoff = setTimeout(() => void run(), 0);

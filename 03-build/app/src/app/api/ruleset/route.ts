@@ -19,5 +19,12 @@ export async function GET() {
     max_points: ruleset.scorecard.length * 20,
     product_min_salary: ruleset.parameters.product_min_salary,
     personal_loan_max_term_months: ruleset.parameters.personal_loan_max_term_months,
+    // The version-editable parameters, so the client can seed the locked v1.0 base version.
+    params: {
+      dbr_cap: ruleset.parameters.dbr_cap,
+      amount_salary_multiple: ruleset.parameters.amount_salary_multiple,
+      max_age_at_maturity: ruleset.parameters.max_age_at_maturity,
+      min_tenure_months: ruleset.parameters.min_tenure_months,
+    },
   });
 }

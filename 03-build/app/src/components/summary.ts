@@ -13,4 +13,13 @@ export interface RulesetSummary {
   max_points: number;
   product_min_salary: Record<string, number>;
   personal_loan_max_term_months: number;
+  params: VersionParams;
+}
+
+// The four version-editable policy parameters.
+export interface VersionParams {
+  dbr_cap: number;
+  amount_salary_multiple: number;
+  max_age_at_maturity: number;
+  min_tenure_months: number;
 }

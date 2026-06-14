@@ -8,6 +8,12 @@
 import { useCallback, useEffect, useState } from "react";
 import type { Applicant, Application, CaseRecord, Decision } from "@/lib/types";
 import { createCase, loadCases, recordOfficerAction } from "@/lib/cases";
+import {
+  ensureBase,
+  getActiveLabel,
+  getVersion,
+  type PolicyVersion,
+} from "@/lib/policyVersions";
 import type { RulesetSummary } from "@/components/summary";
 import Brand from "@/components/Brand";
 import Hero from "@/components/Hero";
@@ -16,14 +22,24 @@ import AssessmentProgress from "@/components/AssessmentProgress";
 import DecisionView from "@/components/DecisionView";
 import ImpactView from "@/components/ImpactView";
 import PolicyView from "@/components/PolicyView";
+import VersionsView from "@/components/VersionsView";
 import CaseList from "@/components/CaseList";
 
-type ViewKind = "intake" | "assessing" | "decision" | "policy" | "impact" | "queue" | "audit";
+type ViewKind =
+  | "intake"
+  | "assessing"
+  | "decision"
+  | "policy"
+  | "versions"
+  | "impact"
+  | "queue"
+  | "audit";
 type View =
   | { kind: "intake" }
   | { kind: "assessing"; applicant: Applicant; application: Application }
   | { kind: "decision"; record: CaseRecord }
   | { kind: "policy" }
+  | { kind: "versions" }
   | { kind: "impact" }
   | { kind: "queue" }
   | { kind: "audit" };
@@ -55,6 +71,14 @@ const icons: Record<string, React.ReactNode> = {
       <path d="M12 8v4l3 2" />
     </>
   ),
+  versions: (
+    <>
+      <circle cx="6" cy="6" r="2.5" />
+      <circle cx="6" cy="18" r="2.5" />
+      <circle cx="18" cy="12" r="2.5" />
+      <path d="M6 8.5v7M8.5 6H14a2 2 0 0 1 2 2v2M8.5 18H14a2 2 0 0 0 2-2v-2" />
+    </>
+  ),
 };
 
 export default function Home() {
@@ -62,21 +86,30 @@ export default function Home() {
   const [tab, setTab] = useState<"case" | "impact">("case");
   const [cases, setCases] = useState<CaseRecord[]>([]);
   const [summary, setSummary] = useState<RulesetSummary | null>(null);
+  const [activeVersion, setActiveVersion] = useState<PolicyVersion | null>(null);
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
       const res = await fetch("/api/ruleset").catch(() => null);
       const data = res && res.ok ? ((await res.json()) as RulesetSummary) : null;
-      if (!cancelled) {
-        setSummary(data);
-        setCases(loadCases());
+      if (cancelled) return;
+      setSummary(data);
+      setCases(loadCases());
+      if (data) {
+        ensureBase(data.ruleset_version, data.params);
+        const label = getActiveLabel(data.ruleset_version);
+        setActiveVersion(getVersion(label) ?? getVersion(data.ruleset_version) ?? null);
       }
     })();
     return () => {
       cancelled = true;
     };
   }, []);
+
+  const activateVersion = (label: string) => {
+    setActiveVersion(getVersion(label) ?? null);
+  };
 
   const queueCount = cases.filter((c) => c.status === "awaiting_review").length;
 
@@ -169,13 +202,23 @@ export default function Home() {
             Govern
           </div>
           {navItem("policy", "Policy")}
+          {navItem("versions", "Versions")}
           {navItem("impact", "Policy impact")}
         </nav>
 
         <div className="hidden border-t border-white/10 px-4 py-4 text-xs md:block">
           {summary ? (
             <>
-              <div className="font-medium text-slate-300">{summary.ruleset_version}</div>
+              <div className="flex items-center gap-1.5">
+                <span className="font-mono font-medium text-slate-200">
+                  {activeVersion?.label ?? summary.ruleset_version}
+                </span>
+                {activeVersion && !activeVersion.is_base && (
+                  <span className="rounded bg-amber-400/20 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-amber-300">
+                    active
+                  </span>
+                )}
+              </div>
               <div className="text-slate-500">
                 {summary.market_name} · {summary.rule_count} rules · {summary.factor_count}{" "}
                 factors
@@ -202,6 +245,7 @@ export default function Home() {
               applicant={view.applicant}
               application={view.application}
               summary={summary}
+              activeVersion={activeVersion}
               onComplete={onComplete}
             />
           )}
@@ -236,6 +280,14 @@ export default function Home() {
           )}
 
           {view.kind === "policy" && <PolicyView />}
+
+          {view.kind === "versions" && (
+            <VersionsView
+              summary={summary}
+              activeLabel={activeVersion?.label ?? summary?.ruleset_version ?? ""}
+              onActivate={activateVersion}
+            />
+          )}
 
           {view.kind === "impact" && (
             <div className="flex flex-col gap-4">

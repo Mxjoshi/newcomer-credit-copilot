@@ -10,10 +10,12 @@ import { loadLiveRuleset } from "@/lib/livePack";
 export async function POST(request: Request) {
   let applicant: Applicant;
   let application: Application;
+  let overrides: { params?: Record<string, number>; ruleset_version?: string } | undefined;
   try {
     const body = await request.json();
     applicant = body.applicant;
     application = body.application;
+    overrides = body.overrides;
     if (!applicant || !application) throw new Error("missing applicant or application");
   } catch {
     return NextResponse.json(
@@ -21,6 +23,6 @@ export async function POST(request: Request) {
       { status: 400 },
     );
   }
-  const ruleset = await loadLiveRuleset();
+  const ruleset = await loadLiveRuleset(overrides);
   return NextResponse.json({ decision: assess(applicant, application, ruleset) });
 }
