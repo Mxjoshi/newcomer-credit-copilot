@@ -126,22 +126,24 @@ export default function Home() {
     setView({ kind: "assessing", applicant, application });
   };
 
-  const onComplete = useCallback((decision: Decision) => {
-    setView((current) => {
-      if (current.kind !== "assessing") return current;
-      const record = createCase(current.applicant, current.application, decision);
+  // The case is created here, NOT inside a setState updater: updater functions must be pure, and
+  // React invokes them twice in development, which would write the record twice.
+  const onComplete = useCallback(
+    (decision: Decision, applicant: Applicant, application: Application) => {
+      const record = createCase(applicant, application, decision);
       setCases(loadCases());
-      return { kind: "decision", record };
-    });
-  }, []);
+      setView({ kind: "decision", record });
+    },
+    [],
+  );
 
+  // Same rule as onComplete: the localStorage write happens in the handler body, not inside a
+  // setState updater (which React double-invokes in development).
   const onOfficerAction = (action: "accepted" | "overridden", overrideReason?: string) => {
-    setView((current) => {
-      if (current.kind !== "decision") return current;
-      const updated = recordOfficerAction(current.record.case_id, action, overrideReason);
-      setCases(loadCases());
-      return updated ? { kind: "decision", record: updated } : current;
-    });
+    if (view.kind !== "decision") return;
+    const updated = recordOfficerAction(view.record.case_id, action, overrideReason);
+    setCases(loadCases());
+    if (updated) setView({ kind: "decision", record: updated });
   };
 
   const openCase = (record: CaseRecord) => {

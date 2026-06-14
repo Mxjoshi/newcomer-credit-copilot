@@ -17,7 +17,7 @@ interface Props {
   application: Application;
   summary: RulesetSummary | null;
   activeVersion: PolicyVersion | null;
-  onComplete: (decision: Decision) => void;
+  onComplete: (decision: Decision, applicant: Applicant, application: Application) => void;
 }
 
 type StepState = "pending" | "busy" | "done";
@@ -82,7 +82,7 @@ export default function AssessmentProgress({
       setSteps(["done", "done", "done"]);
       setResults((prev) => [prev[0], prev[1], "explanation written and grounded"]);
       clearTimeout(slowTimer);
-      setTimeout(() => onComplete(decision), 550);
+      setTimeout(() => onComplete(decision, applicant, application), 550);
     } catch (err) {
       clearTimeout(slowTimer);
       setFailed(

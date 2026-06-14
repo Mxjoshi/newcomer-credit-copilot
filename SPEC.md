@@ -319,3 +319,73 @@ over the 24 profiles, with each explanation verified by hand.
 - A second market pack (for example a Saudi pack with SIMAH and SAMA) to prove a market is a pack.
 - Real bureau integration and authentication.
 - An optional in-app assistant to answer officer questions about a decision or the policy.
+
+---
+
+## Appendix A: Repository layout
+
+The repository is organised by capstone phase at the top level, with the application under
+`03-build/app`.
+
+```
+AI-Capstone/
+  00-reference/             the course brief
+  01-scope-and-research/    Phase 1 deliverables (problem, competitors, metrics)
+  02-design/                Phase 2 deliverables (UI flow, data model)
+  03-build/                 Phase 3 build
+    app/                    the Next.js application (below)
+  04-evaluate-and-ship/     Phase 4 (ground truth, pitch notes, user journey)
+  SPEC.md                   this specification
+  README.md
+```
+
+The application:
+
+```
+03-build/app/
+  config/uae/
+    policy-rules.json        the live, editable market pack
+    policy-rules.v1.0.json   the locked v1.0 reference
+  src/
+    app/
+      page.tsx               the shell: left rail, top bar, screen routing
+      layout.tsx, globals.css
+      api/
+        decide/route.ts      deterministic core only
+        assess/route.ts      core plus the LLM explanation
+        ruleset/route.ts     pack summary
+        impact/route.ts      champion vs challenger, with what-if overrides
+        policy/route.ts      the full live ruleset, read only
+    components/
+      WelcomeView.tsx         the overview landing
+      IntakeForm.tsx          Screen 1, intake
+      AssessmentProgress.tsx  Screen 2, the visible three steps
+      DecisionView.tsx        Screen 3, the decision
+      ImpactView.tsx          champion vs challenger and the what-if
+      PolicyView.tsx          the live ruleset, read only
+      VersionsView.tsx        policy versions
+      CaseList.tsx            review queue and audit log
+      Brand.tsx, summary.ts   the mark, and the shared summary type
+    lib/
+      types.ts                the entity shapes
+      constants.ts            app constants (model id, storage keys, timeouts)
+      ruleset.ts              builds and validates a market pack
+      packValidate.ts         shared pack validation helpers
+      policy.ts               rule check semantics, keyed by rule_id
+      scorecard.ts            factor compute semantics, keyed by factor_id
+      decision.ts             combination logic and counterfactuals
+      explain.ts              the LLM explanation layer
+      validator.ts            the deterministic grounding validator
+      livePack.ts             server-side pack loader, with overrides
+      cases.ts                CaseRecord storage (review queue, audit log)
+      policyVersions.ts       the policy version store
+      policyLog.ts            the what-if change log
+      samples.ts              the six sample scenarios
+      groundTruth.ts          the 24 locked profiles (mirror of the markdown)
+  tests/
+    core.test.ts             the deterministic core and the market pack
+    explain.test.ts          the explanation layer and the grounding validator
+    samples.test.ts          asserts each sample lands on its labelled outcome
+  scripts/
+    harness.ts               runs the 24 profiles through the core
+```
