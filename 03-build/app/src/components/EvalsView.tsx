@@ -117,7 +117,9 @@ export default function EvalsView() {
 
   const metric = (label: string, value: string, target: string, met: boolean) => (
     <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-      <div className="text-xs text-slate-500">{label}</div>
+      <div className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+        {label}
+      </div>
       <div className="mt-1 flex items-baseline gap-2">
         <span className="text-xl font-bold text-slate-900">{value}</span>
         <span

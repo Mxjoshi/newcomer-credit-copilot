@@ -185,7 +185,9 @@ export default function ImpactView() {
 
   const stat = (label: string, value: number, accent: string) => (
     <div>
-      <div className="text-xs text-slate-500">{label}</div>
+      <div className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+        {label}
+      </div>
       <div key={`${label}-${value}`} className={`animate-count text-2xl font-bold ${accent}`}>
         {value}
       </div>
@@ -227,7 +229,9 @@ export default function ImpactView() {
 
         <div className="mt-4">
           <div className="flex items-center justify-between text-sm">
-            <span className="font-medium text-slate-700">Debt burden ratio cap</span>
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+              Debt burden ratio cap
+            </span>
             <div className="flex items-center gap-1">
               <input
                 type="number"
@@ -258,8 +262,10 @@ export default function ImpactView() {
 
         <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
           {KNOBS.map((key) => (
-            <label key={key} className="flex flex-col gap-1 text-xs">
-              <span className="font-medium text-slate-600">{PARAM_META[key].label}</span>
+            <label key={key} className="flex flex-col gap-1.5 text-xs">
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+                {PARAM_META[key].label}
+              </span>
               <input
                 type="number"
                 value={params[key]}
@@ -312,9 +318,9 @@ export default function ImpactView() {
 
       <div>
         <p className="mb-3 text-sm text-slate-600">
-          Two strategies on the same 24 locked profiles. <strong>Champion</strong> is the status
-          quo a newcomer faces today; <strong>challenger</strong> is this product on the current
-          ruleset.
+          Two strategies on the same 24 locked profiles. <strong>Today</strong>, a newcomer with
+          no usable credit file is declined; <strong>with the copilot</strong>, they are assessed
+          on alternative data against the current ruleset.
         </p>
         <div className="flex flex-col gap-4 lg:flex-row">
           {strategyCard(data.champion, "border-slate-300 bg-white", "text-slate-700")}

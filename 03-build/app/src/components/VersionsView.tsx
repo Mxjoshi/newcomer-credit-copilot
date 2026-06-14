@@ -118,7 +118,9 @@ export default function VersionsView({ summary, activeLabel, onActivate }: Props
 
           <div className="mt-4">
             <div className="flex items-center justify-between text-sm">
-              <span className="font-medium text-slate-700">Debt burden ratio cap</span>
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+                Debt burden ratio cap
+              </span>
               <div className="flex items-center gap-1">
                 <input
                   type="number"
@@ -146,8 +148,10 @@ export default function VersionsView({ summary, activeLabel, onActivate }: Props
           <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
             {(["amount_salary_multiple", "max_age_at_maturity", "min_tenure_months"] as const).map(
               (key) => (
-                <label key={key} className="flex flex-col gap-1 text-xs">
-                  <span className="font-medium text-slate-600">{PARAM_LABEL[key]}</span>
+                <label key={key} className="flex flex-col gap-1.5 text-xs">
+                  <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+                    {PARAM_LABEL[key]}
+                  </span>
                   <input
                     type="number"
                     value={draft[key]}
@@ -159,8 +163,10 @@ export default function VersionsView({ summary, activeLabel, onActivate }: Props
             )}
           </div>
 
-          <label className="mt-4 flex flex-col gap-1 text-sm">
-            <span className="font-medium text-slate-700">Rationale (required)</span>
+          <label className="mt-4 flex flex-col gap-1.5 text-sm">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+              Rationale (required)
+            </span>
             <textarea
               value={rationale}
               onChange={(e) => setRationale(e.target.value)}
