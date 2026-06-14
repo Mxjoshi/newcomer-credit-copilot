@@ -226,11 +226,20 @@ export default function ImpactView() {
         </div>
 
         <div className="mt-4">
-          <div className="flex items-baseline justify-between text-sm">
+          <div className="flex items-center justify-between text-sm">
             <span className="font-medium text-slate-700">Debt burden ratio cap</span>
-            <span className="font-mono text-lg font-bold text-blue-700">
-              {Math.round(params.dbr_cap * 100)}%
-            </span>
+            <div className="flex items-center gap-1">
+              <input
+                type="number"
+                min={0}
+                max={100}
+                step={1}
+                value={Math.round(params.dbr_cap * 100)}
+                onChange={(e) => update("dbr_cap", Number(e.target.value) / 100)}
+                className="w-16 rounded-lg border border-slate-300 bg-white px-2 py-1 text-right font-mono text-sm font-semibold text-blue-700 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+              />
+              <span className="font-mono text-sm font-semibold text-blue-700">%</span>
+            </div>
           </div>
           <input
             type="range"
