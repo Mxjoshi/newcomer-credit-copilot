@@ -216,27 +216,85 @@ export default function EvalsView() {
                   <span className="text-slate-300">{open ? "▲" : "▼"}</span>
                 </span>
               </button>
-              {open && (
-                <div className="border-t border-slate-100 p-4">
-                  <div className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-                    Generated explanation
-                  </div>
-                  <p className="mt-1.5 text-sm leading-7 text-slate-800">{r.explanation}</p>
-                  {r.reasons.length > 0 && (
-                    <ul className="mt-3 space-y-1.5">
-                      {r.reasons.map((reason, i) => (
-                        <li key={i} className="flex gap-2 text-sm text-slate-700">
-                          <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-blue-400" />
-                          {reason}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-              )}
+              {open && <ExpandedTest result={r} />}
             </div>
           );
         })}
+      </div>
+    </div>
+  );
+}
+
+// The expanded row: what the test actually is (the applicant inputs), why the locked label is
+// what it is, and the explanation the model generated for it.
+function ExpandedTest({ result }: { result: Result }) {
+  const row = GROUND_TRUTH.find((g) => g.id === result.id);
+  const fmtAed = (n: number) => `AED ${n.toLocaleString("en-US")}`;
+  const t = (s: string) => s.replace(/_/g, " ");
+
+  const item = (label: string, value: string) => (
+    <div>
+      <dt className="text-[11px] uppercase tracking-wide text-slate-400">{label}</dt>
+      <dd className="text-sm font-medium text-slate-800">{value}</dd>
+    </div>
+  );
+
+  return (
+    <div className="flex flex-col gap-4 border-t border-slate-100 p-4">
+      {row && (
+        <div>
+          <div className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+            Test profile (the inputs)
+          </div>
+          <dl className="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {item("Salary", fmtAed(row.applicant.monthly_salary_aed))}
+            {item(
+              "Employment",
+              `${t(row.applicant.employment_status)}, ${row.applicant.job_tenure_months}mo`,
+            )}
+            {item("Employer", t(row.applicant.employer_category))}
+            {item("Rent history", t(row.applicant.rent_history))}
+            {item(
+              "In UAE / visa",
+              `${row.applicant.months_in_uae}mo · ${row.applicant.visa_type}`,
+            )}
+            {item("Obligations", fmtAed(row.applicant.existing_monthly_obligations_aed))}
+            {item(
+              "Age / visa left",
+              `${row.applicant.age_years} · ${row.applicant.visa_months_remaining}mo`,
+            )}
+            {item(
+              "Request",
+              `${t(row.application.product)}, ${fmtAed(row.application.amount_aed)}, ${row.application.term_months}mo`,
+            )}
+          </dl>
+        </div>
+      )}
+
+      {row && (
+        <div className="rounded-xl bg-slate-50 p-3">
+          <div className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+            Correct answer: {row.expected_outcome}, and why
+          </div>
+          <p className="mt-1 text-sm text-slate-600">{row.rationale}</p>
+        </div>
+      )}
+
+      <div>
+        <div className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+          Generated explanation
+        </div>
+        <p className="mt-1.5 text-sm leading-7 text-slate-800">{result.explanation}</p>
+        {result.reasons.length > 0 && (
+          <ul className="mt-3 space-y-1.5">
+            {result.reasons.map((reason, i) => (
+              <li key={i} className="flex gap-2 text-sm text-slate-700">
+                <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-blue-400" />
+                {reason}
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
     </div>
   );
