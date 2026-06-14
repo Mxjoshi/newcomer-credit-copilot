@@ -134,8 +134,10 @@ export default function IntakeForm({ summary, onAssess }: Props) {
   };
 
   const field = (key: keyof FormState, label: string, input: React.ReactNode) => (
-    <label className="flex flex-col gap-1 text-sm">
-      <span className="font-medium text-slate-700">{label}</span>
+    <label className="flex flex-col gap-1.5 text-sm">
+      <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+        {label}
+      </span>
       {input}
       {errors[key] && <span className="text-xs text-rose-600">{errors[key]}</span>}
     </label>
@@ -183,8 +185,10 @@ export default function IntakeForm({ summary, onAssess }: Props) {
   return (
     <div className="flex flex-col gap-5">
       <div className="flex flex-wrap items-end justify-end gap-3">
-        <label className="flex flex-col gap-1 text-sm">
-          <span className="font-medium text-slate-600">Load a sample scenario</span>
+        <label className="flex flex-col gap-1.5 text-sm">
+          <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+            Load a sample scenario
+          </span>
           <select
             value={loaded}
             onChange={(e) => loadSample(e.target.value)}
@@ -205,8 +209,8 @@ export default function IntakeForm({ summary, onAssess }: Props) {
       {sectionCard(
         "bg-blue-100 text-blue-700",
         "1",
-        "Applicant · the scored five",
-        null,
+        "Applicant details",
+        "The five factors the scorecard uses to assess the applicant.",
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {field(
             "full_name",
@@ -266,8 +270,8 @@ export default function IntakeForm({ summary, onAssess }: Props) {
       {sectionCard(
         "bg-pink-100 text-pink-700",
         "2",
-        "Policy inputs · never scored (M4)",
-        "These three feed the policy rules only. The scorecard never sees them.",
+        "Policy inputs",
+        "Used by the lending rules only. These are never scored.",
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           {field(
             "existing_monthly_obligations_aed",
@@ -286,8 +290,8 @@ export default function IntakeForm({ summary, onAssess }: Props) {
       {sectionCard(
         "bg-sky-100 text-sky-700",
         "3",
-        "Application · the request",
-        null,
+        "Application details",
+        "The product and amount being requested.",
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           {field(
             "product",
