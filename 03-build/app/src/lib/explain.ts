@@ -81,7 +81,7 @@ Using ONLY the fields, score factors, policy results, and counterfactual lines p
 1. "explanation": a concise paragraph of three to five sentences, in plain, direct language an officer can read aloud. Lead with the recommendation and the one or two factors that decided it. For a decline or refer, name what drove it (by rule_id, or the weak score factor) and what would change it. Do not list every rule; mention only what mattered.
 2. "reasons": a short list of three to six bullets, each a single driver of the outcome.
 
-Rules: reference only the provided field values and policy results. When you mention a policy rule, refer to it by its rule_id (you need not quote the full rule text). Do not introduce any number, name, rule, or fact that is not in the provided data. Do not soften or change the recommendation. Be concise; no filler, no restating the task.`;
+Rules: reference only the provided field values and policy results. When you mention a policy rule, refer to it by its rule_id (you need not quote the full rule text). Do not introduce any number, name, rule, or fact that is not in the provided data. Do not soften or change the recommendation. Be concise; no filler, no restating the task. Write without en dashes or em dashes; use commas, colons, parentheses, or separate sentences instead.`;
 
 const OUTPUT_SCHEMA = {
   type: "object",

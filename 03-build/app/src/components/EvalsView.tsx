@@ -20,6 +20,8 @@ interface Result {
   explanation: string;
   reasons: string[];
   latencyMs: number;
+  policyResults: { rule_id: string; passed: boolean; finding: string }[];
+  score: { total: number; max: number; band: string };
 }
 
 const OUTCOME_LABEL: Record<string, string> = {
@@ -82,6 +84,16 @@ export default function EvalsView() {
           explanation: decision.explanation,
           reasons: decision.reasons,
           latencyMs: performance.now() - t0,
+          policyResults: decision.policy_results.map((p) => ({
+            rule_id: p.rule_id,
+            passed: p.passed,
+            finding: p.finding,
+          })),
+          score: {
+            total: decision.score_result.total_points,
+            max: decision.score_result.factors.length * 20,
+            band: decision.score_result.risk_band,
+          },
         });
         setResults([...acc]);
       } catch {
@@ -242,8 +254,8 @@ function ExpandedTest({ result }: { result: Result }) {
   return (
     <div className="flex flex-col gap-4 border-t border-slate-100 p-4">
       {row && (
-        <div>
-          <div className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+        <div className="rounded-xl border border-slate-200 bg-white p-3">
+          <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">
             Test profile (the inputs)
           </div>
           <dl className="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -271,18 +283,43 @@ function ExpandedTest({ result }: { result: Result }) {
         </div>
       )}
 
-      {row && (
-        <div className="rounded-xl bg-slate-50 p-3">
+      <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+        <div className="flex items-center justify-between">
           <div className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+            Rules checked against the inputs (the engine)
+          </div>
+          <span className="text-xs font-medium text-slate-600">
+            score {result.score.total}/{result.score.max} · {result.score.band}
+          </span>
+        </div>
+        <div className="mt-2 flex flex-col gap-1.5">
+          {result.policyResults.map((p) => (
+            <div
+              key={p.rule_id}
+              className={`flex items-start gap-2 rounded-lg px-2 py-1 text-xs ${
+                p.passed ? "bg-emerald-50 text-emerald-900" : "bg-rose-50 text-rose-900"
+              }`}
+            >
+              <span>{p.passed ? "✅" : "❌"}</span>
+              <span className="font-mono text-slate-500">{p.rule_id}</span>
+              <span>{p.finding}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {row && (
+        <div className="rounded-xl border border-amber-200 bg-amber-50 p-3">
+          <div className="text-xs font-semibold uppercase tracking-wide text-amber-700">
             Correct answer: {row.expected_outcome}, and why
           </div>
-          <p className="mt-1 text-sm text-slate-600">{row.rationale}</p>
+          <p className="mt-1 text-sm text-amber-900">{row.rationale}</p>
         </div>
       )}
 
-      <div>
-        <div className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-          Generated explanation
+      <div className="rounded-xl border border-blue-200 bg-blue-50/40 p-3">
+        <div className="text-xs font-semibold uppercase tracking-wide text-blue-700">
+          Generated explanation (the output)
         </div>
         <p className="mt-1.5 text-sm leading-7 text-slate-800">{result.explanation}</p>
         {result.reasons.length > 0 && (
