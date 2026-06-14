@@ -4,7 +4,7 @@
 export default function Brand({ size = 36 }: { size?: number }) {
   return (
     <span
-      className="inline-flex items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 via-indigo-600 to-sky-500 text-white shadow-sm shadow-indigo-500/30"
+      className="inline-flex items-center justify-center rounded-lg bg-gradient-to-br from-blue-700 via-blue-800 to-slate-900 text-white shadow-sm shadow-blue-900/30"
       style={{ width: size, height: size }}
       aria-hidden
     >

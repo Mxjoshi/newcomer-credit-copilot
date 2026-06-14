@@ -95,7 +95,7 @@ export default function DecisionView({ record, onAction, onNew }: Props) {
           <ul className="mt-3 space-y-1.5">
             {decision.reasons.map((reason, i) => (
               <li key={i} className="flex gap-2 text-sm text-slate-700">
-                <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-indigo-400" />
+                <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-blue-400" />
                 {reason}
               </li>
             ))}

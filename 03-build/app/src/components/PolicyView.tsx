@@ -89,7 +89,7 @@ export default function PolicyView() {
 
       <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
         <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm">
-          <span className="rounded-full bg-indigo-100 px-3 py-1 text-xs font-semibold text-indigo-800">
+          <span className="rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-800">
             {data.identity.ruleset_version}
           </span>
           <span>
@@ -124,7 +124,7 @@ export default function PolicyView() {
                   <div className="text-xs text-slate-400">{data.parameter_notes[key]}</div>
                 )}
               </div>
-              <div className="font-mono text-sm font-semibold text-indigo-700">
+              <div className="font-mono text-sm font-semibold text-blue-700">
                 {paramValue(key, value)}
               </div>
             </div>
@@ -134,7 +134,7 @@ export default function PolicyView() {
               <div className="text-sm font-medium text-slate-800">Risk band cut-offs</div>
               <div className="text-xs text-slate-400">{data.band_cutoffs.note}</div>
             </div>
-            <div className="font-mono text-sm font-semibold text-indigo-700">
+            <div className="font-mono text-sm font-semibold text-blue-700">
               low ≥ {data.band_cutoffs.low} · high &lt; {data.band_cutoffs.high}
             </div>
           </div>
@@ -210,7 +210,7 @@ function pointRow(points: unknown, text: string, key: string | number) {
   const p = typeof points === "number" ? `${points >= 0 ? "+" : ""}${points}` : "";
   return (
     <div key={key} className="flex gap-2 text-xs">
-      <span className="w-10 shrink-0 font-mono font-semibold text-indigo-700">{p}</span>
+      <span className="w-10 shrink-0 font-mono font-semibold text-blue-700">{p}</span>
       <span className="text-slate-600">{text}</span>
     </div>
   );

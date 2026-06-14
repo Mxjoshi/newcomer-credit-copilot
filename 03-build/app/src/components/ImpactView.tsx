@@ -207,11 +207,11 @@ export default function ImpactView() {
 
   return (
     <div className="flex flex-col gap-5">
-      <section className="rounded-2xl border border-indigo-200 bg-indigo-50/60 p-5">
+      <section className="rounded-2xl border border-blue-200 bg-blue-50/60 p-5">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h3 className="text-sm font-semibold text-indigo-900">Policy what-if</h3>
-            <p className="text-xs text-indigo-700">
+            <h3 className="text-sm font-semibold text-blue-900">Policy what-if</h3>
+            <p className="text-xs text-blue-700">
               Move a policy value and the 24-profile run re-computes live. Policy is
               configuration, not code.
             </p>
@@ -228,7 +228,7 @@ export default function ImpactView() {
         <div className="mt-4">
           <div className="flex items-baseline justify-between text-sm">
             <span className="font-medium text-slate-700">Debt burden ratio cap</span>
-            <span className="font-mono text-lg font-bold text-indigo-700">
+            <span className="font-mono text-lg font-bold text-blue-700">
               {Math.round(params.dbr_cap * 100)}%
             </span>
           </div>
@@ -239,7 +239,7 @@ export default function ImpactView() {
             step={0.01}
             value={params.dbr_cap}
             onChange={(e) => update("dbr_cap", Number(e.target.value))}
-            className="mt-2 w-full accent-indigo-600"
+            className="mt-2 w-full accent-blue-600"
           />
           <div className="flex justify-between text-[11px] text-slate-400">
             <span>30%</span>
@@ -255,7 +255,7 @@ export default function ImpactView() {
                 type="number"
                 value={params[key]}
                 onChange={(e) => update(key, Number(e.target.value))}
-                className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm shadow-sm outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
+                className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm shadow-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
               />
             </label>
           ))}
@@ -294,7 +294,7 @@ export default function ImpactView() {
         {dirty && (
           <button
             onClick={reset}
-            className="mt-4 rounded-lg border border-indigo-300 bg-white px-4 py-2 text-sm font-medium text-indigo-700 transition hover:bg-indigo-100"
+            className="mt-4 rounded-lg border border-blue-300 bg-white px-4 py-2 text-sm font-medium text-blue-700 transition hover:bg-blue-100"
           >
             Reset to locked v1.0 baseline
           </button>
@@ -349,14 +349,14 @@ export default function ImpactView() {
                 <tr
                   key={row.id}
                   className={`border-b border-slate-100 ${
-                    moved ? "bg-indigo-50" : row.match ? "" : "bg-amber-50"
+                    moved ? "bg-blue-50" : row.match ? "" : "bg-amber-50"
                   }`}
                 >
                   <td className="px-3 py-2 font-medium text-slate-700">
                     {row.applicant_name}
                     <span className="ml-1.5 text-[10px] text-slate-400">{row.id}</span>
                     {moved && (
-                      <span className="ml-1.5 rounded bg-indigo-200 px-1.5 py-0.5 text-[10px] font-semibold text-indigo-800">
+                      <span className="ml-1.5 rounded bg-blue-200 px-1.5 py-0.5 text-[10px] font-semibold text-blue-800">
                         moved
                       </span>
                     )}

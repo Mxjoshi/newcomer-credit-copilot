@@ -45,7 +45,7 @@ export default function CaseList({ cases, mode, onOpen }: Props) {
           <button
             key={c.case_id}
             onClick={() => onOpen(c)}
-            className="animate-fade-up flex flex-wrap items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4 text-left text-sm shadow-sm transition hover:border-indigo-300 hover:shadow-md"
+            className="animate-fade-up flex flex-wrap items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4 text-left text-sm shadow-sm transition hover:border-blue-300 hover:shadow-md"
           >
             <span
               className={`rounded-full px-2.5 py-1 text-xs font-bold ${VERDICT_TONE[c.decision.recommendation]}`}

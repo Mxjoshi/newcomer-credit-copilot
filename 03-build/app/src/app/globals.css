@@ -129,13 +129,12 @@ body {
   animation: shimmer 1.4s infinite;
 }
 
-/* The brand mesh behind the hero. */
+/* The brand band behind the hero: a sober banking navy, restrained, with a single thin accent
+   glow. Reads enterprise console, not consumer marketing. */
 .hero-mesh {
   background:
-    radial-gradient(circle at 18% 18%, rgba(79, 70, 229, 0.18), transparent 42%),
-    radial-gradient(circle at 82% 12%, rgba(16, 185, 129, 0.16), transparent 45%),
-    radial-gradient(circle at 60% 88%, rgba(56, 189, 248, 0.14), transparent 45%),
-    linear-gradient(135deg, #0b1437 0%, #1e2a6b 55%, #243a8f 100%);
+    radial-gradient(circle at 92% -20%, rgba(37, 99, 235, 0.28), transparent 42%),
+    linear-gradient(115deg, #0a1626 0%, #0e2038 55%, #12294a 100%);
 }
 
 @media (prefers-reduced-motion: reduce) {

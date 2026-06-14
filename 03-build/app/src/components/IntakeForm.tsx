@@ -50,7 +50,7 @@ const EMPTY: FormState = {
 };
 
 const inputClass =
-  "rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100";
+  "rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-100";
 
 export default function IntakeForm({ summary, onAssess }: Props) {
   const [form, setForm] = useState<FormState>(EMPTY);
@@ -209,7 +209,7 @@ export default function IntakeForm({ summary, onAssess }: Props) {
       </div>
 
       {sectionCard(
-        "bg-indigo-100 text-indigo-700",
+        "bg-blue-100 text-blue-700",
         "1",
         "Applicant · the scored five",
         null,
@@ -310,7 +310,7 @@ export default function IntakeForm({ summary, onAssess }: Props) {
 
       <button
         onClick={submit}
-        className="group inline-flex w-fit items-center gap-2 rounded-xl bg-indigo-600 px-6 py-3 font-semibold text-white shadow-lg shadow-indigo-600/25 transition hover:bg-indigo-700 hover:shadow-indigo-600/40"
+        className="group inline-flex w-fit items-center gap-2 rounded-xl bg-blue-600 px-6 py-3 font-semibold text-white shadow-lg shadow-blue-600/25 transition hover:bg-blue-700 hover:shadow-blue-600/40"
       >
         Assess applicant
         <svg
