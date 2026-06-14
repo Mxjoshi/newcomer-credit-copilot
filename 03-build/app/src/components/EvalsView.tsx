@@ -248,7 +248,7 @@ function ExpandedTest({ result }: { result: Result }) {
 
   const item = (label: string, value: string) => (
     <div>
-      <dt className="text-[11px] uppercase tracking-wide text-slate-400">{label}</dt>
+      <dt className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">{label}</dt>
       <dd className="text-sm font-medium text-slate-800">{value}</dd>
     </div>
   );

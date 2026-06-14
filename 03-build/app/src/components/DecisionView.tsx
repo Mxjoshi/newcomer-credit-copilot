@@ -225,8 +225,10 @@ export default function DecisionView({ record, onAction, onNew, onViewAudit }: P
         <section className="animate-scale-in rounded-2xl border border-slate-300 bg-slate-50 p-5">
           <h3 className="mb-3 text-sm font-semibold">Override the recommendation</h3>
           <div className="flex flex-wrap items-end gap-3">
-            <label className="flex flex-col gap-1 text-sm">
-              <span>New outcome</span>
+            <label className="flex flex-col gap-1.5 text-sm">
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+                New outcome
+              </span>
               <select
                 value={overrideOutcome}
                 onChange={(e) => setOverrideOutcome(e.target.value as Recommendation)}
@@ -239,8 +241,10 @@ export default function DecisionView({ record, onAction, onNew, onViewAudit }: P
                 ))}
               </select>
             </label>
-            <label className="flex grow flex-col gap-1 text-sm">
-              <span>Reason (required)</span>
+            <label className="flex grow flex-col gap-1.5 text-sm">
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+                Reason (required)
+              </span>
               <input
                 value={overrideReason}
                 onChange={(e) => setOverrideReason(e.target.value)}

@@ -109,11 +109,11 @@ export default function PolicyView() {
           {params.map(([key, value]) => (
             <div key={key} className="flex flex-col gap-0.5 py-2.5 sm:flex-row sm:items-baseline sm:gap-4">
               <div className="sm:w-72">
-                <div className="text-sm font-medium text-slate-800">
+                <div className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
                   {PARAM_LABEL[key] ?? key}
                 </div>
                 {data.parameter_notes[key] && (
-                  <div className="text-xs text-slate-400">{data.parameter_notes[key]}</div>
+                  <div className="mt-0.5 text-xs text-slate-400">{data.parameter_notes[key]}</div>
                 )}
               </div>
               <div className="font-mono text-sm font-semibold text-blue-700">
@@ -123,8 +123,10 @@ export default function PolicyView() {
           ))}
           <div className="flex flex-col gap-0.5 py-2.5 sm:flex-row sm:items-baseline sm:gap-4">
             <div className="sm:w-72">
-              <div className="text-sm font-medium text-slate-800">Risk band cut-offs</div>
-              <div className="text-xs text-slate-400">{data.band_cutoffs.note}</div>
+              <div className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+                Risk band cut-offs
+              </div>
+              <div className="mt-0.5 text-xs text-slate-400">{data.band_cutoffs.note}</div>
             </div>
             <div className="font-mono text-sm font-semibold text-blue-700">
               low ≥ {data.band_cutoffs.low} · high &lt; {data.band_cutoffs.high}
