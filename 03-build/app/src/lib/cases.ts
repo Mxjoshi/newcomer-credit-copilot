@@ -5,6 +5,10 @@
 import type { Applicant, Application, CaseRecord, Decision } from "./types";
 import { CASE_STORAGE_KEY } from "./constants";
 
+// Keep the store bounded so a long demo session never accumulates an unwieldy log; the oldest
+// applications drop off once past this many.
+const MAX_CASES = 50;
+
 export function loadCases(): CaseRecord[] {
   if (typeof window === "undefined") return [];
   try {
@@ -14,6 +18,11 @@ export function loadCases(): CaseRecord[] {
   } catch {
     return [];
   }
+}
+
+// Wipes every saved application (the review queue and the audit log both read from this store).
+export function clearCases(): void {
+  if (typeof window !== "undefined") window.localStorage.removeItem(CASE_STORAGE_KEY);
 }
 
 function persist(cases: CaseRecord[]): void {
@@ -36,7 +45,7 @@ export function createCase(
     status: decision.recommendation === "refer" ? "awaiting_review" : "closed",
     closed_at: decision.recommendation === "refer" ? undefined : new Date().toISOString(),
   };
-  persist([record, ...loadCases()]);
+  persist([record, ...loadCases()].slice(0, MAX_CASES));
   return record;
 }
 

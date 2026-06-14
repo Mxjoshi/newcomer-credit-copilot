@@ -7,7 +7,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import type { Applicant, Application, CaseRecord, Decision } from "@/lib/types";
-import { createCase, loadCases, recordOfficerAction } from "@/lib/cases";
+import { clearCases, createCase, loadCases, recordOfficerAction } from "@/lib/cases";
 import {
   ensureBase,
   getActiveLabel,
@@ -147,6 +147,11 @@ export default function Home() {
   const openCase = (record: CaseRecord) => {
     setTab("case");
     setView({ kind: "decision", record });
+  };
+
+  const clearAllCases = () => {
+    clearCases();
+    setCases([]);
   };
 
   // The persistent top bar shows the current screen's name and a one-line description.
@@ -366,9 +371,13 @@ export default function Home() {
 
           {view.kind === "impact" && <ImpactView />}
 
-          {view.kind === "queue" && <CaseList cases={cases} mode="queue" onOpen={openCase} />}
+          {view.kind === "queue" && (
+            <CaseList cases={cases} mode="queue" onOpen={openCase} onClear={clearAllCases} />
+          )}
 
-          {view.kind === "audit" && <CaseList cases={cases} mode="audit" onOpen={openCase} />}
+          {view.kind === "audit" && (
+            <CaseList cases={cases} mode="audit" onOpen={openCase} onClear={clearAllCases} />
+          )}
         </main>
 
         <footer className="mx-auto w-full max-w-5xl px-6 py-6 text-center text-xs text-slate-400">

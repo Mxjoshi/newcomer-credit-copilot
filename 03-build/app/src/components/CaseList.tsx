@@ -10,6 +10,7 @@ interface Props {
   cases: CaseRecord[];
   mode: "queue" | "audit";
   onOpen: (record: CaseRecord) => void;
+  onClear: () => void;
 }
 
 const VERDICT_TONE: Record<string, string> = {
@@ -18,16 +19,36 @@ const VERDICT_TONE: Record<string, string> = {
   refer: "bg-amber-100 text-amber-800",
 };
 
-export default function CaseList({ cases, mode, onOpen }: Props) {
+export default function CaseList({ cases, mode, onOpen, onClear }: Props) {
   const shown = mode === "queue" ? cases.filter((c) => c.status === "awaiting_review") : cases;
+
+  const clear = () => {
+    if (
+      window.confirm(
+        "Clear all saved applications? This wipes the audit log and the review queue for this browser. It cannot be undone.",
+      )
+    ) {
+      onClear();
+    }
+  };
 
   return (
     <div className="flex flex-col gap-4">
-      <p className="text-sm text-slate-500">
-        {mode === "queue"
-          ? `${shown.length} ${shown.length === 1 ? "case" : "cases"} awaiting a human decision.`
-          : `${shown.length} ${shown.length === 1 ? "assessment" : "assessments"} recorded in this browser, every officer action included.`}
-      </p>
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-sm text-slate-500">
+          {mode === "queue"
+            ? `${shown.length} ${shown.length === 1 ? "case" : "cases"} awaiting a human decision.`
+            : `${shown.length} ${shown.length === 1 ? "assessment" : "assessments"} recorded in this browser, every officer action included.`}
+        </p>
+        {cases.length > 0 && (
+          <button
+            onClick={clear}
+            className="rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-medium text-slate-600 transition hover:border-rose-300 hover:bg-rose-50 hover:text-rose-700"
+          >
+            Clear all
+          </button>
+        )}
+      </div>
 
       {shown.length === 0 && (
         <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center text-sm text-slate-400">
