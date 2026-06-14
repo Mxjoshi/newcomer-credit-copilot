@@ -71,11 +71,17 @@ export function buildGroundingContext(input: ExplainInput): GroundingContext {
   };
 }
 
-// The instruction, per the spec (tone per decision U3: plain language, formal structure).
-const SYSTEM_PROMPT = `You are drafting a credit decision explanation for a loan officer at a UAE digital bank. Using ONLY the fields, score factors, policy results, and counterfactual lines provided, write:
-1. "explanation": one formal paragraph explaining the recommendation, in plain language, suitable for the officer to read aloud to a manager or to compliance.
-2. "reasons": a short list of reasons, each one a single driver of the outcome.
-Reference only the provided field values and the cited rule text. When you mention a policy rule, cite its rule_id and quote its rule_text. Do not introduce any number, name, rule, or fact that is not in the provided data. Do not soften or change the recommendation.`;
+// The instruction, per the spec (tone per decision U3: plain language). Tuned for readability:
+// the officer already sees the full scorecard and every cited rule on the same screen, so the
+// paragraph leads with the decision and the few factors that drove it, rather than reciting
+// everything. Shorter is also faster (latency) and easier to read aloud.
+const SYSTEM_PROMPT = `You are drafting a credit decision explanation for a loan officer at a UAE digital bank. The officer also sees the full scorecard and every policy rule with its citation on the same screen, so do not repeat them all.
+
+Using ONLY the fields, score factors, policy results, and counterfactual lines provided, write:
+1. "explanation": a concise paragraph of three to five sentences, in plain, direct language an officer can read aloud. Lead with the recommendation and the one or two factors that decided it. For a decline or refer, name what drove it (by rule_id, or the weak score factor) and what would change it. Do not list every rule; mention only what mattered.
+2. "reasons": a short list of three to six bullets, each a single driver of the outcome.
+
+Rules: reference only the provided field values and policy results. When you mention a policy rule, refer to it by its rule_id (you need not quote the full rule text). Do not introduce any number, name, rule, or fact that is not in the provided data. Do not soften or change the recommendation. Be concise; no filler, no restating the task.`;
 
 const OUTPUT_SCHEMA = {
   type: "object",
@@ -116,7 +122,7 @@ async function requestExplanation(
     : data;
   const response = await client.messages.create({
     model: EXPLANATION_MODEL,
-    max_tokens: 2048,
+    max_tokens: 1024,
     system: SYSTEM_PROMPT,
     output_config: { format: { type: "json_schema", schema: OUTPUT_SCHEMA } },
     messages: [{ role: "user", content }],

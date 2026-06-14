@@ -6,7 +6,7 @@
 // generated and whether it was grounded. This is the Phase 4 metrics-versus-baseline deliverable
 // made visible and inspectable, message by message.
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { GROUND_TRUTH } from "@/lib/groundTruth";
 import type { Decision } from "@/lib/types";
 
@@ -37,18 +37,32 @@ export default function EvalsView() {
   const [results, setResults] = useState<Result[]>([]);
   const [running, setRunning] = useState(false);
   const [done, setDone] = useState(false);
+  const [stopped, setStopped] = useState(false);
   const [expanded, setExpanded] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const cancel = useRef(false);
 
   const total = GROUND_TRUTH.length;
 
+  const stop = () => {
+    cancel.current = true;
+  };
+
   const run = async () => {
+    cancel.current = false;
     setRunning(true);
     setDone(false);
+    setStopped(false);
     setError(null);
     setResults([]);
     const acc: Result[] = [];
     for (const row of GROUND_TRUTH) {
+      // Stop before the next call, so halting does not spend another model token.
+      if (cancel.current) {
+        setRunning(false);
+        setStopped(true);
+        return;
+      }
       const t0 = performance.now();
       try {
         const res = await fetch("/api/assess", {
@@ -114,16 +128,30 @@ export default function EvalsView() {
           decision, whether it matched the locked label, and the exact explanation the model
           wrote. Roughly 30 to 40 cents of model usage, and a few minutes to run.
         </p>
-        <button
-          onClick={run}
-          disabled={running}
-          className="rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 disabled:opacity-50"
-        >
-          {running ? `Running... ${n}/${total}` : done ? "Run again" : "Run benchmark"}
-        </button>
+        {running ? (
+          <button
+            onClick={stop}
+            className="rounded-xl bg-rose-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-rose-700"
+          >
+            Stop ({n}/{total})
+          </button>
+        ) : (
+          <button
+            onClick={run}
+            className="rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700"
+          >
+            {done || stopped ? "Run again" : "Run benchmark"}
+          </button>
+        )}
       </div>
 
       {error && <p className="text-sm text-rose-600">{error}</p>}
+      {stopped && (
+        <p className="text-sm text-slate-500">
+          Stopped at {n} of {total}. The remaining profiles were not run, so no further model
+          tokens were used.
+        </p>
+      )}
 
       {running && (
         <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-200">
