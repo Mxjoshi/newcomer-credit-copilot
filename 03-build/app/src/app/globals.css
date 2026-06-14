@@ -21,6 +21,9 @@ body {
   color: var(--foreground);
   font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
+  /* Tabular numerals so figures (AED amounts, scores, percentages) align in columns and read
+     like a financial instrument, a small but real trust signal. */
+  font-variant-numeric: tabular-nums;
 }
 
 /* Motion: small, tasteful, used to make state changes feel alive without being noisy. */
