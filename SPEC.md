@@ -1,12 +1,11 @@
 # Newcomer Credit Copilot: Software Specification
 
-Consolidated specification for the system, written after the build and improved against it.
-One source of truth that an engineer could build the whole product from, and that a reviewer
-can read to understand every part. Where the demo deliberately stops short of production, that
-boundary is stated, not hidden.
+This document specifies the Newcomer Credit Copilot: what it is for, who uses it, how it is
+built, the rules it enforces, and the guarantees it must hold. It is the single reference for
+building, reviewing, and extending the system. Where v1 is intentionally narrower than a
+production system, the boundary is stated.
 
-Status: Phase 3 build complete. Phase 4 (measured evals and pitch) in progress.
-Last consolidated: 2026-06-14.
+Version 1.0.
 
 ---
 
