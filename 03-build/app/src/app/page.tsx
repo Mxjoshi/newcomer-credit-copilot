@@ -23,6 +23,7 @@ import DecisionView from "@/components/DecisionView";
 import ImpactView from "@/components/ImpactView";
 import PolicyView from "@/components/PolicyView";
 import VersionsView from "@/components/VersionsView";
+import EvalsView from "@/components/EvalsView";
 import CaseList from "@/components/CaseList";
 
 type ViewKind =
@@ -33,6 +34,7 @@ type ViewKind =
   | "policy"
   | "versions"
   | "impact"
+  | "evals"
   | "queue"
   | "audit";
 type View =
@@ -43,6 +45,7 @@ type View =
   | { kind: "policy" }
   | { kind: "versions" }
   | { kind: "impact" }
+  | { kind: "evals" }
   | { kind: "queue" }
   | { kind: "audit" };
 
@@ -85,6 +88,12 @@ const icons: Record<string, React.ReactNode> = {
       <circle cx="6" cy="18" r="2.5" />
       <circle cx="18" cy="12" r="2.5" />
       <path d="M6 8.5v7M8.5 6H14a2 2 0 0 1 2 2v2M8.5 18H14a2 2 0 0 0 2-2v-2" />
+    </>
+  ),
+  evals: (
+    <>
+      <path d="M9 11l3 3 6-6" />
+      <path d="M21 12v7a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h11" />
     </>
   ),
 };
@@ -183,6 +192,10 @@ export default function Home() {
       title: "Policy impact",
       description: "Champion vs challenger on the 24 locked profiles, with a live what-if.",
     },
+    evals: {
+      title: "Evals",
+      description: "The 24-profile benchmark with the real model, and every generated explanation.",
+    },
     queue: { title: "Review queue", description: "Refers awaiting a human decision." },
     audit: { title: "Audit log", description: "Every assessment and the officer action taken." },
   };
@@ -258,6 +271,7 @@ export default function Home() {
           {navItem("policy", "Policy")}
           {navItem("versions", "Versions")}
           {navItem("impact", "Policy impact")}
+          {navItem("evals", "Evals")}
         </nav>
 
         <div className="hidden border-t border-white/10 px-4 py-4 text-xs md:block">
@@ -372,6 +386,8 @@ export default function Home() {
           )}
 
           {view.kind === "impact" && <ImpactView />}
+
+          {view.kind === "evals" && <EvalsView />}
 
           {view.kind === "queue" && (
             <CaseList cases={cases} mode="queue" onOpen={openCase} onClear={clearAllCases} />
