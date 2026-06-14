@@ -19,6 +19,17 @@ const VERDICT_TONE: Record<string, string> = {
   refer: "bg-amber-100 text-amber-800",
 };
 
+const STATUS: Record<string, { label: string; tone: string }> = {
+  awaiting_review: { label: "Awaiting review", tone: "bg-amber-100 text-amber-700" },
+  closed: { label: "Closed", tone: "bg-slate-100 text-slate-600" },
+};
+
+const ACTION_LABEL: Record<string, string> = {
+  accepted: "Accepted",
+  overridden: "Overridden",
+  none: "",
+};
+
 export default function CaseList({ cases, mode, onOpen, onClear }: Props) {
   const shown = mode === "queue" ? cases.filter((c) => c.status === "awaiting_review") : cases;
 
@@ -57,30 +68,43 @@ export default function CaseList({ cases, mode, onOpen, onClear }: Props) {
       )}
 
       <div className="flex flex-col gap-2.5">
-        {shown.map((c) => (
-          <button
-            key={c.case_id}
-            onClick={() => onOpen(c)}
-            className="animate-fade-up flex flex-wrap items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4 text-left text-sm shadow-sm transition hover:border-blue-300 hover:shadow-md"
-          >
-            <span
-              className={`rounded-full px-2.5 py-1 text-xs font-bold ${VERDICT_TONE[c.decision.recommendation]}`}
+        {shown.map((c) => {
+          const action = ACTION_LABEL[c.decision.officer_action];
+          const status = STATUS[c.status];
+          return (
+            <button
+              key={c.case_id}
+              onClick={() => onOpen(c)}
+              className="animate-fade-up flex items-center gap-3.5 rounded-2xl border border-slate-200 bg-white p-4 text-left shadow-sm transition hover:border-blue-300 hover:shadow-md"
             >
-              {c.decision.recommendation.toUpperCase()}
-            </span>
-            <span className="font-semibold text-slate-800">{c.applicant.full_name}</span>
-            <span className="text-slate-600">
-              {c.application.product.replace("_", " ")} · AED{" "}
-              {c.application.amount_aed.toLocaleString("en-US")}
-            </span>
-            <span className="ml-auto text-right text-xs text-slate-400">
-              <span className="block">{new Date(c.created_at).toLocaleString("en-GB")}</span>
-              <span className="block">
-                officer: {c.decision.officer_action} · {c.status.replace("_", " ")}
+              <span
+                className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-bold ${VERDICT_TONE[c.decision.recommendation]}`}
+              >
+                {c.decision.recommendation.toUpperCase()}
               </span>
-            </span>
-          </button>
-        ))}
+              <div className="min-w-0 flex-1">
+                <div className="font-semibold text-slate-800">{c.applicant.full_name}</div>
+                <div className="text-xs text-slate-500">
+                  {c.application.product.replace("_", " ")} · AED{" "}
+                  {c.application.amount_aed.toLocaleString("en-US")} ·{" "}
+                  {new Date(c.created_at).toLocaleString("en-GB")}
+                </div>
+              </div>
+              <div className="flex shrink-0 items-center gap-2">
+                {action && (
+                  <span className="hidden text-xs text-slate-500 sm:inline">{action}</span>
+                )}
+                {status && (
+                  <span
+                    className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${status.tone}`}
+                  >
+                    {status.label}
+                  </span>
+                )}
+              </div>
+            </button>
+          );
+        })}
       </div>
     </div>
   );
