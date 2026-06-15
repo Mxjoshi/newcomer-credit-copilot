@@ -88,7 +88,7 @@ export function ensureSeedUsers(): User[] {
   if (users.length > 0) return users;
   const base = { password: "demo", avatar: "", timezone: "Asia/Dubai" };
   const seeded: User[] = [
-    { id: "u-super", userId: "monika", name: "Monika Raj", alias: "Monika", role: "superuser", ...base },
+    { id: "u-super", userId: "monika", name: "Monika Joshi", alias: "Monika", role: "superuser", ...base },
     { id: "u-officer", userId: "ahmed", name: "Ahmed Khan", alias: "Ahmed", role: "officer", ...base },
     { id: "u-risk", userId: "lena", name: "Lena Park", alias: "Lena", role: "risk_manager", ...base },
   ];

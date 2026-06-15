@@ -8,6 +8,7 @@ import { TIMEZONES, updateUser, type User } from "@/lib/auth";
 import Avatar from "./Avatar";
 
 export default function ProfileView({ user, onSaved }: { user: User; onSaved: () => void }) {
+  const [name, setName] = useState(user.name);
   const [alias, setAlias] = useState(user.alias);
   const [timezone, setTimezone] = useState(user.timezone);
   const [avatar, setAvatar] = useState(user.avatar);
@@ -23,7 +24,13 @@ export default function ProfileView({ user, onSaved }: { user: User; onSaved: ()
   };
 
   const save = () => {
-    updateUser(user.id, { alias: alias.trim() || user.name.split(" ")[0], timezone, avatar });
+    const cleanName = name.trim() || user.name;
+    updateUser(user.id, {
+      name: cleanName,
+      alias: alias.trim() || cleanName.split(" ")[0],
+      timezone,
+      avatar,
+    });
     onSaved();
     setSaved(true);
     setTimeout(() => setSaved(false), 2500);
@@ -36,9 +43,9 @@ export default function ProfileView({ user, onSaved }: { user: User; onSaved: ()
     <div className="flex max-w-xl flex-col gap-5">
       <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
         <div className="flex items-center gap-4">
-          <Avatar name={user.name} avatar={avatar} size={64} />
+          <Avatar name={name || user.name} avatar={avatar} size={64} />
           <div className="min-w-0">
-            <div className="font-semibold text-slate-900">{user.name}</div>
+            <div className="font-semibold text-slate-900">{name || user.name}</div>
             <div className="text-xs text-slate-500">
               <span className="font-mono">{user.userId}</span>
             </div>
@@ -71,6 +78,12 @@ export default function ProfileView({ user, onSaved }: { user: User; onSaved: ()
 
       <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <label className="flex flex-col gap-1.5">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+              Full name
+            </span>
+            <input value={name} onChange={(e) => setName(e.target.value)} className={inputClass} />
+          </label>
           <label className="flex flex-col gap-1.5">
             <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
               Preferred name (alias)
