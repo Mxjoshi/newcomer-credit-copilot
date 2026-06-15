@@ -443,7 +443,9 @@ export default function Home() {
             />
           )}
 
-          {view.kind === "intake" && <IntakeForm summary={summary} onAssess={onAssess} />}
+          {view.kind === "intake" && (
+            <IntakeForm summary={summary} recentCases={cases} onAssess={onAssess} />
+          )}
 
           {view.kind === "assessing" && (
             <AssessmentProgress

@@ -49,6 +49,27 @@ export function createCase(
   return record;
 }
 
+// Duplicate detection: the same applicant asking for the same product, amount, and term is almost
+// always a re-submission. Identity here is the normalised name plus the exact ask; that is enough
+// to warn an officer before they run (and pay for) the same assessment twice.
+const normalizeName = (name: string) => name.trim().toLowerCase().replace(/\s+/g, " ");
+
+export function findDuplicate(
+  applicant: Applicant,
+  application: Application,
+  cases: CaseRecord[] = loadCases(),
+): CaseRecord | null {
+  const name = normalizeName(applicant.full_name);
+  const match = cases.find(
+    (c) =>
+      normalizeName(c.applicant.full_name) === name &&
+      c.application.product === application.product &&
+      c.application.amount_aed === application.amount_aed &&
+      c.application.term_months === application.term_months,
+  );
+  return match ?? null;
+}
+
 // An officer can send any case to the review queue for a second human look, even when the engine
 // recommended approve or decline. Reopens the case as awaiting_review and clears any closed stamp.
 export function referToReview(caseId: string): CaseRecord | null {

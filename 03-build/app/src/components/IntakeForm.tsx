@@ -6,14 +6,23 @@
 // anything is sent; the personal loan term cap comes from the live pack.
 
 import { useState } from "react";
-import type { Applicant, Application } from "@/lib/types";
+import type { Applicant, Application, CaseRecord } from "@/lib/types";
 import { SAMPLE_PROFILES } from "@/lib/samples";
+import { findDuplicate } from "@/lib/cases";
+import { useDateFormat } from "@/lib/userContext";
 import type { RulesetSummary } from "./summary";
 
 interface Props {
   summary: RulesetSummary | null;
+  recentCases: CaseRecord[];
   onAssess: (applicant: Applicant, application: Application) => void;
 }
+
+const REC_LABEL: Record<string, string> = {
+  approve: "APPROVE",
+  decline: "DECLINE",
+  refer: "REFER",
+};
 
 type FormState = {
   full_name: string;
@@ -52,19 +61,29 @@ const EMPTY: FormState = {
 const inputClass =
   "rounded-lg border border-slate-300 dark:border-white/15 bg-white dark:bg-slate-900 px-3 py-2 text-sm shadow-sm outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-100";
 
-export default function IntakeForm({ summary, onAssess }: Props) {
+export default function IntakeForm({ summary, recentCases, onAssess }: Props) {
+  const fmtDate = useDateFormat();
   const [form, setForm] = useState<FormState>(EMPTY);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loaded, setLoaded] = useState<string>("");
+  // A detected duplicate, with the exact payload it would assess. Cleared on any edit.
+  const [dup, setDup] = useState<{
+    match: CaseRecord;
+    applicant: Applicant;
+    application: Application;
+  } | null>(null);
 
-  const set = (key: keyof FormState) => (value: string) =>
+  const set = (key: keyof FormState) => (value: string) => {
+    setDup(null);
     setForm((f) => ({ ...f, [key]: value }));
+  };
 
   const loadSample = (label: string) => {
     const sample = SAMPLE_PROFILES.find((s) => s.label === label);
     if (!sample) return;
     setLoaded(label);
     setErrors({});
+    setDup(null);
     setForm({
       full_name: sample.applicant.full_name,
       months_in_uae: String(sample.applicant.months_in_uae),
@@ -115,22 +134,29 @@ export default function IntakeForm({ summary, onAssess }: Props) {
     setErrors(errs);
     if (Object.keys(errs).length > 0) return;
 
-    onAssess(
-      {
-        full_name: form.full_name.trim(),
-        months_in_uae,
-        visa_type: form.visa_type,
-        employment_status: form.employment_status,
-        job_tenure_months,
-        employer_category: form.employer_category,
-        monthly_salary_aed,
-        rent_history: form.rent_history,
-        existing_monthly_obligations_aed: existing,
-        age_years,
-        visa_months_remaining,
-      },
-      { product: form.product, amount_aed, term_months },
-    );
+    const applicant: Applicant = {
+      full_name: form.full_name.trim(),
+      months_in_uae,
+      visa_type: form.visa_type,
+      employment_status: form.employment_status,
+      job_tenure_months,
+      employer_category: form.employer_category,
+      monthly_salary_aed,
+      rent_history: form.rent_history,
+      existing_monthly_obligations_aed: existing,
+      age_years,
+      visa_months_remaining,
+    };
+    const application: Application = { product: form.product, amount_aed, term_months };
+
+    // Stop a repeat submission of the same applicant and ask before it runs; the officer can still
+    // proceed deliberately from the warning.
+    const match = findDuplicate(applicant, application, recentCases);
+    if (match) {
+      setDup({ match, applicant, application });
+      return;
+    }
+    onAssess(applicant, application);
   };
 
   const field = (key: keyof FormState, label: string, input: React.ReactNode) => (
@@ -306,25 +332,71 @@ export default function IntakeForm({ summary, onAssess }: Props) {
         </div>,
       )}
 
-      <button
-        onClick={submit}
-        className="group inline-flex w-fit items-center gap-2 rounded-xl bg-blue-600 px-6 py-3 font-semibold text-white shadow-lg shadow-blue-600/25 transition hover:bg-blue-700 hover:shadow-blue-600/40"
-      >
-        Assess applicant
-        <svg
-          width="18"
-          height="18"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2.4"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="transition group-hover:translate-x-0.5"
+      {dup ? (
+        <section className="animate-scale-in rounded-2xl border border-amber-300 bg-amber-50 p-5 dark:border-amber-400/40 dark:bg-amber-500/10">
+          <div className="flex items-start gap-3">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 9v4M12 17h.01" />
+                <path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z" />
+              </svg>
+            </span>
+            <div className="min-w-0 flex-1">
+              <h3 className="font-semibold text-amber-900 dark:text-amber-200">
+                Possible duplicate application
+              </h3>
+              <p className="mt-1 text-sm text-amber-800 dark:text-amber-200/90">
+                {dup.match.applicant.full_name} already has an assessment for{" "}
+                {dup.application.product.replace("_", " ")} of AED{" "}
+                {dup.application.amount_aed.toLocaleString("en-US")} over {dup.application.term_months}{" "}
+                months, recorded {fmtDate(dup.match.created_at)} with recommendation{" "}
+                <span className="font-semibold">
+                  {REC_LABEL[dup.match.decision.recommendation]}
+                </span>
+                . Running it again creates a second record and spends another API call.
+              </p>
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                <button
+                  onClick={() => {
+                    const { applicant, application } = dup;
+                    setDup(null);
+                    onAssess(applicant, application);
+                  }}
+                  className="rounded-xl bg-amber-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-amber-700"
+                >
+                  Assess anyway
+                </button>
+                <button
+                  onClick={() => setDup(null)}
+                  className="rounded-xl border border-amber-300 bg-white px-5 py-2.5 text-sm font-medium text-amber-800 transition hover:bg-amber-100 dark:border-amber-400/40 dark:bg-transparent dark:text-amber-200 dark:hover:bg-amber-500/10"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+      ) : (
+        <button
+          onClick={submit}
+          className="group inline-flex w-fit items-center gap-2 rounded-xl bg-blue-600 px-6 py-3 font-semibold text-white shadow-lg shadow-blue-600/25 transition hover:bg-blue-700 hover:shadow-blue-600/40"
         >
-          <path d="M5 12h14M13 6l6 6-6 6" />
-        </svg>
-      </button>
+          Assess applicant
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.4"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="transition group-hover:translate-x-0.5"
+          >
+            <path d="M5 12h14M13 6l6 6-6 6" />
+          </svg>
+        </button>
+      )}
     </div>
   );
 }
