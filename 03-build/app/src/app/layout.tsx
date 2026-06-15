@@ -32,6 +32,9 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      // The theme-init script sets the `dark` class on <html> before hydration, so the class list
+      // intentionally differs from the server render. Suppress the expected mismatch on this node.
+      suppressHydrationWarning
       className={`${sans.variable} ${mono.variable} h-full antialiased`}
     >
       <head>
