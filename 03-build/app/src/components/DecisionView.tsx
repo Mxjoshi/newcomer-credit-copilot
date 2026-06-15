@@ -14,6 +14,7 @@ interface Props {
   onAction: (action: "accepted" | "overridden", overrideReason?: string) => void;
   onNew: () => void;
   onViewAudit: () => void;
+  onOverview: () => void;
 }
 
 const VERDICT: Record<
@@ -46,7 +47,7 @@ const VALIDATION_LABEL: Record<string, string> = {
   fell_back_to_template: "deterministic explanation",
 };
 
-export default function DecisionView({ record, onAction, onNew, onViewAudit }: Props) {
+export default function DecisionView({ record, onAction, onNew, onViewAudit, onOverview }: Props) {
   const { decision, applicant, application } = record;
   const verdict = VERDICT[decision.recommendation];
   const overrideOptions = (["approve", "decline", "refer"] as const).filter(
@@ -200,6 +201,15 @@ export default function DecisionView({ record, onAction, onNew, onViewAudit }: P
           className="rounded-xl border border-slate-300 dark:border-white/15 bg-white dark:bg-slate-900 px-5 py-2.5 font-medium transition hover:bg-slate-100"
         >
           New assessment
+        </button>
+        <button
+          onClick={onOverview}
+          className="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 font-medium text-slate-600 transition hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-white/5"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M19 12H5M11 18l-6-6 6-6" />
+          </svg>
+          Back to overview
         </button>
       </section>
 

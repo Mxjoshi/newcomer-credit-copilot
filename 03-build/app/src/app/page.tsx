@@ -470,6 +470,7 @@ export default function Home() {
                   onAction={onOfficerAction}
                   onNew={() => setView({ kind: "intake" })}
                   onViewAudit={() => setView({ kind: "audit" })}
+                  onOverview={() => setView({ kind: "home" })}
                 />
               ) : (
                 <ImpactView activeLabel={activeVersion?.label ?? summary?.ruleset_version ?? ""} />
