@@ -329,6 +329,7 @@ export default function Home() {
             <WelcomeView
               summary={summary}
               queueCount={queueCount}
+              activeLabel={activeVersion?.label ?? summary?.ruleset_version ?? ""}
               onNavigate={(kind) => setView({ kind } as View)}
             />
           )}
@@ -370,12 +371,14 @@ export default function Home() {
                   onViewAudit={() => setView({ kind: "audit" })}
                 />
               ) : (
-                <ImpactView />
+                <ImpactView activeLabel={activeVersion?.label ?? summary?.ruleset_version ?? ""} />
               )}
             </div>
           )}
 
-          {view.kind === "policy" && <PolicyView />}
+          {view.kind === "policy" && (
+            <PolicyView activeLabel={activeVersion?.label ?? summary?.ruleset_version ?? ""} />
+          )}
 
           {view.kind === "versions" && (
             <VersionsView
@@ -385,7 +388,7 @@ export default function Home() {
             />
           )}
 
-          {view.kind === "impact" && <ImpactView />}
+          {view.kind === "impact" && <ImpactView activeLabel={activeVersion?.label ?? summary?.ruleset_version ?? ""} />}
 
           {view.kind === "evals" && <EvalsView />}
 

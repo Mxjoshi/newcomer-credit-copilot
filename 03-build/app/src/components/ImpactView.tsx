@@ -1,12 +1,10 @@
 "use client";
 
-// The impact view (Screen 3 tab + Policy impact nav, M6): champion vs challenger on the 24
-// locked ground-truth profiles, with a live "policy what-if" control. Moving a policy value
-// re-runs the challenger against the same locked labels and the numbers shift on screen, with
-// the cited rule text re-rendered from the new value. A change-confirmation strip shows exactly
-// what moved, moved rows are flagged, and every distinct what-if is written to a session policy
-// change log. No file writes; instant, deterministic, repeatable, with a one-click reset to the
-// locked v1.0 baseline.
+// The impact view (Screen 3 tab + Policy impact nav, M6): the status quo vs this product on the
+// 24 locked ground-truth profiles, with a live "policy what-if" control. The baseline is the
+// active policy version (choose another with the version picker); moving a value re-runs the 24
+// against that version, the numbers shift, and every distinct what-if is written to a session
+// change log. No file writes; instant, deterministic, repeatable, with a one-click reset.
 
 import { useEffect, useRef, useState } from "react";
 import {
@@ -16,6 +14,8 @@ import {
   type PolicyChange,
   type PolicyLogEntry,
 } from "@/lib/policyLog";
+import { loadVersions, type PolicyVersion } from "@/lib/policyVersions";
+import VersionPicker from "./VersionPicker";
 
 interface StrategyNumbers {
   label: string;
@@ -43,7 +43,6 @@ interface Params {
 interface ImpactData {
   ruleset_version: string;
   market_name: string;
-  is_what_if: boolean;
   parameters: Params;
   total: number;
   accuracy: number;
@@ -58,11 +57,13 @@ const PARAM_META: Record<keyof Params, { label: string; fmt: (v: number) => stri
   max_age_at_maturity: { label: "Max age at maturity", fmt: (v) => `${v}` },
   min_tenure_months: { label: "Min tenure", fmt: (v) => `${v} months` },
 };
-const KNOBS: Array<keyof Params> = [
+const KEYS: Array<keyof Params> = [
+  "dbr_cap",
   "amount_salary_multiple",
   "max_age_at_maturity",
   "min_tenure_months",
 ];
+const KNOBS: Array<keyof Params> = ["amount_salary_multiple", "max_age_at_maturity", "min_tenure_months"];
 
 const countOutcomes = (rows: ImpactRow[]) =>
   rows.reduce(
@@ -73,19 +74,29 @@ const countOutcomes = (rows: ImpactRow[]) =>
     { approve: 0, decline: 0, refer: 0 },
   );
 
+const buildQuery = (p: Params, label: string) =>
+  `?${new URLSearchParams({
+    dbr_cap: String(p.dbr_cap),
+    amount_salary_multiple: String(p.amount_salary_multiple),
+    max_age_at_maturity: String(p.max_age_at_maturity),
+    min_tenure_months: String(p.min_tenure_months),
+    ruleset_version: label,
+  }).toString()}`;
+
 async function fetchImpact(query: string): Promise<ImpactData> {
   const res = await fetch(`/api/impact${query}`);
   if (!res.ok) throw new Error("impact run failed");
   return (await res.json()) as ImpactData;
 }
 
-export default function ImpactView() {
+export default function ImpactView({ activeLabel }: { activeLabel: string }) {
   const [data, setData] = useState<ImpactData | null>(null);
   const [params, setParams] = useState<Params | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [log, setLog] = useState<PolicyLogEntry[]>([]);
-  // Baseline lives in state (read during render); the locked v1.0 outcomes and counts to compare
-  // against. Set once on load.
+  const [versions, setVersions] = useState<PolicyVersion[]>([]);
+  const [selectedLabel, setSelectedLabel] = useState(activeLabel);
+  // The baseline (the selected version) to compare what-if edits against.
   const [baseline, setBaseline] = useState<Params | null>(null);
   const [baselineOutcomes, setBaselineOutcomes] = useState<Record<string, string>>({});
   const [baselineCounts, setBaselineCounts] = useState({ approve: 0, decline: 0, refer: 0 });
@@ -93,20 +104,24 @@ export default function ImpactView() {
   const debounce = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastSig = useRef<string>("");
 
+  // Load the baseline for the selected version (and reload when the version changes).
   useEffect(() => {
     let cancelled = false;
     (async () => {
       try {
-        const result = await fetchImpact("");
+        const vers = loadVersions();
+        const v = vers.find((x) => x.label === selectedLabel) ?? vers.find((x) => x.is_base);
+        const result = await fetchImpact(v ? buildQuery(v.params, v.label) : "");
         if (cancelled) return;
-        setLog(loadPolicyLog());
-        setBaseline(result.parameters);
-        setBaselineOutcomes(
-          Object.fromEntries(result.rows.map((r) => [r.id, r.recommendation])),
-        );
+        const baseParams = v ? v.params : result.parameters;
+        setVersions(vers);
+        setBaseline(baseParams);
+        setBaselineOutcomes(Object.fromEntries(result.rows.map((r) => [r.id, r.recommendation])));
         setBaselineCounts(countOutcomes(result.rows));
         setData(result);
-        setParams(result.parameters);
+        setParams(baseParams);
+        setLog(loadPolicyLog());
+        lastSig.current = "";
       } catch {
         if (!cancelled) setError("could not run the impact view, try again");
       }
@@ -114,16 +129,14 @@ export default function ImpactView() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [selectedLabel]);
 
-  // Defined inline (not memoized) so it always closes over the loaded baseline state.
-  const rerun = (next: Params, base: Params, outcomes: Record<string, string>) => {
-    const diffs = (Object.keys(next) as Array<keyof Params>).filter((k) => next[k] !== base[k]);
-    const query = diffs.length === 0 ? "" : `?${diffs.map((k) => `${k}=${next[k]}`).join("&")}`;
-    fetchImpact(query)
+  const rerun = (next: Params, base: Params, outcomes: Record<string, string>, label: string) => {
+    fetchImpact(buildQuery(next, label))
       .then((result) => {
         setData(result);
-        if (!result.is_what_if) return;
+        const diffs = KEYS.filter((k) => next[k] !== base[k]);
+        if (diffs.length === 0) return;
         const changes: PolicyChange[] = diffs.map((k) => ({
           param: k,
           label: PARAM_META[k].label,
@@ -154,16 +167,17 @@ export default function ImpactView() {
     const next = { ...params, [key]: value };
     const base = baseline;
     const outcomes = baselineOutcomes;
+    const label = selectedLabel;
     setParams(next);
     if (debounce.current) clearTimeout(debounce.current);
-    debounce.current = setTimeout(() => rerun(next, base, outcomes), 220);
+    debounce.current = setTimeout(() => rerun(next, base, outcomes, label), 220);
   };
 
   const reset = () => {
     if (!baseline) return;
     setParams(baseline);
     lastSig.current = "";
-    rerun(baseline, baseline, baselineOutcomes);
+    rerun(baseline, baseline, baselineOutcomes, selectedLabel);
   };
 
   if (error) return <p className="text-sm text-rose-600">{error}</p>;
@@ -172,14 +186,10 @@ export default function ImpactView() {
   }
   const base = baseline;
 
-  const dirty = (Object.keys(params) as Array<keyof Params>).some((k) => params[k] !== base[k]);
-  const changedKeys = (Object.keys(params) as Array<keyof Params>).filter(
-    (k) => params[k] !== base[k],
-  );
+  const dirty = KEYS.some((k) => params[k] !== base[k]);
+  const changedKeys = KEYS.filter((k) => params[k] !== base[k]);
   const movedRows = new Set(
-    data.is_what_if
-      ? data.rows.filter((r) => r.recommendation !== baselineOutcomes[r.id]).map((r) => r.id)
-      : [],
+    dirty ? data.rows.filter((r) => r.recommendation !== baselineOutcomes[r.id]).map((r) => r.id) : [],
   );
   const nowCounts = countOutcomes(data.rows);
 
@@ -214,17 +224,26 @@ export default function ImpactView() {
           <div>
             <h3 className="text-sm font-semibold text-blue-900">Policy what-if</h3>
             <p className="text-xs text-blue-700">
-              Move a policy value and the 24-profile run re-computes live. Policy is
-              configuration, not code.
+              Move a policy value and the 24-profile run re-computes live. Policy is configuration,
+              not code.
             </p>
           </div>
-          <span
-            className={`rounded-full px-3 py-1 text-xs font-semibold ${
-              data.is_what_if ? "bg-amber-100 text-amber-800" : "bg-emerald-100 text-emerald-800"
-            }`}
-          >
-            {data.is_what_if ? data.ruleset_version : "locked v1.0 baseline"}
-          </span>
+          <div className="flex items-center gap-3">
+            <VersionPicker
+              versions={versions}
+              selectedLabel={selectedLabel}
+              activeLabel={activeLabel}
+              onChange={setSelectedLabel}
+            />
+            <span
+              className={`rounded-full px-3 py-1 font-mono text-xs font-semibold ${
+                dirty ? "bg-amber-100 text-amber-800" : "bg-emerald-100 text-emerald-800"
+              }`}
+            >
+              {selectedLabel}
+              {dirty ? " · modified" : ""}
+            </span>
+          </div>
         </div>
 
         <div className="mt-4">
@@ -276,8 +295,7 @@ export default function ImpactView() {
           ))}
         </div>
 
-        {/* Change confirmation: exactly what moved, so it is obvious the edit took effect. */}
-        {data.is_what_if && (
+        {dirty && (
           <div className="animate-fade-up mt-4 rounded-xl border border-amber-300 bg-amber-50 p-3.5 text-sm">
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5">
               {changedKeys.map((k) => (
@@ -311,16 +329,16 @@ export default function ImpactView() {
             onClick={reset}
             className="mt-4 rounded-lg border border-blue-300 bg-white px-4 py-2 text-sm font-medium text-blue-700 transition hover:bg-blue-100"
           >
-            Reset to locked v1.0 baseline
+            Reset to {selectedLabel}
           </button>
         )}
       </section>
 
       <div>
         <p className="mb-3 text-sm text-slate-600">
-          Two strategies on the same 24 locked profiles. <strong>Today</strong>, a newcomer with
-          no usable credit file is declined; <strong>with the copilot</strong>, they are assessed
-          on alternative data against the current ruleset.
+          Two strategies on the same 24 locked profiles. <strong>Today</strong>, a newcomer with no
+          usable credit file is declined; <strong>with the copilot</strong>, they are assessed on
+          alternative data against this ruleset.
         </p>
         <div className="flex flex-col gap-4 lg:flex-row">
           {strategyCard(data.champion, "border-slate-300 bg-white", "text-slate-700")}
@@ -338,9 +356,8 @@ export default function ImpactView() {
         </p>
         <p className="mt-1 text-xs text-slate-500">
           Below are the 24 test profiles in the benchmark: synthetic applicants, each with a known
-          correct outcome (the &ldquo;label&rdquo;), locked before the model was built so the
-          model cannot grade its own exam. &ldquo;Match&rdquo; is whether the model agreed with
-          the label.
+          correct outcome (the &ldquo;label&rdquo;), locked before the model was built so the model
+          cannot grade its own exam. &ldquo;Match&rdquo; is whether the model agreed with the label.
         </p>
       </div>
 
@@ -397,14 +414,13 @@ export default function ImpactView() {
         </table>
       </section>
 
-      {/* The policy change log: the audit trail of what-if runs this session. */}
       <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
         <div className="mb-3 flex items-center justify-between">
           <div>
             <h3 className="text-sm font-semibold text-slate-900">Policy change log</h3>
             <p className="text-xs text-slate-500">
-              Every what-if run this session, with what it did to the numbers. In production this
-              is where a real ruleset version change is recorded.
+              Every what-if run this session, with what it did to the numbers. In production this is
+              where a real ruleset version change is recorded.
             </p>
           </div>
           {log.length > 0 && (
@@ -434,13 +450,11 @@ export default function ImpactView() {
                   {new Date(entry.at).toLocaleTimeString("en-GB")}
                 </span>
                 <span className="font-medium text-slate-700">
-                  {entry.changes
-                    .map((c) => `${c.label} ${c.from} → ${c.to}`)
-                    .join(", ")}
+                  {entry.changes.map((c) => `${c.label} ${c.from} → ${c.to}`).join(", ")}
                 </span>
                 <span className="ml-auto text-slate-500">
-                  {entry.moved} moved · approve {entry.approved} · refer {entry.referred} ·
-                  decline {entry.declined} · accuracy {entry.accuracy}/24
+                  {entry.moved} moved · approve {entry.approved} · refer {entry.referred} · decline{" "}
+                  {entry.declined} · accuracy {entry.accuracy}/24
                 </span>
               </div>
             ))}

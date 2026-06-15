@@ -8,13 +8,13 @@
   "bureau": "AECB",
   "parameters": {
     "_notes": {
-      "product_min_salary": "product assumption, stated in the ground truth",
-      "flat_annual_rate": "used ONLY to estimate the monthly installment for the DBR check (rule 2); product assumption locked with the ground truth",
-      "dbr_cap": "UAE-standard cap, flagged in the ground truth for primary-sourcing: total repayments may not exceed half of income",
-      "amount_salary_multiple": "UAE-standard cap: a personal loan may not exceed 20 times monthly salary",
-      "max_age_at_maturity": "the borrower must be 65 or younger when the last installment falls due (rule 3)",
-      "min_tenure_months": "minimum months in the current job (rule 4); matches one full probation period",
-      "personal_loan_max_term_months": "48-month personal loan term cap (Phase 3 primary-sourcing); Step 5 form validation enforces it"
+      "product_min_salary": "Product assumption, stated in the ground truth.",
+      "flat_annual_rate": "Used only to estimate the monthly installment for the DBR check (rule 2); product assumption locked with the ground truth.",
+      "dbr_cap": "UAE-standard cap, flagged in the ground truth for primary-sourcing: total repayments may not exceed half of income.",
+      "amount_salary_multiple": "UAE-standard cap: a personal loan may not exceed 20 times monthly salary.",
+      "max_age_at_maturity": "The borrower must be 65 or younger when the last installment falls due (rule 3)",
+      "min_tenure_months": "Minimum months in the current job (rule 4); matches one full probation period.",
+      "personal_loan_max_term_months": "48-month personal loan term cap (Phase 3 primary-sourcing); Step 5 form validation enforces it."
     },
     "product_min_salary": {
       "personal_loan": 8000,

@@ -45,8 +45,9 @@ export async function GET(request: Request) {
       overrides[key] = Number(value);
     }
   }
+  const label = url.searchParams.get("ruleset_version");
+  if (label) pack.ruleset_version = label;
   const isWhatIf = Object.keys(overrides).length > 0;
-  if (isWhatIf) pack.ruleset_version = `${pack.ruleset_version} (what-if)`;
 
   const ruleset = buildRuleset(pack);
 

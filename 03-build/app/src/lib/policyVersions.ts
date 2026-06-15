@@ -136,3 +136,16 @@ export function diffParams(from: VersionParams, to: VersionParams): ParamDiff[] 
     .filter((k) => from[k] !== to[k])
     .map((k) => ({ param: k, label: PARAM_LABEL[k], from: from[k], to: to[k] }));
 }
+
+// A query string of a version's parameters plus its label, for the read routes (policy, impact),
+// so they can render or run any version, not only the base on disk.
+export function versionQuery(params: VersionParams, label: string): string {
+  const q = new URLSearchParams({
+    dbr_cap: String(params.dbr_cap),
+    amount_salary_multiple: String(params.amount_salary_multiple),
+    max_age_at_maturity: String(params.max_age_at_maturity),
+    min_tenure_months: String(params.min_tenure_months),
+    ruleset_version: label,
+  });
+  return `?${q.toString()}`;
+}

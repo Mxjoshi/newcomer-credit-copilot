@@ -7,6 +7,8 @@
 // file the engine runs.
 
 import { useEffect, useState } from "react";
+import { loadVersions, versionQuery, type PolicyVersion } from "@/lib/policyVersions";
+import VersionPicker from "./VersionPicker";
 
 interface RuleRow {
   rule_id: string;
@@ -52,17 +54,26 @@ function paramValue(key: string, value: unknown): string {
   return String(value);
 }
 
-export default function PolicyView() {
+export default function PolicyView({ activeLabel }: { activeLabel: string }) {
   const [data, setData] = useState<PolicyData | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [versions, setVersions] = useState<PolicyVersion[]>([]);
+  const [selected, setSelected] = useState(activeLabel);
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
+      const vers = loadVersions();
+      const v = vers.find((x) => x.label === selected) ?? vers.find((x) => x.is_base);
+      const query = v ? versionQuery(v.params, v.label) : "";
       try {
-        const res = await fetch("/api/policy");
+        const res = await fetch(`/api/policy${query}`);
         if (!res.ok) throw new Error("failed");
-        if (!cancelled) setData((await res.json()) as PolicyData);
+        const json = (await res.json()) as PolicyData;
+        if (!cancelled) {
+          setVersions(vers);
+          setData(json);
+        }
       } catch {
         if (!cancelled) setError("could not load the policy");
       }
@@ -70,15 +81,25 @@ export default function PolicyView() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [selected]);
 
   if (error) return <p className="text-sm text-rose-600">{error}</p>;
-  if (!data) return <p className="text-sm text-slate-500">Loading the live policy...</p>;
+  if (!data) return <p className="text-sm text-slate-500">Loading the policy...</p>;
 
   const params = Object.entries(data.parameters).filter(([k]) => !k.startsWith("_"));
 
   return (
     <div className="flex flex-col gap-5">
+      {versions.length > 1 && (
+        <div className="flex justify-end">
+          <VersionPicker
+            versions={versions}
+            selectedLabel={selected}
+            activeLabel={activeLabel}
+            onChange={setSelected}
+          />
+        </div>
+      )}
       <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
         <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm">
           <span className="rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-800">

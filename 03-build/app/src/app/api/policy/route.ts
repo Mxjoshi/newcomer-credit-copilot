@@ -2,6 +2,9 @@
 // Rule text and conditions come rendered from the built ruleset (so the numbers shown are the
 // numbers enforced); the parameter notes and scorecard tiers come from the raw pack so the
 // reader sees the rationale next to each value. Read fresh from disk on every call.
+//
+// Optional query overrides (a saved version's parameters, plus its label) are merged in memory,
+// so the Policy view can render any version, not only the locked base on disk.
 
 import { promises as fs } from "fs";
 import path from "path";
@@ -10,12 +13,35 @@ import { buildRuleset } from "@/lib/ruleset";
 
 const LIVE_PACK_PATH = path.join(process.cwd(), "config", "uae", "policy-rules.json");
 
-export async function GET() {
-  const raw = await fs.readFile(LIVE_PACK_PATH, "utf8");
-  const pack = JSON.parse(raw);
-  const ruleset = buildRuleset(pack);
+const OVERRIDABLE = new Set([
+  "dbr_cap",
+  "amount_salary_multiple",
+  "max_age_at_maturity",
+  "min_tenure_months",
+]);
 
-  const paramNotes = (pack.parameters?._notes ?? {}) as Record<string, string>;
+export async function GET(request: Request) {
+  const raw = await fs.readFile(LIVE_PACK_PATH, "utf8");
+  const pack = JSON.parse(raw) as {
+    parameters: Record<string, unknown>;
+    ruleset_version: string;
+    [key: string]: unknown;
+  };
+
+  const url = new URL(request.url);
+  for (const key of OVERRIDABLE) {
+    const value = url.searchParams.get(key);
+    if (value !== null && Number.isFinite(Number(value))) pack.parameters[key] = Number(value);
+  }
+  const label = url.searchParams.get("ruleset_version");
+  if (label) pack.ruleset_version = label;
+
+  const ruleset = buildRuleset(pack);
+  const paramNotes = ((pack.parameters as { _notes?: Record<string, string> })._notes ??
+    {}) as Record<string, string>;
+  const bandNote = (pack.band_cutoffs as { _note?: string } | undefined)?._note ?? "";
+  const factors =
+    (pack.scorecard as { factors?: Array<{ enabled?: boolean }> } | undefined)?.factors ?? [];
 
   return NextResponse.json({
     identity: {
@@ -30,7 +56,7 @@ export async function GET() {
     band_cutoffs: {
       low: ruleset.band_cutoffs.low,
       high: ruleset.band_cutoffs.high,
-      note: (pack.band_cutoffs?._note ?? "") as string,
+      note: bandNote,
     },
     rules: ruleset.rules.map((r) => ({
       rule_id: r.rule_id,
@@ -40,9 +66,6 @@ export async function GET() {
       condition: r.condition,
       severity: r.severity,
     })),
-    // Raw scorecard factor blocks carry the tier tables and rationales the engine draws from.
-    scorecard: (pack.scorecard?.factors ?? []).filter(
-      (f: { enabled?: boolean }) => f.enabled !== false,
-    ),
+    scorecard: factors.filter((f) => f.enabled !== false),
   });
 }

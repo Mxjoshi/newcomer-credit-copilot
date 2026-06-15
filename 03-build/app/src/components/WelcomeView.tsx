@@ -11,6 +11,7 @@ type Target = "intake" | "queue" | "audit" | "policy" | "versions" | "impact";
 interface Props {
   summary: RulesetSummary | null;
   queueCount: number;
+  activeLabel: string;
   onNavigate: (kind: Target) => void;
 }
 
@@ -30,7 +31,7 @@ const stroke = {
   strokeLinejoin: "round" as const,
 };
 
-export default function WelcomeView({ summary, queueCount, onNavigate }: Props) {
+export default function WelcomeView({ summary, queueCount, activeLabel, onNavigate }: Props) {
   const capabilities: Capability[] = [
     {
       target: "intake",
@@ -115,7 +116,7 @@ export default function WelcomeView({ summary, queueCount, onNavigate }: Props) 
           {summary && (
             <span className="flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-              {summary.market_name} · {summary.ruleset_version}
+              {summary.market_name} · {activeLabel || summary.ruleset_version}
             </span>
           )}
         </div>
