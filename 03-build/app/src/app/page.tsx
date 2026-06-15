@@ -7,7 +7,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import type { Applicant, Application, CaseRecord, Decision } from "@/lib/types";
-import { clearCases, createCase, loadCases, recordOfficerAction } from "@/lib/cases";
+import { clearCases, createCase, loadCases, recordOfficerAction, referToReview } from "@/lib/cases";
 import {
   ensureBase,
   getActiveLabel,
@@ -193,6 +193,14 @@ export default function Home() {
   const onOfficerAction = (action: "accepted" | "overridden", overrideReason?: string) => {
     if (view.kind !== "decision") return;
     const updated = recordOfficerAction(view.record.case_id, action, overrideReason);
+    setCases(loadCases());
+    if (updated) setView({ kind: "decision", record: updated });
+  };
+
+  // Officer sends the current case to the review queue (works for any recommendation).
+  const onReferToReview = () => {
+    if (view.kind !== "decision") return;
+    const updated = referToReview(view.record.case_id);
     setCases(loadCases());
     if (updated) setView({ kind: "decision", record: updated });
   };
@@ -471,6 +479,7 @@ export default function Home() {
                   onNew={() => setView({ kind: "intake" })}
                   onViewAudit={() => setView({ kind: "audit" })}
                   onOverview={() => setView({ kind: "home" })}
+                  onRefer={onReferToReview}
                 />
               ) : (
                 <ImpactView activeLabel={activeVersion?.label ?? summary?.ruleset_version ?? ""} />

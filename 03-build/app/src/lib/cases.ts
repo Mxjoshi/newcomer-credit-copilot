@@ -49,6 +49,18 @@ export function createCase(
   return record;
 }
 
+// An officer can send any case to the review queue for a second human look, even when the engine
+// recommended approve or decline. Reopens the case as awaiting_review and clears any closed stamp.
+export function referToReview(caseId: string): CaseRecord | null {
+  const cases = loadCases();
+  const record = cases.find((c) => c.case_id === caseId);
+  if (!record) return null;
+  record.status = "awaiting_review";
+  record.closed_at = undefined;
+  persist(cases);
+  return record;
+}
+
 // The officer's call (U4, D2). Accept or override always closes the case: it has been handled.
 export function recordOfficerAction(
   caseId: string,

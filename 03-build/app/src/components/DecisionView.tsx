@@ -15,6 +15,7 @@ interface Props {
   onNew: () => void;
   onViewAudit: () => void;
   onOverview: () => void;
+  onRefer: () => void;
 }
 
 const VERDICT: Record<
@@ -47,7 +48,7 @@ const VALIDATION_LABEL: Record<string, string> = {
   fell_back_to_template: "deterministic explanation",
 };
 
-export default function DecisionView({ record, onAction, onNew, onViewAudit, onOverview }: Props) {
+export default function DecisionView({ record, onAction, onNew, onViewAudit, onOverview, onRefer }: Props) {
   const { decision, applicant, application } = record;
   const verdict = VERDICT[decision.recommendation];
   const overrideOptions = (["approve", "decline", "refer"] as const).filter(
@@ -175,6 +176,12 @@ export default function DecisionView({ record, onAction, onNew, onViewAudit, onO
       )}
 
       <section className="flex flex-wrap items-center gap-3">
+        {decision.officer_action === "none" && record.status === "awaiting_review" && (
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-800 dark:bg-amber-500/15 dark:text-amber-300">
+            <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
+            In the review queue
+          </span>
+        )}
         {decision.officer_action === "none" ? (
           <>
             <button
@@ -189,6 +196,18 @@ export default function DecisionView({ record, onAction, onNew, onViewAudit, onO
             >
               Override
             </button>
+            {record.status !== "awaiting_review" && (
+              <button
+                onClick={onRefer}
+                className="inline-flex items-center gap-2 rounded-xl border border-amber-300 bg-amber-50 px-5 py-2.5 font-medium text-amber-800 transition hover:bg-amber-100 dark:border-amber-400/40 dark:bg-amber-500/10 dark:text-amber-300"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 9v4M12 17h.01" />
+                  <path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z" />
+                </svg>
+                Refer to manual review
+              </button>
+            )}
           </>
         ) : (
           <span className={`rounded-full px-3 py-1.5 text-sm font-medium ${verdict.chip}`}>
