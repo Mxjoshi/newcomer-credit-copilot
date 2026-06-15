@@ -84,7 +84,7 @@ export default function PolicyView({ activeLabel }: { activeLabel: string }) {
   }, [selected]);
 
   if (error) return <p className="text-sm text-rose-600">{error}</p>;
-  if (!data) return <p className="text-sm text-slate-500">Loading the policy...</p>;
+  if (!data) return <p className="text-sm text-slate-500 dark:text-slate-400">Loading the policy...</p>;
 
   const params = Object.entries(data.parameters).filter(([k]) => !k.startsWith("_"));
 
@@ -100,41 +100,41 @@ export default function PolicyView({ activeLabel }: { activeLabel: string }) {
           />
         </div>
       )}
-      <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <section className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900 p-5 shadow-sm">
         <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm">
           <span className="rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-800">
             {data.identity.ruleset_version}
           </span>
           <span>
-            <span className="text-slate-500">Market</span>{" "}
+            <span className="text-slate-500 dark:text-slate-400">Market</span>{" "}
             <strong>{data.identity.market_name}</strong>
           </span>
           <span>
-            <span className="text-slate-500">Regulator</span>{" "}
+            <span className="text-slate-500 dark:text-slate-400">Regulator</span>{" "}
             <strong>{data.identity.regulator}</strong>
           </span>
           <span>
-            <span className="text-slate-500">Bureau</span>{" "}
+            <span className="text-slate-500 dark:text-slate-400">Bureau</span>{" "}
             <strong>{data.identity.bureau}</strong>
           </span>
           <span>
-            <span className="text-slate-500">Currency</span>{" "}
+            <span className="text-slate-500 dark:text-slate-400">Currency</span>{" "}
             <strong>{data.identity.currency}</strong>
           </span>
         </div>
       </section>
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-        <h3 className="mb-3 text-sm font-semibold text-slate-900">Parameters</h3>
+      <section className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900 p-5 shadow-sm">
+        <h3 className="mb-3 text-sm font-semibold text-slate-900 dark:text-slate-100">Parameters</h3>
         <div className="flex flex-col divide-y divide-slate-100">
           {params.map(([key, value]) => (
             <div key={key} className="flex flex-col gap-0.5 py-2.5 sm:flex-row sm:items-baseline sm:gap-4">
               <div className="sm:w-72">
-                <div className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+                <div className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                   {PARAM_LABEL[key] ?? key}
                 </div>
                 {data.parameter_notes[key] && (
-                  <div className="mt-0.5 text-xs text-slate-400">{data.parameter_notes[key]}</div>
+                  <div className="mt-0.5 text-xs text-slate-400 dark:text-slate-500">{data.parameter_notes[key]}</div>
                 )}
               </div>
               <div className="font-mono text-sm font-semibold text-blue-700">
@@ -144,10 +144,10 @@ export default function PolicyView({ activeLabel }: { activeLabel: string }) {
           ))}
           <div className="flex flex-col gap-0.5 py-2.5 sm:flex-row sm:items-baseline sm:gap-4">
             <div className="sm:w-72">
-              <div className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+              <div className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                 Risk band cut-offs
               </div>
-              <div className="mt-0.5 text-xs text-slate-400">{data.band_cutoffs.note}</div>
+              <div className="mt-0.5 text-xs text-slate-400 dark:text-slate-500">{data.band_cutoffs.note}</div>
             </div>
             <div className="font-mono text-sm font-semibold text-blue-700">
               low ≥ {data.band_cutoffs.low} · high &lt; {data.band_cutoffs.high}
@@ -156,18 +156,18 @@ export default function PolicyView({ activeLabel }: { activeLabel: string }) {
         </div>
       </section>
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-        <h3 className="mb-3 text-sm font-semibold text-slate-900">
-          Policy rules <span className="text-slate-400">· {data.rules.length}</span>
+      <section className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900 p-5 shadow-sm">
+        <h3 className="mb-3 text-sm font-semibold text-slate-900 dark:text-slate-100">
+          Policy rules <span className="text-slate-400 dark:text-slate-500">· {data.rules.length}</span>
         </h3>
         <div className="flex flex-col gap-2.5">
           {data.rules.map((r, i) => (
-            <div key={r.rule_id} className="rounded-xl border border-slate-200 p-3.5">
+            <div key={r.rule_id} className="rounded-xl border border-slate-200 dark:border-white/10 p-3.5">
               <div className="flex flex-wrap items-center gap-2">
-                <span className="flex h-6 w-6 items-center justify-center rounded-md bg-slate-100 text-xs font-semibold text-slate-600">
+                <span className="flex h-6 w-6 items-center justify-center rounded-md bg-slate-100 dark:bg-white/10 text-xs font-semibold text-slate-600 dark:text-slate-300">
                   {i + 1}
                 </span>
-                <span className="text-sm font-semibold text-slate-800">{r.title}</span>
+                <span className="text-sm font-semibold text-slate-800 dark:text-slate-100">{r.title}</span>
                 <span
                   className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${
                     r.severity === "hard_fail"
@@ -177,19 +177,19 @@ export default function PolicyView({ activeLabel }: { activeLabel: string }) {
                 >
                   {r.severity === "hard_fail" ? "hard fail" : "refer"}
                 </span>
-                <span className="ml-auto text-xs text-slate-400">{r.source_section}</span>
+                <span className="ml-auto text-xs text-slate-400 dark:text-slate-500">{r.source_section}</span>
               </div>
-              <p className="mt-2 text-sm text-slate-700">&ldquo;{r.rule_text}&rdquo;</p>
-              <p className="mt-1 font-mono text-xs text-slate-400">{r.condition}</p>
+              <p className="mt-2 text-sm text-slate-700 dark:text-slate-200">&ldquo;{r.rule_text}&rdquo;</p>
+              <p className="mt-1 font-mono text-xs text-slate-400 dark:text-slate-500">{r.condition}</p>
             </div>
           ))}
         </div>
       </section>
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-        <h3 className="mb-3 text-sm font-semibold text-slate-900">
+      <section className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900 p-5 shadow-sm">
+        <h3 className="mb-3 text-sm font-semibold text-slate-900 dark:text-slate-100">
           Scorecard factors{" "}
-          <span className="text-slate-400">· {data.scorecard.length}, 0-20 points each</span>
+          <span className="text-slate-400 dark:text-slate-500">· {data.scorecard.length}, 0-20 points each</span>
         </h3>
         <div className="flex flex-col gap-2.5">
           {data.scorecard.map((f) => (
@@ -213,7 +213,7 @@ const titleWord = (k: string) => k.replace(/_/g, " ");
 function Section({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <div className="mb-1 text-[11px] font-medium uppercase tracking-wide text-slate-400">
+      <div className="mb-1 text-[11px] font-medium uppercase tracking-wide text-slate-400 dark:text-slate-500">
         {label}
       </div>
       <div className="flex flex-col gap-1">{children}</div>
@@ -226,7 +226,7 @@ function pointRow(points: unknown, text: string, key: string | number) {
   return (
     <div key={key} className="flex gap-2 text-xs">
       <span className="w-10 shrink-0 font-mono font-semibold text-blue-700">{p}</span>
-      <span className="text-slate-600">{text}</span>
+      <span className="text-slate-600 dark:text-slate-300">{text}</span>
     </div>
   );
 }
@@ -262,7 +262,7 @@ function FactorCard({ factor }: { factor: Record<string, unknown> }) {
         // Plain list of strings, e.g. which visa types count as long-term.
         sections.push(
           <Section key={key} label={sectionLabel(key)}>
-            <div className="text-xs text-slate-600">
+            <div className="text-xs text-slate-600 dark:text-slate-300">
               {arr.map((v) => titleWord(String(v))).join(", ")}
             </div>
           </Section>,
@@ -307,17 +307,17 @@ function FactorCard({ factor }: { factor: Record<string, unknown> }) {
   }
 
   return (
-    <div className="rounded-xl border border-slate-200 p-3.5">
+    <div className="rounded-xl border border-slate-200 dark:border-white/10 p-3.5">
       <div className="flex flex-wrap items-baseline gap-2">
-        <span className="text-sm font-semibold text-slate-800">
+        <span className="text-sm font-semibold text-slate-800 dark:text-slate-100">
           {String(factor.factor_name)}
         </span>
         {!!factor.threshold_label && (
-          <span className="text-xs text-slate-400">{String(factor.threshold_label)}</span>
+          <span className="text-xs text-slate-400 dark:text-slate-500">{String(factor.threshold_label)}</span>
         )}
       </div>
       {!!factor._rationale && (
-        <p className="mt-1 text-xs text-slate-500">{String(factor._rationale)}</p>
+        <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">{String(factor._rationale)}</p>
       )}
       <div className="mt-2.5 flex flex-col gap-2.5">{sections}</div>
     </div>

@@ -22,7 +22,7 @@ const ROLE_TONE: Record<string, string> = {
   superuser: "bg-blue-100 text-blue-700",
   officer: "bg-emerald-100 text-emerald-700",
   risk_manager: "bg-amber-100 text-amber-700",
-  viewer: "bg-slate-100 text-slate-600",
+  viewer: "bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-300",
 };
 
 export default function TeamView({ currentUserId }: { currentUserId: string }) {
@@ -62,17 +62,17 @@ export default function TeamView({ currentUserId }: { currentUserId: string }) {
   };
 
   const inputClass =
-    "rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-100";
-  const labelClass = "text-[11px] font-semibold uppercase tracking-wider text-slate-500";
+    "rounded-lg border border-slate-300 dark:border-white/15 bg-white dark:bg-slate-900 px-3 py-2 text-sm shadow-sm outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-100";
+  const labelClass = "text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400";
 
   return (
     <div className="flex flex-col gap-5">
-      <p className="text-sm text-slate-500">
+      <p className="text-sm text-slate-500 dark:text-slate-400">
         Add people and assign a role. The role decides what each person can see and do.
       </p>
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-        <h3 className="mb-3 text-sm font-semibold text-slate-900">Add a person</h3>
+      <section className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900 p-5 shadow-sm">
+        <h3 className="mb-3 text-sm font-semibold text-slate-900 dark:text-slate-100">Add a person</h3>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
           <label className="flex flex-col gap-1.5">
             <span className={labelClass}>Full name</span>
@@ -115,7 +115,7 @@ export default function TeamView({ currentUserId }: { currentUserId: string }) {
             </button>
           </div>
         </div>
-        <p className="mt-2 text-xs text-slate-400">{ROLE_BLURB[role]}</p>
+        <p className="mt-2 text-xs text-slate-400 dark:text-slate-500">{ROLE_BLURB[role]}</p>
         {error && <p className="mt-1 text-xs text-rose-600">{error}</p>}
       </section>
 
@@ -123,17 +123,17 @@ export default function TeamView({ currentUserId }: { currentUserId: string }) {
         {users.map((u) => (
           <div
             key={u.id}
-            className="flex items-center gap-3.5 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"
+            className="flex items-center gap-3.5 rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900 p-4 shadow-sm"
           >
             <Avatar name={u.name} avatar={u.avatar} size={40} />
             <div className="min-w-0 flex-1">
-              <div className="font-semibold text-slate-800">
+              <div className="font-semibold text-slate-800 dark:text-slate-100">
                 {u.name}
                 {u.id === currentUserId && (
-                  <span className="ml-2 text-xs font-normal text-slate-400">(you)</span>
+                  <span className="ml-2 text-xs font-normal text-slate-400 dark:text-slate-500">(you)</span>
                 )}
               </div>
-              <div className="font-mono text-xs text-slate-500">{u.userId}</div>
+              <div className="font-mono text-xs text-slate-500 dark:text-slate-400">{u.userId}</div>
             </div>
             <span
               className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold ${ROLE_TONE[u.role]}`}
@@ -143,7 +143,7 @@ export default function TeamView({ currentUserId }: { currentUserId: string }) {
             {u.id !== currentUserId && (
               <button
                 onClick={() => remove(u.id)}
-                className="shrink-0 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-500 transition hover:border-rose-300 hover:bg-rose-50 hover:text-rose-700"
+                className="shrink-0 rounded-lg border border-slate-200 dark:border-white/10 px-3 py-1.5 text-xs font-medium text-slate-500 dark:text-slate-400 transition hover:border-rose-300 hover:bg-rose-50 hover:text-rose-700"
               >
                 Remove
               </button>

@@ -50,7 +50,7 @@ const EMPTY: FormState = {
 };
 
 const inputClass =
-  "rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-100";
+  "rounded-lg border border-slate-300 dark:border-white/15 bg-white dark:bg-slate-900 px-3 py-2 text-sm shadow-sm outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-100";
 
 export default function IntakeForm({ summary, onAssess }: Props) {
   const [form, setForm] = useState<FormState>(EMPTY);
@@ -135,7 +135,7 @@ export default function IntakeForm({ summary, onAssess }: Props) {
 
   const field = (key: keyof FormState, label: string, input: React.ReactNode) => (
     <label className="flex flex-col gap-1.5 text-sm">
-      <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+      <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
         {label}
       </span>
       {input}
@@ -170,14 +170,14 @@ export default function IntakeForm({ summary, onAssess }: Props) {
     note: string | null,
     body: React.ReactNode,
   ) => (
-    <section className="animate-fade-up rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+    <section className="animate-fade-up rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900 p-5 shadow-sm">
       <div className="mb-4 flex items-center gap-2.5">
         <span className={`flex h-7 w-7 items-center justify-center rounded-lg text-sm ${accent}`}>
           {badge}
         </span>
-        <h3 className="text-sm font-semibold text-slate-900">{title}</h3>
+        <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">{title}</h3>
       </div>
-      {note && <p className="-mt-2 mb-4 text-xs text-slate-500">{note}</p>}
+      {note && <p className="-mt-2 mb-4 text-xs text-slate-500 dark:text-slate-400">{note}</p>}
       {body}
     </section>
   );
@@ -186,7 +186,7 @@ export default function IntakeForm({ summary, onAssess }: Props) {
     <div className="flex flex-col gap-5">
       <div className="flex flex-wrap items-end justify-end gap-3">
         <label className="flex flex-col gap-1.5 text-sm">
-          <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+          <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
             Load a sample scenario
           </span>
           <select

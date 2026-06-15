@@ -116,12 +116,12 @@ export default function EvalsView() {
   const maxLat = n ? Math.max(...latencies) / 1000 : 0;
 
   const metric = (label: string, value: string, target: string, met: boolean) => (
-    <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-      <div className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+    <div className="rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900 p-4 shadow-sm">
+      <div className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
         {label}
       </div>
       <div className="mt-1 flex items-baseline gap-2">
-        <span className="text-xl font-bold text-slate-900">{value}</span>
+        <span className="text-xl font-bold text-slate-900 dark:text-slate-100">{value}</span>
         <span
           className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${
             met ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"
@@ -130,14 +130,14 @@ export default function EvalsView() {
           {met ? "met" : "watch"}
         </span>
       </div>
-      <div className="mt-0.5 text-[11px] text-slate-400">{target}</div>
+      <div className="mt-0.5 text-[11px] text-slate-400 dark:text-slate-500">{target}</div>
     </div>
   );
 
   return (
     <div className="flex flex-col gap-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="max-w-2xl text-sm text-slate-500">
+        <p className="max-w-2xl text-sm text-slate-500 dark:text-slate-400">
           The 24 locked ground-truth profiles, run through the real pipeline. Each one shows the
           decision, whether it matched the locked label, and the exact explanation the model
           wrote. Roughly 30 to 40 cents of model usage, and a few minutes to run.
@@ -161,14 +161,14 @@ export default function EvalsView() {
 
       {error && <p className="text-sm text-rose-600">{error}</p>}
       {stopped && (
-        <p className="text-sm text-slate-500">
+        <p className="text-sm text-slate-500 dark:text-slate-400">
           Stopped at {n} of {total}. The remaining profiles were not run, so no further model
           tokens were used.
         </p>
       )}
 
       {running && (
-        <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-200">
+        <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-white/15">
           <div
             className="h-full rounded-full bg-blue-500 transition-all"
             style={{ width: `${(n / total) * 100}%` }}
@@ -188,7 +188,7 @@ export default function EvalsView() {
       )}
 
       {n === 0 && !running && (
-        <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center text-sm text-slate-400">
+        <div className="rounded-2xl border border-dashed border-slate-300 dark:border-white/15 bg-white dark:bg-slate-900 p-10 text-center text-sm text-slate-400 dark:text-slate-500">
           Click Run benchmark to evaluate all 24 profiles and see each generated explanation.
         </div>
       )}
@@ -199,8 +199,8 @@ export default function EvalsView() {
           return (
             <div
               key={r.id}
-              className={`rounded-2xl border bg-white shadow-sm transition ${
-                r.match ? "border-slate-200" : "border-amber-300"
+              className={`rounded-2xl border bg-white dark:bg-slate-900 shadow-sm transition ${
+                r.match ? "border-slate-200 dark:border-white/10" : "border-amber-300"
               }`}
             >
               <button
@@ -212,9 +212,9 @@ export default function EvalsView() {
                 >
                   {r.recommendation.toUpperCase()}
                 </span>
-                <span className="font-semibold text-slate-800">{r.name}</span>
-                <span className="text-xs text-slate-400">{r.id}</span>
-                <span className="text-xs text-slate-500">
+                <span className="font-semibold text-slate-800 dark:text-slate-100">{r.name}</span>
+                <span className="text-xs text-slate-400 dark:text-slate-500">{r.id}</span>
+                <span className="text-xs text-slate-500 dark:text-slate-400">
                   label: {r.expected} ·{" "}
                   {r.match ? (
                     <span className="text-emerald-600">match</span>
@@ -222,8 +222,8 @@ export default function EvalsView() {
                     <span className="font-semibold text-amber-600">no match</span>
                   )}
                 </span>
-                <span className="ml-auto flex items-center gap-2 text-xs text-slate-400">
-                  <span className="rounded bg-slate-100 px-1.5 py-0.5 text-slate-600">
+                <span className="ml-auto flex items-center gap-2 text-xs text-slate-400 dark:text-slate-500">
+                  <span className="rounded bg-slate-100 dark:bg-white/10 px-1.5 py-0.5 text-slate-600 dark:text-slate-300">
                     {r.validation_outcome ? OUTCOME_LABEL[r.validation_outcome] : "-"}
                   </span>
                   {(r.latencyMs / 1000).toFixed(1)}s
@@ -248,16 +248,16 @@ function ExpandedTest({ result }: { result: Result }) {
 
   const item = (label: string, value: string) => (
     <div>
-      <dt className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">{label}</dt>
-      <dd className="text-sm font-medium text-slate-800">{value}</dd>
+      <dt className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">{label}</dt>
+      <dd className="text-sm font-medium text-slate-800 dark:text-slate-100">{value}</dd>
     </div>
   );
 
   return (
     <div className="flex flex-col gap-4 border-t border-slate-100 p-4">
       {row && (
-        <div className="rounded-xl border border-slate-200 bg-white p-3">
-          <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+        <div className="rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900 p-3">
+          <div className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
             Test profile (the inputs)
           </div>
           <dl className="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -285,12 +285,12 @@ function ExpandedTest({ result }: { result: Result }) {
         </div>
       )}
 
-      <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+      <div className="rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 p-3">
         <div className="flex items-center justify-between">
-          <div className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+          <div className="text-xs font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">
             Rules checked against the inputs (the engine)
           </div>
-          <span className="text-xs font-medium text-slate-600">
+          <span className="text-xs font-medium text-slate-600 dark:text-slate-300">
             score {result.score.total}/{result.score.max} · {result.score.band}
           </span>
         </div>
@@ -303,7 +303,7 @@ function ExpandedTest({ result }: { result: Result }) {
               }`}
             >
               <span>{p.passed ? "✅" : "❌"}</span>
-              <span className="font-mono text-slate-500">{p.rule_id}</span>
+              <span className="font-mono text-slate-500 dark:text-slate-400">{p.rule_id}</span>
               <span>{p.finding}</span>
             </div>
           ))}
@@ -323,11 +323,11 @@ function ExpandedTest({ result }: { result: Result }) {
         <div className="text-xs font-semibold uppercase tracking-wide text-blue-700">
           Generated explanation (the output)
         </div>
-        <p className="mt-1.5 text-sm leading-7 text-slate-800">{result.explanation}</p>
+        <p className="mt-1.5 text-sm leading-7 text-slate-800 dark:text-slate-100">{result.explanation}</p>
         {result.reasons.length > 0 && (
           <ul className="mt-3 space-y-1.5">
             {result.reasons.map((reason, i) => (
-              <li key={i} className="flex gap-2 text-sm text-slate-700">
+              <li key={i} className="flex gap-2 text-sm text-slate-700 dark:text-slate-200">
                 <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-blue-400" />
                 {reason}
               </li>

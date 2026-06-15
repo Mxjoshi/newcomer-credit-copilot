@@ -184,7 +184,7 @@ export default function ImpactView({ activeLabel }: { activeLabel: string }) {
 
   if (error) return <p className="text-sm text-rose-600">{error}</p>;
   if (!data || !params || !baseline) {
-    return <p className="text-sm text-slate-500">Running the locked ground-truth set...</p>;
+    return <p className="text-sm text-slate-500 dark:text-slate-400">Running the locked ground-truth set...</p>;
   }
   const base = baseline;
 
@@ -197,7 +197,7 @@ export default function ImpactView({ activeLabel }: { activeLabel: string }) {
 
   const stat = (label: string, value: number, accent: string) => (
     <div>
-      <div className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+      <div className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
         {label}
       </div>
       <div key={`${label}-${value}`} className={`animate-count text-2xl font-bold ${accent}`}>
@@ -207,13 +207,13 @@ export default function ImpactView({ activeLabel }: { activeLabel: string }) {
   );
   const strategyCard = (s: StrategyNumbers, tone: string, accent: string) => (
     <div className={`flex-1 rounded-2xl border-2 p-5 ${tone}`}>
-      <h4 className="text-sm font-semibold text-slate-800">{s.label}</h4>
+      <h4 className="text-sm font-semibold text-slate-800 dark:text-slate-100">{s.label}</h4>
       <div className="mt-4 grid grid-cols-3 gap-3">
         {stat("Approved", s.approved_of_labeled, accent)}
         {stat("False approvals", s.false_approvals, "text-rose-600")}
         {stat("Referred", s.referred, "text-amber-600")}
       </div>
-      <p className="mt-3 text-xs text-slate-500">
+      <p className="mt-3 text-xs text-slate-500 dark:text-slate-400">
         of {s.labeled_approve} creditworthy newcomers in the locked set
       </p>
     </div>
@@ -250,7 +250,7 @@ export default function ImpactView({ activeLabel }: { activeLabel: string }) {
 
         <div className="mt-4">
           <div className="flex items-center justify-between text-sm">
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
               Debt burden ratio cap
             </span>
             <div className="flex items-center gap-1">
@@ -261,7 +261,7 @@ export default function ImpactView({ activeLabel }: { activeLabel: string }) {
                 step={1}
                 value={Math.round(params.dbr_cap * 100)}
                 onChange={(e) => update("dbr_cap", Number(e.target.value) / 100)}
-                className="w-16 rounded-lg border border-slate-300 bg-white px-2 py-1 text-right font-mono text-sm font-semibold text-blue-700 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+                className="w-16 rounded-lg border border-slate-300 dark:border-white/15 bg-white dark:bg-slate-900 px-2 py-1 text-right font-mono text-sm font-semibold text-blue-700 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
               />
               <span className="font-mono text-sm font-semibold text-blue-700">%</span>
             </div>
@@ -275,7 +275,7 @@ export default function ImpactView({ activeLabel }: { activeLabel: string }) {
             onChange={(e) => update("dbr_cap", Number(e.target.value))}
             className="mt-2 w-full accent-blue-600"
           />
-          <div className="flex justify-between text-[11px] text-slate-400">
+          <div className="flex justify-between text-[11px] text-slate-400 dark:text-slate-500">
             <span>30%</span>
             <span>60%</span>
           </div>
@@ -284,14 +284,14 @@ export default function ImpactView({ activeLabel }: { activeLabel: string }) {
         <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
           {KNOBS.map((key) => (
             <label key={key} className="flex flex-col gap-1.5 text-xs">
-              <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                 {PARAM_META[key].label}
               </span>
               <input
                 type="number"
                 value={params[key]}
                 onChange={(e) => update(key, Number(e.target.value))}
-                className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm shadow-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+                className="rounded-lg border border-slate-300 dark:border-white/15 bg-white dark:bg-slate-900 px-3 py-1.5 text-sm shadow-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
               />
             </label>
           ))}
@@ -303,7 +303,7 @@ export default function ImpactView({ activeLabel }: { activeLabel: string }) {
               {changedKeys.map((k) => (
                 <span key={k} className="font-medium text-amber-900">
                   {PARAM_META[k].label}{" "}
-                  <span className="font-mono text-slate-500">{PARAM_META[k].fmt(base[k])}</span>
+                  <span className="font-mono text-slate-500 dark:text-slate-400">{PARAM_META[k].fmt(base[k])}</span>
                   {" → "}
                   <span className="font-mono text-amber-700">{PARAM_META[k].fmt(params[k])}</span>
                 </span>
@@ -329,7 +329,7 @@ export default function ImpactView({ activeLabel }: { activeLabel: string }) {
         {dirty && (
           <button
             onClick={reset}
-            className="mt-4 rounded-lg border border-blue-300 bg-white px-4 py-2 text-sm font-medium text-blue-700 transition hover:bg-blue-100"
+            className="mt-4 rounded-lg border border-blue-300 bg-white dark:bg-slate-900 px-4 py-2 text-sm font-medium text-blue-700 transition hover:bg-blue-100"
           >
             Reset to {selectedLabel}
           </button>
@@ -337,36 +337,36 @@ export default function ImpactView({ activeLabel }: { activeLabel: string }) {
       </section>
 
       <div>
-        <p className="mb-3 text-sm text-slate-600">
+        <p className="mb-3 text-sm text-slate-600 dark:text-slate-300">
           Two strategies on the same 24 locked profiles. <strong>Today</strong>, a newcomer with no
           usable credit file is declined; <strong>with the copilot</strong>, they are assessed on
           alternative data against this ruleset.
         </p>
         <div className="flex flex-col gap-4 lg:flex-row">
-          {strategyCard(data.champion, "border-slate-300 bg-white", "text-slate-700")}
+          {strategyCard(data.champion, "border-slate-300 dark:border-white/15 bg-white dark:bg-slate-900", "text-slate-700 dark:text-slate-200")}
           {strategyCard(data.challenger, "border-emerald-300 bg-emerald-50", "text-emerald-700")}
         </div>
       </div>
 
       <div>
-        <p className="text-sm text-slate-700">
+        <p className="text-sm text-slate-700 dark:text-slate-200">
           Decision accuracy vs the locked labels:{" "}
           <strong>
             {data.accuracy} of {data.total}
           </strong>{" "}
           ({((data.accuracy / data.total) * 100).toFixed(1)}%, target 80%+).
         </p>
-        <p className="mt-1 text-xs text-slate-500">
+        <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
           Below are the 24 test profiles in the benchmark: synthetic applicants, each with a known
           correct outcome (the &ldquo;label&rdquo;), locked before the model was built so the model
           cannot grade its own exam. &ldquo;Match&rdquo; is whether the model agreed with the label.
         </p>
       </div>
 
-      <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+      <section className="overflow-hidden rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900 shadow-sm">
         <table className="w-full text-xs">
           <thead>
-            <tr className="border-b border-slate-200 bg-slate-50 text-left text-slate-500">
+            <tr className="border-b border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 text-left text-slate-500 dark:text-slate-400">
               <th className="px-3 py-2">Test applicant</th>
               <th className="px-3 py-2">Score</th>
               <th className="px-3 py-2">Band</th>
@@ -386,9 +386,9 @@ export default function ImpactView({ activeLabel }: { activeLabel: string }) {
                     moved ? "bg-blue-50" : row.match ? "" : "bg-amber-50"
                   }`}
                 >
-                  <td className="px-3 py-2 font-medium text-slate-700">
+                  <td className="px-3 py-2 font-medium text-slate-700 dark:text-slate-200">
                     {row.applicant_name}
-                    <span className="ml-1.5 text-[10px] text-slate-400">{row.id}</span>
+                    <span className="ml-1.5 text-[10px] text-slate-400 dark:text-slate-500">{row.id}</span>
                     {moved && (
                       <span className="ml-1.5 rounded bg-blue-200 px-1.5 py-0.5 text-[10px] font-semibold text-blue-800">
                         moved
@@ -397,11 +397,11 @@ export default function ImpactView({ activeLabel }: { activeLabel: string }) {
                   </td>
                   <td className="px-3 py-2">{row.score}</td>
                   <td className="px-3 py-2">{row.band}</td>
-                  <td className="px-3 py-2 text-slate-500">
+                  <td className="px-3 py-2 text-slate-500 dark:text-slate-400">
                     {row.failed_rules.length > 0 ? row.failed_rules.join(", ") : "none"}
                   </td>
                   <td className="px-3 py-2 font-medium">{row.recommendation}</td>
-                  <td className="px-3 py-2 text-slate-500">{row.expected}</td>
+                  <td className="px-3 py-2 text-slate-500 dark:text-slate-400">{row.expected}</td>
                   <td className="px-3 py-2">
                     {row.match ? (
                       <span className="text-emerald-600">yes</span>
@@ -416,11 +416,11 @@ export default function ImpactView({ activeLabel }: { activeLabel: string }) {
         </table>
       </section>
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <section className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900 p-5 shadow-sm">
         <div className="mb-3 flex items-center justify-between">
           <div>
-            <h3 className="text-sm font-semibold text-slate-900">Policy change log</h3>
-            <p className="text-xs text-slate-500">
+            <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">Policy change log</h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400">
               Every what-if run this session, with what it did to the numbers. In production this is
               where a real ruleset version change is recorded.
             </p>
@@ -431,14 +431,14 @@ export default function ImpactView({ activeLabel }: { activeLabel: string }) {
                 clearPolicyLog();
                 setLog([]);
               }}
-              className="rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-medium text-slate-600 transition hover:bg-slate-100"
+              className="rounded-lg border border-slate-300 dark:border-white/15 px-3 py-1.5 text-xs font-medium text-slate-600 dark:text-slate-300 transition hover:bg-slate-100"
             >
               Clear log
             </button>
           )}
         </div>
         {log.length === 0 ? (
-          <p className="text-sm text-slate-400">
+          <p className="text-sm text-slate-400 dark:text-slate-500">
             No changes yet. Move a policy value above and it will be recorded here.
           </p>
         ) : (
@@ -448,13 +448,13 @@ export default function ImpactView({ activeLabel }: { activeLabel: string }) {
                 key={entry.id}
                 className="flex flex-wrap items-center gap-x-4 gap-y-1 rounded-xl border border-slate-100 bg-slate-50/50 p-3 text-xs"
               >
-                <span className="text-slate-400">
+                <span className="text-slate-400 dark:text-slate-500">
                   {fmtDate(entry.at)}
                 </span>
-                <span className="font-medium text-slate-700">
+                <span className="font-medium text-slate-700 dark:text-slate-200">
                   {entry.changes.map((c) => `${c.label} ${c.from} → ${c.to}`).join(", ")}
                 </span>
-                <span className="ml-auto text-slate-500">
+                <span className="ml-auto text-slate-500 dark:text-slate-400">
                   {entry.moved} moved · approve {entry.approved} · refer {entry.referred} · decline{" "}
                   {entry.declined} · accuracy {entry.accuracy}/24
                 </span>

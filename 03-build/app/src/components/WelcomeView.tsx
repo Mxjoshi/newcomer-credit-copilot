@@ -108,7 +108,7 @@ export default function WelcomeView({
   return (
     <div className="flex flex-col gap-6">
       {userName && (
-        <h2 className="text-2xl font-bold tracking-tight text-slate-900">Hello, {userName}</h2>
+        <h2 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">Hello, {userName}</h2>
       )}
 
       {/* Pending reviews are decisions a human must make; surface them on landing so they are
@@ -139,23 +139,23 @@ export default function WelcomeView({
         </section>
       )}
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+      <section className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900 p-6 shadow-sm sm:p-8">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="max-w-2xl">
             <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-blue-600">
               Credit decisioning · officer console
             </div>
-            <h2 className="mt-2 text-2xl font-bold tracking-tight text-slate-900">
+            <h2 className="mt-2 text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
               Assess newcomers, and explain every decision.
             </h2>
-            <p className="mt-2 text-sm leading-6 text-slate-600">
+            <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300">
               For UAE newcomers with little local credit history. The copilot scores the risk on
               alternative data, checks lending policy, and returns an approve, decline, or refer
               recommendation, grounded in the rules, that an officer can defend.
             </p>
           </div>
           {summary && (
-            <span className="flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs">
+            <span className="flex items-center gap-2 rounded-full border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 px-3 py-1 text-xs">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
               {summary.market_name} · {activeLabel || summary.ruleset_version}
             </span>
@@ -172,12 +172,12 @@ export default function WelcomeView({
               <path d="M5 12h14M13 6l6 6-6 6" />
             </svg>
           </button>
-          <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-slate-500">
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-slate-500 dark:text-slate-400">
             {steps.map((s, i) => (
               <span key={i} className="flex items-center gap-2">
                 {i > 0 && <span className="text-slate-300">→</span>}
                 <span>
-                  <span className="font-semibold text-slate-400">{i + 1}.</span> {s}
+                  <span className="font-semibold text-slate-400 dark:text-slate-500">{i + 1}.</span> {s}
                 </span>
               </span>
             ))}
@@ -186,13 +186,13 @@ export default function WelcomeView({
       </section>
 
       <div>
-        <h3 className="mb-3 text-sm font-semibold text-slate-700">What you can do</h3>
+        <h3 className="mb-3 text-sm font-semibold text-slate-700 dark:text-slate-200">What you can do</h3>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {capabilities.map((c) => (
             <button
               key={c.target}
               onClick={() => onNavigate(c.target)}
-              className="group flex flex-col gap-2 rounded-2xl border border-slate-200 bg-white p-5 text-left shadow-sm transition hover:border-blue-300 hover:shadow-md"
+              className="group flex flex-col gap-2 rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900 p-5 text-left shadow-sm transition hover:border-blue-300 hover:shadow-md"
             >
               <div className="flex items-center gap-2.5">
                 <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
@@ -200,14 +200,14 @@ export default function WelcomeView({
                     {c.icon}
                   </svg>
                 </span>
-                <span className="font-semibold text-slate-900">{c.title}</span>
+                <span className="font-semibold text-slate-900 dark:text-slate-100">{c.title}</span>
                 {c.badge !== undefined && c.badge > 0 && (
                   <span className="ml-auto rounded-full bg-blue-500 px-2 py-0.5 text-[10px] font-semibold text-white">
                     {c.badge}
                   </span>
                 )}
               </div>
-              <p className="text-sm text-slate-500">{c.description}</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400">{c.description}</p>
             </button>
           ))}
         </div>

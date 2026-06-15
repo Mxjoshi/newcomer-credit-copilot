@@ -17,13 +17,13 @@ export default function VersionPicker({ versions, selectedLabel, activeLabel, on
   if (versions.length <= 1) return null;
   return (
     <label className="flex items-center gap-2">
-      <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+      <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
         Viewing version
       </span>
       <select
         value={selectedLabel}
         onChange={(e) => onChange(e.target.value)}
-        className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 font-mono text-sm shadow-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+        className="rounded-lg border border-slate-300 dark:border-white/15 bg-white dark:bg-slate-900 px-3 py-1.5 font-mono text-sm shadow-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
       >
         {versions.map((v) => (
           <option key={v.label} value={v.label}>

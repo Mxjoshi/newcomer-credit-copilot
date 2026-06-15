@@ -87,15 +87,15 @@ export default function DecisionView({ record, onAction, onNew, onViewAudit }: P
         </div>
       </div>
 
-      <section className="animate-fade-up rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-        <h3 className="mb-2 text-sm font-semibold text-slate-900">
+      <section className="animate-fade-up rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900 p-5 shadow-sm">
+        <h3 className="mb-2 text-sm font-semibold text-slate-900 dark:text-slate-100">
           Why (read this to your manager)
         </h3>
-        <p className="text-sm leading-7 text-slate-800">{decision.explanation}</p>
+        <p className="text-sm leading-7 text-slate-800 dark:text-slate-100">{decision.explanation}</p>
         {decision.reasons.length > 0 && (
           <ul className="mt-3 space-y-1.5">
             {decision.reasons.map((reason, i) => (
-              <li key={i} className="flex gap-2 text-sm text-slate-700">
+              <li key={i} className="flex gap-2 text-sm text-slate-700 dark:text-slate-200">
                 <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-blue-400" />
                 {reason}
               </li>
@@ -104,38 +104,38 @@ export default function DecisionView({ record, onAction, onNew, onViewAudit }: P
         )}
       </section>
 
-      <section className="animate-fade-up rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <section className="animate-fade-up rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900 p-5 shadow-sm">
         <div className="mb-4 flex items-center justify-between">
-          <h3 className="text-sm font-semibold text-slate-900">Scorecard</h3>
-          <span className="text-sm font-semibold text-slate-700">
+          <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">Scorecard</h3>
+          <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">
             {decision.score_result.total_points}{" "}
-            <span className="text-slate-400">/ {maxPoints}</span> · {decision.score_result.risk_band}
+            <span className="text-slate-400 dark:text-slate-500">/ {maxPoints}</span> · {decision.score_result.risk_band}
           </span>
         </div>
         <div className="flex flex-col gap-3.5">
           {decision.score_result.factors.map((f) => (
             <div key={f.factor_name}>
               <div className="flex items-baseline justify-between text-sm">
-                <span className="font-medium text-slate-800">{f.factor_name}</span>
-                <span className="text-slate-500">
+                <span className="font-medium text-slate-800 dark:text-slate-100">{f.factor_name}</span>
+                <span className="text-slate-500 dark:text-slate-400">
                   {f.applicant_value} · {f.points_awarded}/20
                 </span>
               </div>
-              <div className="mt-1.5 h-2 w-full overflow-hidden rounded-full bg-slate-100">
+              <div className="mt-1.5 h-2 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-white/10">
                 <div
                   className={`h-full rounded-full ${verdict.bar} transition-all`}
                   style={{ width: `${(f.points_awarded / 20) * 100}%` }}
                 />
               </div>
-              <div className="mt-1 text-xs text-slate-500">{f.rationale}</div>
+              <div className="mt-1 text-xs text-slate-500 dark:text-slate-400">{f.rationale}</div>
             </div>
           ))}
         </div>
       </section>
 
-      <section className="animate-fade-up rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-        <h3 className="mb-3 text-sm font-semibold text-slate-900">
-          Policy checks <span className="text-slate-400">· {passed} of {total} passed</span>
+      <section className="animate-fade-up rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900 p-5 shadow-sm">
+        <h3 className="mb-3 text-sm font-semibold text-slate-900 dark:text-slate-100">
+          Policy checks <span className="text-slate-400 dark:text-slate-500">· {passed} of {total} passed</span>
         </h3>
         <div className="flex flex-col gap-2">
           {decision.policy_results.map((r) => (
@@ -143,15 +143,15 @@ export default function DecisionView({ record, onAction, onNew, onViewAudit }: P
               key={r.rule_id}
               open={!r.passed}
               className={`group rounded-xl border p-3 text-sm ${
-                r.passed ? "border-slate-200 bg-slate-50/50" : "border-rose-200 bg-rose-50"
+                r.passed ? "border-slate-200 dark:border-white/10 bg-slate-50/50" : "border-rose-200 bg-rose-50"
               }`}
             >
               <summary className="flex cursor-pointer items-center gap-2 font-medium">
                 <span>{r.passed ? "✅" : "❌"}</span>
-                <span className="text-slate-500">{r.rule_id}</span>
-                <span className="text-slate-800">{r.finding}</span>
+                <span className="text-slate-500 dark:text-slate-400">{r.rule_id}</span>
+                <span className="text-slate-800 dark:text-slate-100">{r.finding}</span>
               </summary>
-              <p className="mt-2 border-l-2 border-slate-300 pl-3 text-slate-600">
+              <p className="mt-2 border-l-2 border-slate-300 dark:border-white/15 pl-3 text-slate-600 dark:text-slate-300">
                 &ldquo;{r.cited_text}&rdquo;
               </p>
             </details>
@@ -184,7 +184,7 @@ export default function DecisionView({ record, onAction, onNew, onViewAudit }: P
             </button>
             <button
               onClick={() => setOverriding((v) => !v)}
-              className="rounded-xl border border-slate-300 bg-white px-5 py-2.5 font-medium transition hover:bg-slate-100"
+              className="rounded-xl border border-slate-300 dark:border-white/15 bg-white dark:bg-slate-900 px-5 py-2.5 font-medium transition hover:bg-slate-100"
             >
               Override
             </button>
@@ -197,24 +197,24 @@ export default function DecisionView({ record, onAction, onNew, onViewAudit }: P
         )}
         <button
           onClick={onNew}
-          className="rounded-xl border border-slate-300 bg-white px-5 py-2.5 font-medium transition hover:bg-slate-100"
+          className="rounded-xl border border-slate-300 dark:border-white/15 bg-white dark:bg-slate-900 px-5 py-2.5 font-medium transition hover:bg-slate-100"
         >
           New assessment
         </button>
       </section>
 
       {decision.officer_action !== "none" && (
-        <div className="flex flex-wrap items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm">
+        <div className="flex flex-wrap items-center gap-2 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 p-3 text-sm">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-emerald-600">
             <path d="M5 12l5 5 9-11" />
           </svg>
-          <span className="text-slate-700">
+          <span className="text-slate-700 dark:text-slate-200">
             Saved to the audit log{" "}
-            <span className="text-slate-400">· ruleset {decision.ruleset_version}</span>
+            <span className="text-slate-400 dark:text-slate-500">· ruleset {decision.ruleset_version}</span>
           </span>
           <button
             onClick={onViewAudit}
-            className="ml-auto rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-slate-100"
+            className="ml-auto rounded-lg border border-slate-300 dark:border-white/15 bg-white dark:bg-slate-900 px-3 py-1.5 text-xs font-medium text-slate-700 dark:text-slate-200 transition hover:bg-slate-100"
           >
             View in audit log
           </button>
@@ -222,17 +222,17 @@ export default function DecisionView({ record, onAction, onNew, onViewAudit }: P
       )}
 
       {overriding && decision.officer_action === "none" && (
-        <section className="animate-scale-in rounded-2xl border border-slate-300 bg-slate-50 p-5">
+        <section className="animate-scale-in rounded-2xl border border-slate-300 dark:border-white/15 bg-slate-50 dark:bg-white/5 p-5">
           <h3 className="mb-3 text-sm font-semibold">Override the recommendation</h3>
           <div className="flex flex-wrap items-end gap-3">
             <label className="flex flex-col gap-1.5 text-sm">
-              <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                 New outcome
               </span>
               <select
                 value={overrideOutcome}
                 onChange={(e) => setOverrideOutcome(e.target.value as Recommendation)}
-                className="rounded-lg border border-slate-300 bg-white px-3 py-2"
+                className="rounded-lg border border-slate-300 dark:border-white/15 bg-white dark:bg-slate-900 px-3 py-2"
               >
                 {overrideOptions.map((o) => (
                   <option key={o} value={o}>
@@ -242,14 +242,14 @@ export default function DecisionView({ record, onAction, onNew, onViewAudit }: P
               </select>
             </label>
             <label className="flex grow flex-col gap-1.5 text-sm">
-              <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                 Reason (required)
               </span>
               <input
                 value={overrideReason}
                 onChange={(e) => setOverrideReason(e.target.value)}
                 placeholder="one line, recorded in the audit log"
-                className="rounded-lg border border-slate-300 px-3 py-2"
+                className="rounded-lg border border-slate-300 dark:border-white/15 px-3 py-2"
               />
             </label>
             <button

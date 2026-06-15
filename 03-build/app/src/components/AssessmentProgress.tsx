@@ -111,8 +111,8 @@ export default function AssessmentProgress({
 
   const summaryItem = (label: string, value: string) => (
     <div className="flex flex-col">
-      <dt className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">{label}</dt>
-      <dd className="text-sm font-medium text-slate-800">{value}</dd>
+      <dt className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">{label}</dt>
+      <dd className="text-sm font-medium text-slate-800 dark:text-slate-100">{value}</dd>
     </div>
   );
 
@@ -123,7 +123,7 @@ export default function AssessmentProgress({
         ? "border-emerald-200 bg-emerald-50"
         : state === "busy"
           ? "border-amber-200 bg-amber-50"
-          : "border-slate-200 bg-white";
+          : "border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900";
     const badge =
       state === "done" ? (
         <span className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500 text-white">
@@ -138,7 +138,7 @@ export default function AssessmentProgress({
           </svg>
         </span>
       ) : (
-        <span className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-slate-200 text-xs font-semibold text-slate-400">
+        <span className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-slate-200 dark:border-white/10 text-xs font-semibold text-slate-400 dark:text-slate-500">
           {index + 1}
         </span>
       );
@@ -146,9 +146,9 @@ export default function AssessmentProgress({
       <div className={`flex items-center gap-4 rounded-2xl border p-4 transition ${tone}`}>
         {badge}
         <div className="min-w-0 flex-1">
-          <div className="font-semibold text-slate-800">{title}</div>
+          <div className="font-semibold text-slate-800 dark:text-slate-100">{title}</div>
           {state === "busy" && <div className="text-sm text-amber-700">{hint}</div>}
-          {state === "pending" && <div className="text-sm text-slate-400">{hint}</div>}
+          {state === "pending" && <div className="text-sm text-slate-400 dark:text-slate-500">{hint}</div>}
           {state === "done" && results[index] && (
             <div className="text-sm text-emerald-800">{results[index]}</div>
           )}
@@ -163,16 +163,16 @@ export default function AssessmentProgress({
   return (
     <div className="flex flex-col gap-5">
       <div>
-        <h2 className="text-lg font-semibold text-slate-900">
+        <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
           Assessing {applicant.full_name}
         </h2>
-        <p className="text-sm text-slate-500">
+        <p className="text-sm text-slate-500 dark:text-slate-400">
           The three steps below run in order. You can see exactly what was submitted.
         </p>
       </div>
 
-      <section className="animate-fade-up rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-        <h3 className="mb-4 text-xs font-semibold uppercase tracking-wide text-slate-500">
+      <section className="animate-fade-up rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900 p-5 shadow-sm">
+        <h3 className="mb-4 text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
           What was submitted
         </h3>
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">

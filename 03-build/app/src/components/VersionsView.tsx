@@ -46,7 +46,7 @@ export default function VersionsView({ summary, activeLabel, onActivate }: Props
     };
   }, [summary]);
 
-  if (!summary) return <p className="text-sm text-slate-500">Loading...</p>;
+  if (!summary) return <p className="text-sm text-slate-500 dark:text-slate-400">Loading...</p>;
 
   const baseLabel = summary.ruleset_version;
   const activeParams = getVersion(activeLabel)?.params ?? summary.params;
@@ -93,7 +93,7 @@ export default function VersionsView({ summary, activeLabel, onActivate }: Props
   return (
     <div className="flex flex-col gap-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="max-w-2xl text-sm text-slate-500">
+        <p className="max-w-2xl text-sm text-slate-500 dark:text-slate-400">
           Every policy change is a version, with a rationale, switchable and reversible. The
           active version drives every assessment.
         </p>
@@ -118,7 +118,7 @@ export default function VersionsView({ summary, activeLabel, onActivate }: Props
 
           <div className="mt-4">
             <div className="flex items-center justify-between text-sm">
-              <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                 Debt burden ratio cap
               </span>
               <div className="flex items-center gap-1">
@@ -129,7 +129,7 @@ export default function VersionsView({ summary, activeLabel, onActivate }: Props
                   step={1}
                   value={Math.round(draft.dbr_cap * 100)}
                   onChange={(e) => setDraftParam("dbr_cap", Number(e.target.value) / 100)}
-                  className="w-16 rounded-lg border border-slate-300 bg-white px-2 py-1 text-right font-mono text-sm font-semibold text-blue-700 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+                  className="w-16 rounded-lg border border-slate-300 dark:border-white/15 bg-white dark:bg-slate-900 px-2 py-1 text-right font-mono text-sm font-semibold text-blue-700 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
                 />
                 <span className="font-mono text-sm font-semibold text-blue-700">%</span>
               </div>
@@ -149,14 +149,14 @@ export default function VersionsView({ summary, activeLabel, onActivate }: Props
             {(["amount_salary_multiple", "max_age_at_maturity", "min_tenure_months"] as const).map(
               (key) => (
                 <label key={key} className="flex flex-col gap-1.5 text-xs">
-                  <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+                  <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                     {PARAM_LABEL[key]}
                   </span>
                   <input
                     type="number"
                     value={draft[key]}
                     onChange={(e) => setDraftParam(key, Number(e.target.value))}
-                    className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm shadow-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+                    className="rounded-lg border border-slate-300 dark:border-white/15 bg-white dark:bg-slate-900 px-3 py-1.5 text-sm shadow-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
                   />
                 </label>
               ),
@@ -164,7 +164,7 @@ export default function VersionsView({ summary, activeLabel, onActivate }: Props
           </div>
 
           <label className="mt-4 flex flex-col gap-1.5 text-sm">
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
               Rationale (required)
             </span>
             <textarea
@@ -172,7 +172,7 @@ export default function VersionsView({ summary, activeLabel, onActivate }: Props
               onChange={(e) => setRationale(e.target.value)}
               rows={2}
               placeholder="Why is this changing? e.g. CBUAE tightened the debt burden ceiling effective Q3."
-              className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+              className="rounded-lg border border-slate-300 dark:border-white/15 bg-white dark:bg-slate-900 px-3 py-2 text-sm shadow-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
             />
           </label>
 
@@ -186,7 +186,7 @@ export default function VersionsView({ summary, activeLabel, onActivate }: Props
             </button>
             <button
               onClick={() => setCreating(false)}
-              className="rounded-xl border border-slate-300 bg-white px-5 py-2.5 text-sm font-medium transition hover:bg-slate-100"
+              className="rounded-xl border border-slate-300 dark:border-white/15 bg-white dark:bg-slate-900 px-5 py-2.5 text-sm font-medium transition hover:bg-slate-100"
             >
               Cancel
             </button>
@@ -203,13 +203,13 @@ export default function VersionsView({ summary, activeLabel, onActivate }: Props
             <div
               key={v.id}
               className={`rounded-2xl border p-5 shadow-sm transition ${
-                isActive ? "border-blue-400 bg-blue-50/40" : "border-slate-200 bg-white"
+                isActive ? "border-blue-400 bg-blue-50/40" : "border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900"
               }`}
             >
               <div className="flex flex-wrap items-center gap-2">
-                <span className="font-mono text-sm font-bold text-slate-900">{v.label}</span>
+                <span className="font-mono text-sm font-bold text-slate-900 dark:text-slate-100">{v.label}</span>
                 {v.is_base && (
-                  <span className="rounded-full bg-slate-200 px-2 py-0.5 text-[10px] font-semibold text-slate-600">
+                  <span className="rounded-full bg-slate-200 dark:bg-white/15 px-2 py-0.5 text-[10px] font-semibold text-slate-600 dark:text-slate-300">
                     locked base
                   </span>
                 )}
@@ -218,20 +218,20 @@ export default function VersionsView({ summary, activeLabel, onActivate }: Props
                     active
                   </span>
                 )}
-                <span className="ml-auto text-xs text-slate-400">
+                <span className="ml-auto text-xs text-slate-400 dark:text-slate-500">
                   {v.created_at ? fmtDate(v.created_at) : "origin"}
                   {v.parent_label ? ` · from ${v.parent_label}` : ""}
                 </span>
               </div>
 
-              <p className="mt-2 text-sm text-slate-700">{v.rationale}</p>
+              <p className="mt-2 text-sm text-slate-700 dark:text-slate-200">{v.rationale}</p>
 
               {diffs.length > 0 && (
                 <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs">
                   {diffs.map((d) => (
-                    <span key={d.param} className="text-slate-600">
+                    <span key={d.param} className="text-slate-600 dark:text-slate-300">
                       {d.label}{" "}
-                      <span className="font-mono text-slate-400">
+                      <span className="font-mono text-slate-400 dark:text-slate-500">
                         {fmtParam(d.param, d.from)}
                       </span>
                       {" → "}
@@ -247,7 +247,7 @@ export default function VersionsView({ summary, activeLabel, onActivate }: Props
                 {!isActive && (
                   <button
                     onClick={() => activate(v.label)}
-                    className="rounded-lg border border-blue-300 bg-white px-4 py-1.5 text-xs font-medium text-blue-700 transition hover:bg-blue-50"
+                    className="rounded-lg border border-blue-300 bg-white dark:bg-slate-900 px-4 py-1.5 text-xs font-medium text-blue-700 transition hover:bg-blue-50"
                   >
                     {v.is_base ? "Roll back to base" : "Make active"}
                   </button>
@@ -255,13 +255,13 @@ export default function VersionsView({ summary, activeLabel, onActivate }: Props
                 {!v.is_base && !isActive && (
                   <button
                     onClick={() => remove(v.label)}
-                    className="rounded-lg border border-slate-200 px-4 py-1.5 text-xs font-medium text-slate-500 transition hover:border-rose-300 hover:bg-rose-50 hover:text-rose-700"
+                    className="rounded-lg border border-slate-200 dark:border-white/10 px-4 py-1.5 text-xs font-medium text-slate-500 dark:text-slate-400 transition hover:border-rose-300 hover:bg-rose-50 hover:text-rose-700"
                   >
                     Delete
                   </button>
                 )}
                 {!v.is_base && isActive && (
-                  <span className="text-xs text-slate-400">
+                  <span className="text-xs text-slate-400 dark:text-slate-500">
                     Active version cannot be deleted. Make another version active first.
                   </span>
                 )}

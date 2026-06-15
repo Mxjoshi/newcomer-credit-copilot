@@ -24,6 +24,7 @@ import {
   type User,
 } from "@/lib/auth";
 import { UserContext } from "@/lib/userContext";
+import { getTheme, toggleTheme, type Theme } from "@/lib/theme";
 import type { RulesetSummary } from "@/components/summary";
 import Avatar from "@/components/Avatar";
 import Brand from "@/components/Brand";
@@ -130,6 +131,7 @@ export default function Home() {
   const [summary, setSummary] = useState<RulesetSummary | null>(null);
   const [activeVersion, setActiveVersion] = useState<PolicyVersion | null>(null);
   const [user, setUser] = useState<User | null>(null);
+  const [theme, setThemeState] = useState<Theme>("light");
 
   useEffect(() => {
     let cancelled = false;
@@ -141,6 +143,7 @@ export default function Home() {
       setCases(loadCases());
       ensureSeedUsers();
       setUser(getCurrentUser());
+      setThemeState(getTheme());
       if (data) {
         ensureBase(data.ruleset_version, data.params);
         const label = getActiveLabel(data.ruleset_version);
@@ -161,6 +164,7 @@ export default function Home() {
     setUser(null);
     setView({ kind: "home" });
   };
+  const onToggleTheme = () => setThemeState(toggleTheme());
 
   const activateVersion = (label: string) => {
     setActiveVersion(getVersion(label) ?? null);
@@ -365,6 +369,22 @@ export default function Home() {
               </span>
             </button>
             <button
+              onClick={onToggleTheme}
+              title={theme === "dark" ? "Switch to light" : "Switch to dark"}
+              className="shrink-0 rounded-lg p-1.5 text-slate-400 transition hover:bg-white/10 hover:text-white"
+            >
+              {theme === "dark" ? (
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="4" />
+                  <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" />
+                </svg>
+              ) : (
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" />
+                </svg>
+              )}
+            </button>
+            <button
               onClick={onLogout}
               title="Sign out"
               className="shrink-0 rounded-lg p-1.5 text-slate-400 transition hover:bg-white/10 hover:text-white"
@@ -378,18 +398,18 @@ export default function Home() {
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-10 border-b border-slate-200/70 bg-white/85 backdrop-blur-md">
+        <header className="sticky top-0 z-10 border-b border-slate-200/70 bg-white/85 backdrop-blur-md dark:border-white/10 dark:bg-slate-900/85">
           <div className="mx-auto flex w-full max-w-5xl items-center justify-between gap-3 px-6 py-3.5">
             <div>
-              <h1 className="text-base font-semibold leading-tight text-slate-900">
+              <h1 className="text-base font-semibold leading-tight text-slate-900 dark:text-slate-100">
                 {screen.title}
               </h1>
-              <p className="text-xs text-slate-500">{screen.description}</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">{screen.description}</p>
             </div>
             {summary && (
-              <span className="flex items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs">
-                <span className="text-slate-500">Ruleset</span>
-                <span className="font-mono font-semibold text-slate-800">
+              <span className="flex items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs dark:border-white/10 dark:bg-white/5">
+                <span className="text-slate-500 dark:text-slate-400">Ruleset</span>
+                <span className="font-mono font-semibold text-slate-800 dark:text-slate-100">
                   {activeVersion?.label ?? summary.ruleset_version}
                 </span>
                 {activeVersion && !activeVersion.is_base && (
@@ -428,15 +448,15 @@ export default function Home() {
 
           {view.kind === "decision" && (
             <div className="flex flex-col gap-5">
-              <div className="flex gap-1 self-start rounded-full bg-slate-200/60 p-1">
+              <div className="flex gap-1 self-start rounded-full bg-slate-200/60 p-1 dark:bg-white/5">
                 {(["case", "impact"] as const).map((t) => (
                   <button
                     key={t}
                     onClick={() => setTab(t)}
                     className={`rounded-full px-5 py-2 text-sm font-medium transition ${
                       tab === t
-                        ? "bg-white text-slate-900 shadow-sm"
-                        : "text-slate-600 hover:text-slate-900"
+                        ? "bg-white text-slate-900 shadow-sm dark:bg-white/15 dark:text-white"
+                        : "text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white"
                     }`}
                   >
                     {t === "case" ? "Case result" : "Impact view"}

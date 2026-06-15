@@ -1,8 +1,16 @@
 @import "tailwindcss";
 
+/* Class-based dark mode: the `.dark` class on <html> flips the theme. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
   --background: #f7f8fc;
   --foreground: #0f172a;
+}
+
+.dark {
+  --background: #0a1424;
+  --foreground: #e2e8f0;
 }
 
 @theme inline {
