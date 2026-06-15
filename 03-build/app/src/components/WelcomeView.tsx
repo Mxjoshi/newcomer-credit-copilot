@@ -5,17 +5,33 @@
 // and calm, no heavy banner.
 
 import type { RulesetSummary } from "./summary";
+import type { CaseRecord } from "@/lib/types";
+import { useDateFormat } from "@/lib/userContext";
 
 type Target = "intake" | "queue" | "audit" | "policy" | "versions" | "impact";
 
 interface Props {
   summary: RulesetSummary | null;
+  cases: CaseRecord[];
   queueCount: number;
   activeLabel: string;
   userName: string;
   canReview: boolean;
   onNavigate: (kind: Target) => void;
 }
+
+// The three recommendation outcomes, with the palette used consistently across the app.
+const OUTCOMES = [
+  { key: "approve", label: "Approved", dot: "bg-emerald-500", bar: "bg-emerald-500", text: "text-emerald-600 dark:text-emerald-400" },
+  { key: "refer", label: "Referred", dot: "bg-amber-500", bar: "bg-amber-500", text: "text-amber-600 dark:text-amber-400" },
+  { key: "decline", label: "Declined", dot: "bg-rose-500", bar: "bg-rose-500", text: "text-rose-600 dark:text-rose-400" },
+] as const;
+
+const VERDICT_TONE: Record<string, string> = {
+  approve: "bg-emerald-100 text-emerald-800 dark:bg-emerald-500/15 dark:text-emerald-300",
+  decline: "bg-rose-100 text-rose-800 dark:bg-rose-500/15 dark:text-rose-300",
+  refer: "bg-amber-100 text-amber-800 dark:bg-amber-500/15 dark:text-amber-300",
+};
 
 interface Capability {
   target: Target;
@@ -35,12 +51,25 @@ const stroke = {
 
 export default function WelcomeView({
   summary,
+  cases,
   queueCount,
   activeLabel,
   userName,
   canReview,
   onNavigate,
 }: Props) {
+  const fmtDate = useDateFormat();
+  const total = cases.length;
+  const counts = {
+    approve: cases.filter((c) => c.decision.recommendation === "approve").length,
+    refer: cases.filter((c) => c.decision.recommendation === "refer").length,
+    decline: cases.filter((c) => c.decision.recommendation === "decline").length,
+  };
+  const pct = (n: number) => (total === 0 ? 0 : Math.round((n / total) * 100));
+  const recent = [...cases]
+    .sort((a, b) => b.created_at.localeCompare(a.created_at))
+    .slice(0, 5);
+
   const capabilities: Capability[] = [
     {
       target: "intake",
@@ -138,6 +167,118 @@ export default function WelcomeView({
           </button>
         </section>
       )}
+
+      {/* Portfolio dashboard: the live mix of recommendations this browser has produced, plus the
+          most recent activity. Counts are read straight from the saved cases. */}
+      <section className="animate-fade-up rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900 p-6 shadow-sm">
+        <div className="flex items-center justify-between gap-3">
+          <h3 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+            Portfolio at a glance
+          </h3>
+          {total > 0 && (
+            <button
+              onClick={() => onNavigate("audit")}
+              className="text-xs font-medium text-blue-600 transition hover:text-blue-700 dark:text-blue-400"
+            >
+              View audit log
+            </button>
+          )}
+        </div>
+
+        {total === 0 ? (
+          <div className="mt-5 flex flex-col items-start gap-3 rounded-xl border border-dashed border-slate-300 dark:border-white/15 p-6">
+            <p className="text-sm text-slate-500 dark:text-slate-400">
+              No assessments recorded yet. Run your first to see the portfolio mix and recent
+              activity here.
+            </p>
+            <button
+              onClick={() => onNavigate("intake")}
+              className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700"
+            >
+              Start an assessment
+            </button>
+          </div>
+        ) : (
+          <>
+            <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+              <div className="rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 p-4">
+                <div className="text-[10px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                  Total assessed
+                </div>
+                <div className="mt-1 text-3xl font-bold tabular-nums text-slate-900 dark:text-slate-100">
+                  {total}
+                </div>
+              </div>
+              {OUTCOMES.map((o) => (
+                <div
+                  key={o.key}
+                  className="rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 p-4"
+                >
+                  <div className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    <span className={`h-2 w-2 rounded-full ${o.dot}`} />
+                    {o.label}
+                  </div>
+                  <div className="mt-1 flex items-baseline gap-1.5">
+                    <span className={`text-3xl font-bold tabular-nums ${o.text}`}>
+                      {counts[o.key]}
+                    </span>
+                    <span className="text-xs font-medium text-slate-400 dark:text-slate-500">
+                      {pct(counts[o.key])}%
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* The recommendation mix as a single stacked bar. */}
+            <div className="mt-5">
+              <div className="flex h-2.5 overflow-hidden rounded-full bg-slate-100 dark:bg-white/10">
+                {OUTCOMES.map((o) =>
+                  counts[o.key] > 0 ? (
+                    <div
+                      key={o.key}
+                      className={o.bar}
+                      style={{ width: `${pct(counts[o.key])}%` }}
+                      title={`${o.label}: ${counts[o.key]} (${pct(counts[o.key])}%)`}
+                    />
+                  ) : null,
+                )}
+              </div>
+            </div>
+
+            <div className="mt-5">
+              <div className="mb-2.5 text-[10px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                Recent activity
+              </div>
+              <div className="flex flex-col gap-1.5">
+                {recent.map((c) => (
+                  <button
+                    key={c.case_id}
+                    onClick={() => onNavigate("audit")}
+                    className="flex items-center gap-3 rounded-lg px-2 py-1.5 text-left transition hover:bg-slate-50 dark:hover:bg-white/5"
+                  >
+                    <span
+                      className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold ${VERDICT_TONE[c.decision.recommendation]}`}
+                    >
+                      {c.decision.recommendation.toUpperCase()}
+                    </span>
+                    <span className="min-w-0 flex-1 truncate text-sm font-medium text-slate-800 dark:text-slate-200">
+                      {c.applicant.full_name}
+                    </span>
+                    <span className="hidden shrink-0 text-xs text-slate-400 dark:text-slate-500 sm:inline">
+                      {c.application.product.replace("_", " ")} · AED{" "}
+                      {c.application.amount_aed.toLocaleString("en-US")}
+                    </span>
+                    <span className="shrink-0 text-xs text-slate-400 dark:text-slate-500">
+                      {fmtDate(c.created_at)}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </>
+        )}
+      </section>
 
       <section className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900 p-6 shadow-sm sm:p-8">
         <div className="flex flex-wrap items-start justify-between gap-4">

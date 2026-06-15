@@ -426,6 +426,7 @@ export default function Home() {
           {view.kind === "home" && (
             <WelcomeView
               summary={summary}
+              cases={cases}
               queueCount={queueCount}
               activeLabel={activeVersion?.label ?? summary?.ruleset_version ?? ""}
               userName={firstName(user)}
