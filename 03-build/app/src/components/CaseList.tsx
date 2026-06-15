@@ -5,6 +5,7 @@
 // read-only, the defensibility story made visible.
 
 import type { CaseRecord } from "@/lib/types";
+import { useDateFormat } from "@/lib/userContext";
 
 interface Props {
   cases: CaseRecord[];
@@ -31,6 +32,7 @@ const ACTION_LABEL: Record<string, string> = {
 };
 
 export default function CaseList({ cases, mode, onOpen, onClear }: Props) {
+  const fmtDate = useDateFormat();
   const shown = mode === "queue" ? cases.filter((c) => c.status === "awaiting_review") : cases;
 
   const clear = () => {
@@ -86,8 +88,7 @@ export default function CaseList({ cases, mode, onOpen, onClear }: Props) {
                 <div className="font-semibold text-slate-800">{c.applicant.full_name}</div>
                 <div className="text-xs text-slate-500">
                   {c.application.product.replace("_", " ")} · AED{" "}
-                  {c.application.amount_aed.toLocaleString("en-US")} ·{" "}
-                  {new Date(c.created_at).toLocaleString("en-GB")}
+                  {c.application.amount_aed.toLocaleString("en-US")} · {fmtDate(c.created_at)}
                 </div>
               </div>
               <div className="flex shrink-0 items-center gap-2">

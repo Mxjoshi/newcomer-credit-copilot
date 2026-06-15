@@ -6,6 +6,7 @@
 // values and writing why. The active version drives every assessment and stamps each decision.
 
 import { useEffect, useState } from "react";
+import { useDateFormat } from "@/lib/userContext";
 import type { RulesetSummary, VersionParams } from "./summary";
 import {
   PARAM_LABEL,
@@ -27,6 +28,7 @@ interface Props {
 }
 
 export default function VersionsView({ summary, activeLabel, onActivate }: Props) {
+  const fmtDate = useDateFormat();
   const [versions, setVersions] = useState<PolicyVersion[]>([]);
   const [creating, setCreating] = useState(false);
   const [draft, setDraft] = useState<VersionParams | null>(null);
@@ -217,7 +219,7 @@ export default function VersionsView({ summary, activeLabel, onActivate }: Props
                   </span>
                 )}
                 <span className="ml-auto text-xs text-slate-400">
-                  {v.created_at ? new Date(v.created_at).toLocaleString("en-GB") : "origin"}
+                  {v.created_at ? fmtDate(v.created_at) : "origin"}
                   {v.parent_label ? ` · from ${v.parent_label}` : ""}
                 </span>
               </div>

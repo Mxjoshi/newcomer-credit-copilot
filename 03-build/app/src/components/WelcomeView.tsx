@@ -106,7 +106,11 @@ export default function WelcomeView({
   ];
 
   return (
-    <div className="flex flex-col gap-7">
+    <div className="flex flex-col gap-6">
+      {userName && (
+        <h2 className="text-2xl font-bold tracking-tight text-slate-900">Hello, {userName}</h2>
+      )}
+
       {/* Pending reviews are decisions a human must make; surface them on landing so they are
           not skipped. */}
       {canReview && queueCount > 0 && (

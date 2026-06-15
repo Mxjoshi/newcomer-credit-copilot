@@ -15,6 +15,7 @@ import {
   type PolicyLogEntry,
 } from "@/lib/policyLog";
 import { loadVersions, type PolicyVersion } from "@/lib/policyVersions";
+import { useDateFormat } from "@/lib/userContext";
 import VersionPicker from "./VersionPicker";
 
 interface StrategyNumbers {
@@ -90,6 +91,7 @@ async function fetchImpact(query: string): Promise<ImpactData> {
 }
 
 export default function ImpactView({ activeLabel }: { activeLabel: string }) {
+  const fmtDate = useDateFormat();
   const [data, setData] = useState<ImpactData | null>(null);
   const [params, setParams] = useState<Params | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -447,7 +449,7 @@ export default function ImpactView({ activeLabel }: { activeLabel: string }) {
                 className="flex flex-wrap items-center gap-x-4 gap-y-1 rounded-xl border border-slate-100 bg-slate-50/50 p-3 text-xs"
               >
                 <span className="text-slate-400">
-                  {new Date(entry.at).toLocaleTimeString("en-GB")}
+                  {fmtDate(entry.at)}
                 </span>
                 <span className="font-medium text-slate-700">
                   {entry.changes.map((c) => `${c.label} ${c.from} → ${c.to}`).join(", ")}

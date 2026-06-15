@@ -1,7 +1,8 @@
 "use client";
 
-// Team management (superuser only): see everyone, add a person with a role, remove people. Each
-// role decides what that person can see and do. Browser-stored for the demo.
+// Team management (superuser only): see everyone, add a person (user ID without spaces, display
+// name with spaces, a password, and a role), remove people. The role decides what that person
+// can see and do. Browser-stored for the demo.
 
 import { useEffect, useState } from "react";
 import {
@@ -11,9 +12,11 @@ import {
   addUser,
   deleteUser,
   loadUsers,
+  normalizeUserId,
   type Role,
   type User,
 } from "@/lib/auth";
+import Avatar from "./Avatar";
 
 const ROLE_TONE: Record<string, string> = {
   superuser: "bg-blue-100 text-blue-700",
@@ -22,13 +25,11 @@ const ROLE_TONE: Record<string, string> = {
   viewer: "bg-slate-100 text-slate-600",
 };
 
-const initials = (name: string) =>
-  name.split(" ").map((p) => p[0]).slice(0, 2).join("").toUpperCase();
-
 export default function TeamView({ currentUserId }: { currentUserId: string }) {
   const [users, setUsers] = useState<User[]>([]);
   const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  const [userId, setUserId] = useState("");
+  const [password, setPassword] = useState("");
   const [role, setRole] = useState<Role>("officer");
   const [error, setError] = useState<string | null>(null);
 
@@ -43,14 +44,16 @@ export default function TeamView({ currentUserId }: { currentUserId: string }) {
   }, []);
 
   const add = () => {
-    if (name.trim() === "" || email.trim() === "") {
-      setError("Name and email are required.");
+    const result = addUser({ userId, name, password, role });
+    if (result.error) {
+      setError(result.error);
       return;
     }
     setError(null);
-    setUsers(addUser(name, email, role));
+    setUsers(result.users ?? loadUsers());
     setName("");
-    setEmail("");
+    setUserId("");
+    setPassword("");
     setRole("officer");
   };
 
@@ -60,6 +63,7 @@ export default function TeamView({ currentUserId }: { currentUserId: string }) {
 
   const inputClass =
     "rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-100";
+  const labelClass = "text-[11px] font-semibold uppercase tracking-wider text-slate-500";
 
   return (
     <div className="flex flex-col gap-5">
@@ -69,23 +73,31 @@ export default function TeamView({ currentUserId }: { currentUserId: string }) {
 
       <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
         <h3 className="mb-3 text-sm font-semibold text-slate-900">Add a person</h3>
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-4">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
           <label className="flex flex-col gap-1.5">
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
-              Name
-            </span>
+            <span className={labelClass}>Full name</span>
             <input value={name} onChange={(e) => setName(e.target.value)} className={inputClass} />
           </label>
           <label className="flex flex-col gap-1.5">
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
-              Email
-            </span>
-            <input value={email} onChange={(e) => setEmail(e.target.value)} className={inputClass} />
+            <span className={labelClass}>User ID (no spaces)</span>
+            <input
+              value={userId}
+              onChange={(e) => setUserId(normalizeUserId(e.target.value))}
+              placeholder="e.g. sara"
+              className={`${inputClass} font-mono`}
+            />
           </label>
           <label className="flex flex-col gap-1.5">
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
-              Role
-            </span>
+            <span className={labelClass}>Password</span>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className={inputClass}
+            />
+          </label>
+          <label className="flex flex-col gap-1.5">
+            <span className={labelClass}>Role</span>
             <select value={role} onChange={(e) => setRole(e.target.value as Role)} className={inputClass}>
               {ROLES.map((r) => (
                 <option key={r} value={r}>
@@ -113,9 +125,7 @@ export default function TeamView({ currentUserId }: { currentUserId: string }) {
             key={u.id}
             className="flex items-center gap-3.5 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"
           >
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-600 to-slate-700 text-sm font-bold text-white">
-              {initials(u.name)}
-            </span>
+            <Avatar name={u.name} avatar={u.avatar} size={40} />
             <div className="min-w-0 flex-1">
               <div className="font-semibold text-slate-800">
                 {u.name}
@@ -123,7 +133,7 @@ export default function TeamView({ currentUserId }: { currentUserId: string }) {
                   <span className="ml-2 text-xs font-normal text-slate-400">(you)</span>
                 )}
               </div>
-              <div className="text-xs text-slate-500">{u.email}</div>
+              <div className="font-mono text-xs text-slate-500">{u.userId}</div>
             </div>
             <span
               className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold ${ROLE_TONE[u.role]}`}

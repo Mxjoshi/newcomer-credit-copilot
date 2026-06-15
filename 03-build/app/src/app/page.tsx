@@ -17,14 +17,18 @@ import {
 import {
   can,
   ensureSeedUsers,
+  firstName,
   getCurrentUser,
   logout,
   ROLE_LABEL,
   type User,
 } from "@/lib/auth";
+import { UserContext } from "@/lib/userContext";
 import type { RulesetSummary } from "@/components/summary";
+import Avatar from "@/components/Avatar";
 import Brand from "@/components/Brand";
 import LoginView from "@/components/LoginView";
+import ProfileView from "@/components/ProfileView";
 import WelcomeView from "@/components/WelcomeView";
 import IntakeForm from "@/components/IntakeForm";
 import AssessmentProgress from "@/components/AssessmentProgress";
@@ -46,6 +50,7 @@ type ViewKind =
   | "impact"
   | "evals"
   | "team"
+  | "profile"
   | "queue"
   | "audit";
 type View =
@@ -58,6 +63,7 @@ type View =
   | { kind: "impact" }
   | { kind: "evals" }
   | { kind: "team" }
+  | { kind: "profile" }
   | { kind: "queue" }
   | { kind: "audit" };
 
@@ -229,6 +235,7 @@ export default function Home() {
       description: "The 24-profile benchmark with the real model, and every generated explanation.",
     },
     team: { title: "Team", description: "Add people and assign roles." },
+    profile: { title: "My profile", description: "Your name, picture, and time zone." },
     queue: { title: "Review queue", description: "Refers awaiting a human decision." },
     audit: { title: "Audit log", description: "Every assessment and the officer action taken." },
   };
@@ -282,6 +289,7 @@ export default function Home() {
   const groupHas = (kinds: ViewKind[]) => kinds.some(allow);
 
   return (
+    <UserContext.Provider value={user}>
     <div className="flex min-h-screen">
       <aside className="sticky top-0 flex h-screen w-16 shrink-0 flex-col bg-[#0b1a2e] md:w-60">
         <button
@@ -345,13 +353,17 @@ export default function Home() {
 
         <div className="hidden border-t border-white/10 px-4 py-3 md:block">
           <div className="flex items-center gap-2.5">
-            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-600 to-slate-700 text-[11px] font-bold text-white">
-              {user.name.split(" ").map((p) => p[0]).slice(0, 2).join("").toUpperCase()}
-            </span>
-            <span className="min-w-0 flex-1">
-              <span className="block truncate text-xs font-semibold text-white">{user.name}</span>
-              <span className="block text-[11px] text-slate-400">{ROLE_LABEL[role]}</span>
-            </span>
+            <button
+              onClick={() => setView({ kind: "profile" })}
+              title="My profile"
+              className="flex min-w-0 flex-1 items-center gap-2.5 rounded-lg p-1 text-left transition hover:bg-white/5"
+            >
+              <Avatar name={user.name} avatar={user.avatar} size={32} />
+              <span className="min-w-0 flex-1">
+                <span className="block truncate text-xs font-semibold text-white">{user.name}</span>
+                <span className="block text-[11px] text-slate-400">{ROLE_LABEL[role]}</span>
+              </span>
+            </button>
             <button
               onClick={onLogout}
               title="Sign out"
@@ -396,7 +408,7 @@ export default function Home() {
               summary={summary}
               queueCount={queueCount}
               activeLabel={activeVersion?.label ?? summary?.ruleset_version ?? ""}
-              userName={user.name}
+              userName={firstName(user)}
               canReview={allow("queue")}
               onNavigate={(kind) => setView({ kind } as View)}
             />
@@ -460,6 +472,10 @@ export default function Home() {
 
           {view.kind === "team" && <TeamView currentUserId={user.id} />}
 
+          {view.kind === "profile" && (
+            <ProfileView user={user} onSaved={() => setUser(getCurrentUser())} />
+          )}
+
           {view.kind === "evals" && <EvalsView />}
 
           {view.kind === "queue" && (
@@ -476,5 +492,6 @@ export default function Home() {
         </footer>
       </div>
     </div>
+    </UserContext.Provider>
   );
 }

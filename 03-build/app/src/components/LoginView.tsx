@@ -1,48 +1,34 @@
 "use client";
 
-// The sign-in screen. Demo-grade: pick a team member to sign in as (no password). The role of
-// the person you choose decides what you can see. The superuser can add and remove people.
+// The sign-in screen: user ID plus password. Demo-grade (passwords are stored in the browser in
+// plain text). The role of the account decides what is visible after signing in.
 
 import { useEffect, useState } from "react";
 import Brand from "./Brand";
-import { ROLE_LABEL, ensureSeedUsers, login, type User } from "@/lib/auth";
-
-const ROLE_TONE: Record<string, string> = {
-  superuser: "bg-blue-100 text-blue-700",
-  officer: "bg-emerald-100 text-emerald-700",
-  risk_manager: "bg-amber-100 text-amber-700",
-  viewer: "bg-slate-100 text-slate-600",
-};
-
-const initials = (name: string) =>
-  name
-    .split(" ")
-    .map((p) => p[0])
-    .slice(0, 2)
-    .join("")
-    .toUpperCase();
+import { ensureSeedUsers, login, type User } from "@/lib/auth";
 
 export default function LoginView({ onSignedIn }: { onSignedIn: (user: User) => void }) {
-  const [users, setUsers] = useState<User[]>([]);
+  const [userId, setUserId] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    let cancelled = false;
-    Promise.resolve().then(() => {
-      if (!cancelled) setUsers(ensureSeedUsers());
-    });
-    return () => {
-      cancelled = true;
-    };
+    Promise.resolve().then(() => ensureSeedUsers());
   }, []);
 
-  const signIn = (id: string) => {
-    const user = login(id);
+  const submit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const user = login(userId, password);
     if (user) onSignedIn(user);
+    else setError("Wrong user ID or password.");
   };
+
+  const inputClass =
+    "rounded-lg border border-white/15 bg-white/10 px-3 py-2.5 text-sm text-white placeholder:text-slate-400 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-500/30";
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-[#0b1a2e] px-6 py-12">
-      <div className="w-full max-w-md">
+      <div className="w-full max-w-sm">
         <div className="mb-6 flex flex-col items-center gap-3 text-center">
           <Brand size={48} />
           <div>
@@ -51,37 +37,48 @@ export default function LoginView({ onSignedIn }: { onSignedIn: (user: User) => 
           </div>
         </div>
 
-        <div className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur">
-          <div className="mb-2 px-1 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
-            Choose your account
-          </div>
-          <div className="flex flex-col gap-2">
-            {users.map((u) => (
-              <button
-                key={u.id}
-                onClick={() => signIn(u.id)}
-                className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 p-3 text-left transition hover:border-blue-400/50 hover:bg-white/10"
-              >
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-600 to-slate-700 text-sm font-bold text-white">
-                  {initials(u.name)}
-                </span>
-                <span className="min-w-0 flex-1">
-                  <span className="block font-semibold text-white">{u.name}</span>
-                  <span className="block text-xs text-slate-400">{u.email}</span>
-                </span>
-                <span
-                  className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold ${ROLE_TONE[u.role]}`}
-                >
-                  {ROLE_LABEL[u.role]}
-                </span>
-              </button>
-            ))}
-          </div>
-        </div>
+        <form
+          onSubmit={submit}
+          className="flex flex-col gap-3 rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur"
+        >
+          <label className="flex flex-col gap-1.5">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+              User ID
+            </span>
+            <input
+              value={userId}
+              onChange={(e) => setUserId(e.target.value)}
+              placeholder="e.g. monika"
+              autoCapitalize="none"
+              className={inputClass}
+            />
+          </label>
+          <label className="flex flex-col gap-1.5">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+              Password
+            </span>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••"
+              className={inputClass}
+            />
+          </label>
+          {error && <p className="text-xs text-rose-400">{error}</p>}
+          <button
+            type="submit"
+            className="mt-1 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700"
+          >
+            Sign in
+          </button>
+        </form>
 
         <p className="mt-4 text-center text-xs text-slate-500">
-          Demo sign-in, no password. Production uses a real auth provider with server-enforced
-          access.
+          Demo accounts: <span className="font-mono text-slate-400">monika</span> (superuser),{" "}
+          <span className="font-mono text-slate-400">ahmed</span> (officer),{" "}
+          <span className="font-mono text-slate-400">lena</span> (risk manager). Password{" "}
+          <span className="font-mono text-slate-400">demo</span>.
         </p>
       </div>
     </div>
