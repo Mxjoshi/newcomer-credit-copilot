@@ -14,8 +14,17 @@ import {
   getVersion,
   type PolicyVersion,
 } from "@/lib/policyVersions";
+import {
+  can,
+  ensureSeedUsers,
+  getCurrentUser,
+  logout,
+  ROLE_LABEL,
+  type User,
+} from "@/lib/auth";
 import type { RulesetSummary } from "@/components/summary";
 import Brand from "@/components/Brand";
+import LoginView from "@/components/LoginView";
 import WelcomeView from "@/components/WelcomeView";
 import IntakeForm from "@/components/IntakeForm";
 import AssessmentProgress from "@/components/AssessmentProgress";
@@ -24,6 +33,7 @@ import ImpactView from "@/components/ImpactView";
 import PolicyView from "@/components/PolicyView";
 import VersionsView from "@/components/VersionsView";
 import EvalsView from "@/components/EvalsView";
+import TeamView from "@/components/TeamView";
 import CaseList from "@/components/CaseList";
 
 type ViewKind =
@@ -35,6 +45,7 @@ type ViewKind =
   | "versions"
   | "impact"
   | "evals"
+  | "team"
   | "queue"
   | "audit";
 type View =
@@ -46,6 +57,7 @@ type View =
   | { kind: "versions" }
   | { kind: "impact" }
   | { kind: "evals" }
+  | { kind: "team" }
   | { kind: "queue" }
   | { kind: "audit" };
 
@@ -96,6 +108,13 @@ const icons: Record<string, React.ReactNode> = {
       <path d="M21 12v7a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h11" />
     </>
   ),
+  team: (
+    <>
+      <circle cx="9" cy="8" r="3" />
+      <path d="M3 20c0-3 2.5-5 6-5s6 2 6 5" />
+      <path d="M16 7a3 3 0 0 1 0 6M18 20c0-2-1-3.5-2.5-4.3" />
+    </>
+  ),
 };
 
 export default function Home() {
@@ -104,6 +123,7 @@ export default function Home() {
   const [cases, setCases] = useState<CaseRecord[]>([]);
   const [summary, setSummary] = useState<RulesetSummary | null>(null);
   const [activeVersion, setActiveVersion] = useState<PolicyVersion | null>(null);
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -113,6 +133,8 @@ export default function Home() {
       if (cancelled) return;
       setSummary(data);
       setCases(loadCases());
+      ensureSeedUsers();
+      setUser(getCurrentUser());
       if (data) {
         ensureBase(data.ruleset_version, data.params);
         const label = getActiveLabel(data.ruleset_version);
@@ -123,6 +145,16 @@ export default function Home() {
       cancelled = true;
     };
   }, []);
+
+  const onSignedIn = (u: User) => {
+    setUser(u);
+    setView({ kind: "home" });
+  };
+  const onLogout = () => {
+    logout();
+    setUser(null);
+    setView({ kind: "home" });
+  };
 
   const activateVersion = (label: string) => {
     setActiveVersion(getVersion(label) ?? null);
@@ -196,6 +228,7 @@ export default function Home() {
       title: "Evals",
       description: "The 24-profile benchmark with the real model, and every generated explanation.",
     },
+    team: { title: "Team", description: "Add people and assign roles." },
     queue: { title: "Review queue", description: "Refers awaiting a human decision." },
     audit: { title: "Audit log", description: "Every assessment and the officer action taken." },
   };
@@ -241,6 +274,13 @@ export default function Home() {
     );
   };
 
+  // No session: show the sign-in screen and nothing else.
+  if (!user) return <LoginView onSignedIn={onSignedIn} />;
+
+  const role = user.role;
+  const allow = (kind: ViewKind) => can(role, kind);
+  const groupHas = (kinds: ViewKind[]) => kinds.some(allow);
+
   return (
     <div className="flex min-h-screen">
       <aside className="sticky top-0 flex h-screen w-16 shrink-0 flex-col bg-[#0b1a2e] md:w-60">
@@ -259,19 +299,24 @@ export default function Home() {
 
         <nav className="flex flex-1 flex-col gap-1 px-2.5 pt-2">
           {navItem("home", "Overview")}
-          <div className="hidden px-3 pb-1 pt-3 text-[10px] font-semibold uppercase tracking-wider text-slate-500 md:block">
-            Assess
-          </div>
-          {navItem("intake", "New assessment")}
-          {navItem("queue", "Review queue", queueCount)}
-          {navItem("audit", "Audit log")}
-          <div className="hidden px-3 pb-1 pt-4 text-[10px] font-semibold uppercase tracking-wider text-slate-500 md:block">
-            Govern
-          </div>
-          {navItem("policy", "Policy")}
-          {navItem("versions", "Versions")}
-          {navItem("impact", "Policy impact")}
-          {navItem("evals", "Evals")}
+          {groupHas(["intake", "queue", "audit"]) && (
+            <div className="hidden px-3 pb-1 pt-3 text-[10px] font-semibold uppercase tracking-wider text-slate-500 md:block">
+              Assess
+            </div>
+          )}
+          {allow("intake") && navItem("intake", "New assessment")}
+          {allow("queue") && navItem("queue", "Review queue", queueCount)}
+          {allow("audit") && navItem("audit", "Audit log")}
+          {groupHas(["policy", "versions", "impact", "evals", "team"]) && (
+            <div className="hidden px-3 pb-1 pt-4 text-[10px] font-semibold uppercase tracking-wider text-slate-500 md:block">
+              Govern
+            </div>
+          )}
+          {allow("policy") && navItem("policy", "Policy")}
+          {allow("versions") && navItem("versions", "Versions")}
+          {allow("impact") && navItem("impact", "Policy impact")}
+          {allow("evals") && navItem("evals", "Evals")}
+          {allow("team") && navItem("team", "Team")}
         </nav>
 
         <div className="hidden border-t border-white/10 px-4 py-4 text-xs md:block">
@@ -296,6 +341,27 @@ export default function Home() {
             <div className="text-slate-500">loading ruleset...</div>
           )}
           <div className="mt-2 text-[11px] text-slate-600">Synthetic data only</div>
+        </div>
+
+        <div className="hidden border-t border-white/10 px-4 py-3 md:block">
+          <div className="flex items-center gap-2.5">
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-600 to-slate-700 text-[11px] font-bold text-white">
+              {user.name.split(" ").map((p) => p[0]).slice(0, 2).join("").toUpperCase()}
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block truncate text-xs font-semibold text-white">{user.name}</span>
+              <span className="block text-[11px] text-slate-400">{ROLE_LABEL[role]}</span>
+            </span>
+            <button
+              onClick={onLogout}
+              title="Sign out"
+              className="shrink-0 rounded-lg p-1.5 text-slate-400 transition hover:bg-white/10 hover:text-white"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" />
+              </svg>
+            </button>
+          </div>
         </div>
       </aside>
 
@@ -330,6 +396,8 @@ export default function Home() {
               summary={summary}
               queueCount={queueCount}
               activeLabel={activeVersion?.label ?? summary?.ruleset_version ?? ""}
+              userName={user.name}
+              canReview={allow("queue")}
               onNavigate={(kind) => setView({ kind } as View)}
             />
           )}
@@ -389,6 +457,8 @@ export default function Home() {
           )}
 
           {view.kind === "impact" && <ImpactView activeLabel={activeVersion?.label ?? summary?.ruleset_version ?? ""} />}
+
+          {view.kind === "team" && <TeamView currentUserId={user.id} />}
 
           {view.kind === "evals" && <EvalsView />}
 
