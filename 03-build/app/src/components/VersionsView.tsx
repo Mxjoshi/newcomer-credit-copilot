@@ -80,11 +80,9 @@ export default function VersionsView({ summary, activeLabel, onActivate }: Props
   };
 
   const remove = (label: string) => {
+    // Only inactive, non-base versions reach this; confirm before housekeeping.
+    if (!window.confirm(`Delete version ${label}? This cannot be undone.`)) return;
     setVersions(deleteVersion(label));
-    if (label === activeLabel) {
-      setActiveLabel(baseLabel);
-      onActivate(baseLabel);
-    }
   };
 
   const setDraftParam = (key: keyof VersionParams, value: number) =>
@@ -243,7 +241,7 @@ export default function VersionsView({ summary, activeLabel, onActivate }: Props
                 </div>
               )}
 
-              <div className="mt-3 flex items-center gap-2">
+              <div className="mt-3 flex flex-wrap items-center gap-2">
                 {!isActive && (
                   <button
                     onClick={() => activate(v.label)}
@@ -252,13 +250,18 @@ export default function VersionsView({ summary, activeLabel, onActivate }: Props
                     {v.is_base ? "Roll back to base" : "Make active"}
                   </button>
                 )}
-                {!v.is_base && (
+                {!v.is_base && !isActive && (
                   <button
                     onClick={() => remove(v.label)}
-                    className="rounded-lg border border-slate-200 px-4 py-1.5 text-xs font-medium text-slate-500 transition hover:bg-slate-100"
+                    className="rounded-lg border border-slate-200 px-4 py-1.5 text-xs font-medium text-slate-500 transition hover:border-rose-300 hover:bg-rose-50 hover:text-rose-700"
                   >
                     Delete
                   </button>
+                )}
+                {!v.is_base && isActive && (
+                  <span className="text-xs text-slate-400">
+                    Active version cannot be deleted. Make another version active first.
+                  </span>
                 )}
               </div>
             </div>

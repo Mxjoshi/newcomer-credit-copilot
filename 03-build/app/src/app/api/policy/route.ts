@@ -6,35 +6,24 @@
 // Optional query overrides (a saved version's parameters, plus its label) are merged in memory,
 // so the Policy view can render any version, not only the locked base on disk.
 
-import { promises as fs } from "fs";
-import path from "path";
 import { NextResponse } from "next/server";
 import { buildRuleset } from "@/lib/ruleset";
+import { applyOverrides, loadRawPack } from "@/lib/livePack";
 
-const LIVE_PACK_PATH = path.join(process.cwd(), "config", "uae", "policy-rules.json");
-
-const OVERRIDABLE = new Set([
-  "dbr_cap",
-  "amount_salary_multiple",
-  "max_age_at_maturity",
-  "min_tenure_months",
-]);
+const OVERRIDABLE = ["dbr_cap", "amount_salary_multiple", "max_age_at_maturity", "min_tenure_months"];
 
 export async function GET(request: Request) {
-  const raw = await fs.readFile(LIVE_PACK_PATH, "utf8");
-  const pack = JSON.parse(raw) as {
-    parameters: Record<string, unknown>;
-    ruleset_version: string;
-    [key: string]: unknown;
-  };
-
+  const pack = await loadRawPack();
   const url = new URL(request.url);
+  const params: Record<string, number> = {};
   for (const key of OVERRIDABLE) {
     const value = url.searchParams.get(key);
-    if (value !== null && Number.isFinite(Number(value))) pack.parameters[key] = Number(value);
+    if (value !== null && Number.isFinite(Number(value))) params[key] = Number(value);
   }
-  const label = url.searchParams.get("ruleset_version");
-  if (label) pack.ruleset_version = label;
+  applyOverrides(pack, {
+    params,
+    ruleset_version: url.searchParams.get("ruleset_version") ?? undefined,
+  });
 
   const ruleset = buildRuleset(pack);
   const paramNotes = ((pack.parameters as { _notes?: Record<string, string> })._notes ??

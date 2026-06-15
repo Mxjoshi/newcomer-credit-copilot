@@ -9,44 +9,29 @@
 // value on screen, rerun, and watch the approval split shift, with the cited rule text
 // re-rendered from the new value. The locked v1.0 baseline is one click away (omit the params).
 
-import { promises as fs } from "fs";
-import path from "path";
 import { NextResponse } from "next/server";
 import { GROUND_TRUTH } from "@/lib/groundTruth";
 import { assess } from "@/lib/decision";
 import { buildRuleset } from "@/lib/ruleset";
-
-const LIVE_PACK_PATH = path.join(process.cwd(), "config", "uae", "policy-rules.json");
+import { applyOverrides, loadRawPack } from "@/lib/livePack";
 
 // Only these parameters are exposed to the what-if control. Each is a number on the pack's
 // `parameters` block; anything else is ignored, so the endpoint cannot be coaxed into changing
 // rule logic, only the documented knobs.
-const OVERRIDABLE = new Set([
-  "dbr_cap",
-  "amount_salary_multiple",
-  "max_age_at_maturity",
-  "min_tenure_months",
-]);
+const OVERRIDABLE = ["dbr_cap", "amount_salary_multiple", "max_age_at_maturity", "min_tenure_months"];
 
 export async function GET(request: Request) {
-  const raw = await fs.readFile(LIVE_PACK_PATH, "utf8");
-  const pack = JSON.parse(raw) as {
-    parameters: Record<string, unknown>;
-    ruleset_version: string;
-    [key: string]: unknown;
-  };
-
+  const pack = await loadRawPack();
   const url = new URL(request.url);
   const overrides: Record<string, number> = {};
   for (const key of OVERRIDABLE) {
     const value = url.searchParams.get(key);
-    if (value !== null && Number.isFinite(Number(value))) {
-      pack.parameters[key] = Number(value);
-      overrides[key] = Number(value);
-    }
+    if (value !== null && Number.isFinite(Number(value))) overrides[key] = Number(value);
   }
-  const label = url.searchParams.get("ruleset_version");
-  if (label) pack.ruleset_version = label;
+  applyOverrides(pack, {
+    params: overrides,
+    ruleset_version: url.searchParams.get("ruleset_version") ?? undefined,
+  });
   const isWhatIf = Object.keys(overrides).length > 0;
 
   const ruleset = buildRuleset(pack);
