@@ -61,6 +61,20 @@ async function main() {
     ms: number;
   }> = [];
 
+  // The generated explanation text per profile, captured so the manual rubric pass (completeness,
+  // clarity, consistency) has something to read. eval.ts otherwise discards the prose after the
+  // grounding check.
+  const explanations: Array<{
+    id: string;
+    name: string;
+    rec: string;
+    expected: string;
+    match: boolean;
+    outcome: ValidationOutcome;
+    explanation: string;
+    reasons: string[];
+  }> = [];
+
   console.log("id     | outcome | label   | match | explanation         | grounded | latency");
   console.log("-------|---------|---------|-------|---------------------|----------|--------");
 
@@ -93,6 +107,16 @@ async function main() {
     if (decision.recommendation === "refer") referred++;
 
     rows.push({ id: row.id, rec: decision.recommendation, expected: row.expected_outcome, match, outcome: validation_outcome, grounded, ms });
+    explanations.push({
+      id: row.id,
+      name: row.applicant.full_name,
+      rec: decision.recommendation,
+      expected: row.expected_outcome,
+      match,
+      outcome: validation_outcome,
+      explanation: output.explanation,
+      reasons: output.reasons,
+    });
     console.log(
       `${row.id} | ${decision.recommendation.padEnd(7)} | ${row.expected_outcome.padEnd(7)} | ${match ? "yes" : "NO "}   | ${validation_outcome.padEnd(19)} | ${(grounded ? "yes" : "NO").padEnd(8)} | ${(ms / 1000).toFixed(1)}s`,
     );
@@ -169,6 +193,31 @@ call, none is a false approval.
   const outPath = path.join(process.cwd(), "..", "..", "04-evaluate-and-ship", "eval-results.md");
   fs.writeFileSync(outPath, md);
   console.log(`\nWrote ${outPath}`);
+
+  // Companion file: the actual explanation text, for the manual rubric pass to read and score.
+  const expMd = `# Phase 4 evals: the 24 generated explanations
+
+Captured from the same run that produced \`eval-results.md\` (ruleset ${CURRENT_RULESET.ruleset_version}) on ${stamp}.
+This is the officer-facing text the manual rubric pass scores for completeness, clarity, and
+consistency (faithfulness and grounding are already enforced in code by the validator). The model
+explanation varies run to run, so this is one snapshot; re-run \`npm run eval\` to refresh it.
+
+${explanations
+  .map(
+    (e) => `## ${e.id} ${e.name}
+
+Recommendation: **${e.rec.toUpperCase()}** | locked label: ${e.expected} | match: ${e.match ? "yes" : "NO"} | grounding: ${e.outcome}
+
+${e.explanation}
+
+Reasons:
+${e.reasons.map((r) => `- ${r}`).join("\n")}`,
+  )
+  .join("\n\n")}
+`;
+  const expPath = path.join(process.cwd(), "..", "..", "04-evaluate-and-ship", "eval-explanations.md");
+  fs.writeFileSync(expPath, expMd);
+  console.log(`Wrote ${expPath}`);
 }
 
 main().catch((e) => {

@@ -6,8 +6,9 @@
 // generated and whether it was grounded. This is the Phase 4 metrics-versus-baseline deliverable
 // made visible and inspectable, message by message.
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { GROUND_TRUTH } from "@/lib/groundTruth";
+import { EVAL_STORAGE_KEY } from "@/lib/constants";
 import type { Decision } from "@/lib/types";
 
 interface Result {
@@ -96,6 +97,32 @@ export default function EvalsView() {
   const cancel = useRef(false);
 
   const total = GROUND_TRUTH.length;
+
+  // Restore the last benchmark run on mount, so a page refresh does not lose it. Done client-side
+  // in an effect (not initial state) to avoid a server/client hydration mismatch.
+  useEffect(() => {
+    try {
+      const raw = window.localStorage.getItem(EVAL_STORAGE_KEY);
+      const saved = raw ? (JSON.parse(raw) as Result[]) : [];
+      if (Array.isArray(saved) && saved.length > 0) {
+        setResults(saved);
+        setDone(true);
+      }
+    } catch {
+      /* ignore unreadable or corrupt storage; the run can be re-run */
+    }
+  }, []);
+
+  // Persist the run whenever it grows. Only write when there are results, so the empty render on
+  // mount (and the reset at the start of a new run) never wipes a previously stored run.
+  useEffect(() => {
+    if (typeof window === "undefined" || results.length === 0) return;
+    try {
+      window.localStorage.setItem(EVAL_STORAGE_KEY, JSON.stringify(results));
+    } catch {
+      /* storage full or unavailable: keep the in-memory run, nothing else to do */
+    }
+  }, [results]);
 
   const stop = () => {
     cancel.current = true;

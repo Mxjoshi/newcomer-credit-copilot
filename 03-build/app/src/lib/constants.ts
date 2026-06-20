@@ -17,3 +17,7 @@ export const LLM_TIMEOUT_MS = 30_000;
 // Browser storage key for CaseRecords (M7/B5: the review queue and audit log live in
 // localStorage in v1).
 export const CASE_STORAGE_KEY = "newcomer-credit-copilot.cases.v1";
+
+// Browser storage key for the last evals benchmark run, so the results survive a page refresh
+// instead of vanishing with the in-memory React state.
+export const EVAL_STORAGE_KEY = "newcomer-credit-copilot.evals.v1";
