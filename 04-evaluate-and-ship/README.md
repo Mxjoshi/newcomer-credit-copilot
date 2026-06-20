@@ -1,7 +1,13 @@
-# Phase 4: Evaluate & Iterate (ship MVP). Not started
+# Phase 4: Evaluate & Iterate (ship MVP). In progress
 
 **Brief deliverable:** *"An MVP, an evals benchmark, and a first set of metrics measured against the
 baseline."*
+
+**Status (2026-06-20):** MVP built and running, the benchmark runs the full pipeline
+(`npm run eval`), and v1 metrics are measured against the Phase 1 targets in `eval-results.md`. Two
+items remain open before the phase is fully locked: record the manual rubric pass of the 24
+explanations (completeness, clarity, consistency) into `eval-results.md`, and write the short
+iteration plan. See `eval-deliverable-rubric.md` for the criterion-by-criterion self-assessment.
 
 ## Tasks
 1. **Surface and validate risks:** list product risks, then the fastest and cheapest way to test each
@@ -36,7 +42,7 @@ never edit that file; Phase 4 measures against it unchanged. The Screen 3 impact
 - **Pre-presentation fact to-do:** if the deck cites the AECB 3.71M salary figure or the CBUAE
   minimum-salary removal, primary-source them (both currently rest on solid secondary reporting).
 
-> Blocked until Phase 3 build is done.
+> Phase 3 build is done; this phase is unblocked and underway (see Status above).
 
 ## Note to verify
 "STAR format" for the MVP is a course-specific term. Confirm what STAR stands for in PMCurve's

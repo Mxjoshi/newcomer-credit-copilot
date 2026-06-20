@@ -29,10 +29,59 @@ const OUTCOME_LABEL: Record<string, string> = {
   passed_on_retry: "grounded on retry",
   fell_back_to_template: "template fallback",
 };
+
+// The output scoring rubric: how each generated explanation is judged. Faithfulness and grounding
+// are enforced in code by the validator before any text reaches the officer; completeness, clarity
+// and consistency are the human-read dimensions. Mirrors 04-evaluate-and-ship/output-scoring-rubric.md.
+const RUBRIC: { dimension: string; checks: string; pass: string; fail: string; enforced: boolean }[] = [
+  {
+    dimension: "Faithfulness",
+    checks: "Every applicant fact stated (salary, tenure, amount) is present in the input data, unchanged.",
+    pass: "All facts trace to the input.",
+    fail: "Any fact is invented or altered.",
+    enforced: true,
+  },
+  {
+    dimension: "Policy grounding",
+    checks: "Every rule and threshold cited traces to the real ruleset and applies to this case.",
+    pass: "All rules and numbers match the ruleset.",
+    fail: "A rule is invented or a threshold is wrong.",
+    enforced: true,
+  },
+  {
+    dimension: "Completeness",
+    checks: "The factor that actually drove the decision is stated; no material risk is omitted.",
+    pass: "Deciding factor is named.",
+    fail: "The real reason is missing.",
+    enforced: false,
+  },
+  {
+    dimension: "Clarity",
+    checks: "Plain, specific language an officer can act on; a refer states what to verify next.",
+    pass: "Clear and specific.",
+    fail: "Generic or confusing.",
+    enforced: false,
+  },
+  {
+    dimension: "Decision consistency",
+    checks: "The text supports the same outcome the system recommended, with no contradicting hedge.",
+    pass: "Text and recommendation agree.",
+    fail: "Text implies a different call.",
+    enforced: false,
+  },
+];
 const VERDICT_TONE: Record<string, string> = {
   approve: "bg-emerald-100 text-emerald-800",
   decline: "bg-rose-100 text-rose-800",
   refer: "bg-amber-100 text-amber-800",
+};
+// The rent-history enum does not humanize cleanly by just swapping underscores ("on time 6plus"),
+// so map each value to a readable label.
+const RENT_LABEL: Record<string, string> = {
+  on_time_6plus: "on-time, 6+ mo",
+  on_time_under_6: "on-time, under 6mo",
+  late_payments: "late payments",
+  none: "none on file",
 };
 
 export default function EvalsView() {
@@ -41,6 +90,8 @@ export default function EvalsView() {
   const [done, setDone] = useState(false);
   const [stopped, setStopped] = useState(false);
   const [expanded, setExpanded] = useState<string | null>(null);
+  const [showRubric, setShowRubric] = useState(false);
+  const [showLegend, setShowLegend] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const cancel = useRef(false);
 
@@ -159,6 +210,72 @@ export default function EvalsView() {
         )}
       </div>
 
+      <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900 shadow-sm">
+        <button
+          onClick={() => setShowRubric((s) => !s)}
+          className="flex w-full items-center justify-between gap-3 p-4 text-left"
+        >
+          <div>
+            <div className="text-sm font-semibold text-slate-800 dark:text-slate-100">
+              How each explanation is scored
+            </div>
+            <div className="text-xs text-slate-500 dark:text-slate-400">
+              The five-dimension rubric. Faithfulness and grounding are enforced in code; the rest
+              are the human-read checks.
+            </div>
+          </div>
+          <span className="text-slate-300">{showRubric ? "▲" : "▼"}</span>
+        </button>
+        {showRubric && (
+          <div className="flex flex-col gap-3 border-t border-slate-100 dark:border-white/10 p-4">
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse text-left text-xs">
+                <thead>
+                  <tr className="border-b border-slate-200 dark:border-white/10 text-[11px] uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    <th className="py-2 pr-3 font-semibold">Dimension</th>
+                    <th className="px-3 py-2 font-semibold">Check</th>
+                    <th className="px-3 py-2 font-semibold">Pass</th>
+                    <th className="px-3 py-2 font-semibold">Fail</th>
+                    <th className="px-3 py-2 font-semibold">Enforcement</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {RUBRIC.map((d) => (
+                    <tr
+                      key={d.dimension}
+                      className="border-b border-slate-100 dark:border-white/5 align-top"
+                    >
+                      <td className="py-2.5 pr-3 font-semibold text-slate-800 dark:text-slate-100">
+                        {d.dimension}
+                      </td>
+                      <td className="px-3 py-2.5 text-slate-600 dark:text-slate-300">{d.checks}</td>
+                      <td className="px-3 py-2.5 text-emerald-700 dark:text-emerald-400">{d.pass}</td>
+                      <td className="px-3 py-2.5 text-rose-600 dark:text-rose-400">{d.fail}</td>
+                      <td className="px-3 py-2.5">
+                        <span
+                          className={`whitespace-nowrap rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+                            d.enforced
+                              ? "bg-emerald-100 text-emerald-700"
+                              : "bg-slate-200 text-slate-600 dark:bg-white/10 dark:text-slate-300"
+                          }`}
+                        >
+                          {d.enforced ? "enforced in code" : "human read"}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p className="text-[11px] text-slate-400 dark:text-slate-500">
+              An explanation passes overall only if every dimension passes. A faithfulness or
+              grounding fail fails the whole explanation. Full definitions, including the Partial
+              level, are in 04-evaluate-and-ship/output-scoring-rubric.md.
+            </p>
+          </div>
+        )}
+      </div>
+
       {error && <p className="text-sm text-rose-600">{error}</p>}
       {stopped && (
         <p className="text-sm text-slate-500 dark:text-slate-400">
@@ -186,6 +303,54 @@ export default function EvalsView() {
           {metric("Max latency", `${maxLat.toFixed(1)}s`, "target under 15s", maxLat < 15)}
         </div>
       )}
+
+      <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900 shadow-sm">
+        <button
+          onClick={() => setShowLegend((s) => !s)}
+          className="flex w-full items-center justify-between gap-3 p-4 text-left"
+        >
+          <div>
+            <div className="text-sm font-semibold text-slate-800 dark:text-slate-100">
+              What the labels mean
+            </div>
+            <div className="text-xs text-slate-500 dark:text-slate-400">
+              A quick key to the badges on each result below.
+            </div>
+          </div>
+          <span className="text-slate-300">{showLegend ? "▲" : "▼"}</span>
+        </button>
+        {showLegend && (
+          <div className="border-t border-slate-100 dark:border-white/10 p-4">
+          <div className="grid grid-cols-[auto_1fr] items-center gap-x-4 gap-y-2 text-xs">
+            <div className="col-span-2 text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+              Decision &amp; accuracy
+            </div>
+            <span className="justify-self-start rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold text-emerald-700">APPROVE</span>
+            <span className="text-slate-600 dark:text-slate-300">The model&apos;s call on the case: approve, review, or decline</span>
+            <span className="justify-self-start font-semibold text-emerald-600">match</span>
+            <span className="text-slate-600 dark:text-slate-300">Agreed with the human label</span>
+            <span className="justify-self-start font-semibold text-amber-600">no match</span>
+            <span className="text-slate-600 dark:text-slate-300">Disagreed with the label (an accuracy miss)</span>
+
+            <div className="col-span-2 mt-2 text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+              Explanation trust
+            </div>
+            <span className="justify-self-start whitespace-nowrap rounded bg-slate-100 dark:bg-white/10 px-1.5 py-0.5 text-slate-600 dark:text-slate-300">grounded</span>
+            <span className="text-slate-600 dark:text-slate-300">Every fact and rule verified against the inputs, first try</span>
+            <span className="justify-self-start whitespace-nowrap rounded bg-slate-100 dark:bg-white/10 px-1.5 py-0.5 text-slate-600 dark:text-slate-300">grounded on retry</span>
+            <span className="text-slate-600 dark:text-slate-300">Verified, but only after one regeneration</span>
+            <span className="justify-self-start whitespace-nowrap rounded bg-slate-100 dark:bg-white/10 px-1.5 py-0.5 text-slate-600 dark:text-slate-300">template fallback</span>
+            <span className="text-slate-600 dark:text-slate-300">Failed the check, so a safe fixed template was shown instead</span>
+
+            <div className="col-span-2 mt-2 text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+              Speed
+            </div>
+            <span className="justify-self-start whitespace-nowrap text-slate-400 dark:text-slate-500">9.5s</span>
+            <span className="text-slate-600 dark:text-slate-300">Time for that one assessment (target under 15s)</span>
+          </div>
+          </div>
+        )}
+      </div>
 
       {n === 0 && !running && (
         <div className="rounded-2xl border border-dashed border-slate-300 dark:border-white/15 bg-white dark:bg-slate-900 p-10 text-center text-sm text-slate-400 dark:text-slate-500">
@@ -267,15 +432,15 @@ function ExpandedTest({ result }: { result: Result }) {
               `${t(row.applicant.employment_status)}, ${row.applicant.job_tenure_months}mo`,
             )}
             {item("Employer", t(row.applicant.employer_category))}
-            {item("Rent history", t(row.applicant.rent_history))}
+            {item("Rent history", RENT_LABEL[row.applicant.rent_history] ?? t(row.applicant.rent_history))}
             {item(
               "In UAE / visa",
-              `${row.applicant.months_in_uae}mo · ${row.applicant.visa_type}`,
+              `${row.applicant.months_in_uae}mo / ${t(row.applicant.visa_type)} visa`,
             )}
             {item("Obligations", fmtAed(row.applicant.existing_monthly_obligations_aed))}
             {item(
               "Age / visa left",
-              `${row.applicant.age_years} · ${row.applicant.visa_months_remaining}mo`,
+              `${row.applicant.age_years} yrs / ${row.applicant.visa_months_remaining}mo`,
             )}
             {item(
               "Request",
