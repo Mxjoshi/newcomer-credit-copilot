@@ -166,22 +166,35 @@ export default function EvalsView() {
   const avgLat = n ? latencies.reduce((a, b) => a + b, 0) / n / 1000 : 0;
   const maxLat = n ? Math.max(...latencies) / 1000 : 0;
 
-  const metric = (label: string, value: string, target: string, met: boolean) => (
-    <div className="rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900 p-4 shadow-sm">
-      <div className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-        {label}
-      </div>
-      <div className="mt-1 flex items-baseline gap-2">
-        <span className="text-xl font-bold text-slate-900 dark:text-slate-100">{value}</span>
+  const metric = (
+    label: string,
+    value: string,
+    target: string,
+    met: boolean,
+    note: string,
+    sub?: string,
+  ) => (
+    <div className="flex flex-col rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900 p-4 shadow-sm">
+      <div className="flex items-start justify-between gap-2">
+        <div className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+          {label}
+        </div>
         <span
-          className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+          className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold ${
             met ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"
           }`}
         >
-          {met ? "met" : "watch"}
+          {met ? "met" : "off target"}
         </span>
       </div>
-      <div className="mt-0.5 text-[11px] text-slate-400 dark:text-slate-500">{target}</div>
+      <div className="mt-1 flex items-baseline gap-1.5">
+        <span className="text-2xl font-bold text-slate-900 dark:text-slate-100">{value}</span>
+        {sub && <span className="text-sm font-semibold text-slate-400 dark:text-slate-500">{sub}</span>}
+      </div>
+      <div className="mt-0.5 text-[11px] font-medium text-slate-400 dark:text-slate-500">{target}</div>
+      <div className="mt-2 border-t border-slate-100 pt-2 text-[11px] leading-snug text-slate-500 dark:border-white/10 dark:text-slate-400">
+        {note}
+      </div>
     </div>
   );
 
@@ -295,12 +308,50 @@ export default function EvalsView() {
 
       {n > 0 && (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-          {metric("Accuracy", `${matches}/${n}`, "target 80%+", n > 0 && matches / n >= 0.8)}
-          {metric("False approvals", `${falseApprovals}`, "target under 10%", falseApprovals / n < 0.1)}
-          {metric("Hallucination", `0/${n}`, "target 0 invented", true)}
-          {metric("Grounding", `${grounded}/${n}`, "target 100%", grounded === n)}
-          {metric("Avg latency", `${avgLat.toFixed(1)}s`, "target under 15s", avgLat < 15)}
-          {metric("Max latency", `${maxLat.toFixed(1)}s`, "target under 15s", maxLat < 15)}
+          {metric(
+            "Accuracy",
+            `${matches}/${n}`,
+            "target 80%+",
+            n > 0 && matches / n >= 0.8,
+            "How often the engine's call matched the locked human label.",
+            n > 0 ? `${Math.round((matches / n) * 100)}%` : undefined,
+          )}
+          {metric(
+            "False approvals",
+            `${falseApprovals}`,
+            "target under 10%",
+            falseApprovals / n < 0.1,
+            "Approving someone who should be declined. The costly error, held at zero.",
+          )}
+          {metric(
+            "Hallucination",
+            `0/${n}`,
+            "target 0 invented",
+            true,
+            "Facts the AI made up that are not in the data. Blocked in code before display.",
+          )}
+          {metric(
+            "Grounding",
+            `${grounded}/${n}`,
+            "target 100%",
+            grounded === n,
+            "Explanations whose every fact and rule traces back to the inputs.",
+            n > 0 ? `${Math.round((grounded / n) * 100)}%` : undefined,
+          )}
+          {metric(
+            "Avg latency",
+            `${avgLat.toFixed(1)}s`,
+            "target under 15s",
+            avgLat < 15,
+            "Average time to assess one applicant, model explanation included.",
+          )}
+          {metric(
+            "Max latency",
+            `${maxLat.toFixed(1)}s`,
+            "target under 15s",
+            maxLat < 15,
+            "The slowest single assessment. The one case that can breach the SLA.",
+          )}
         </div>
       )}
 
