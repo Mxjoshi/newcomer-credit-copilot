@@ -340,7 +340,7 @@ export default function EvalsView() {
             `${matches}/${n}`,
             "target 80%+",
             n > 0 && matches / n >= 0.8,
-            "How often the engine's call matched the locked human label.",
+            "Of the 24 test cases, how often the system's decision matched the human-set correct answer.",
             n > 0 ? `${Math.round((matches / n) * 100)}%` : undefined,
           )}
           {metric(
@@ -362,7 +362,7 @@ export default function EvalsView() {
             `${grounded}/${n}`,
             "target 100%",
             grounded === n,
-            "Explanations whose every fact and rule traces back to the inputs.",
+            "Explanations where every fact and rule comes from the real data, nothing invented.",
             n > 0 ? `${Math.round((grounded / n) * 100)}%` : undefined,
           )}
           {metric(
@@ -377,7 +377,7 @@ export default function EvalsView() {
             `${maxLat.toFixed(1)}s`,
             "target under 15s",
             maxLat < 15,
-            "The slowest single assessment. The one case that can breach the SLA.",
+            "The slowest single assessment, the one most likely to feel slow to an officer.",
           )}
         </div>
       )}

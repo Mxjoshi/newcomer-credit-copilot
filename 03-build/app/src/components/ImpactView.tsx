@@ -205,17 +205,30 @@ export default function ImpactView({ activeLabel }: { activeLabel: string }) {
       </div>
     </div>
   );
-  const strategyCard = (s: StrategyNumbers, tone: string, accent: string) => (
+  const strategyCard = (s: StrategyNumbers, tone: string, accent: string, subtitle: string) => (
     <div className={`flex-1 rounded-2xl border-2 p-5 ${tone}`}>
       <h4 className="text-sm font-semibold text-slate-800 dark:text-slate-100">{s.label}</h4>
-      <div className="mt-4 grid grid-cols-3 gap-3">
-        {stat("Approved", s.approved_of_labeled, accent)}
-        {stat("False approvals", s.false_approvals, "text-rose-600")}
-        {stat("Referred", s.referred, "text-amber-600")}
+      <p className="mt-1 text-xs leading-snug text-slate-500 dark:text-slate-400">{subtitle}</p>
+      <div className="mt-4">
+        <div className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+          Good newcomers approved
+        </div>
+        <div className="mt-0.5 flex items-baseline gap-1">
+          <span key={`hero-${s.approved_of_labeled}`} className={`animate-count text-3xl font-bold ${accent}`}>
+            {s.approved_of_labeled}
+          </span>
+          <span className="text-lg font-semibold text-slate-400 dark:text-slate-500">
+            / {s.labeled_approve}
+          </span>
+        </div>
+        <div className="text-[11px] text-slate-400 dark:text-slate-500">
+          of the {s.labeled_approve} applicants the answer key says deserve credit
+        </div>
       </div>
-      <p className="mt-3 text-xs text-slate-500 dark:text-slate-400">
-        of {s.labeled_approve} creditworthy newcomers in the locked set
-      </p>
+      <div className="mt-4 grid grid-cols-2 gap-3 border-t border-slate-200/70 pt-3 dark:border-white/10">
+        {stat("False approvals", s.false_approvals, "text-rose-600")}
+        {stat("Referred to a human", s.referred, "text-amber-600")}
+      </div>
     </div>
   );
 
@@ -343,8 +356,18 @@ export default function ImpactView({ activeLabel }: { activeLabel: string }) {
           alternative data against this ruleset.
         </p>
         <div className="flex flex-col gap-4 lg:flex-row">
-          {strategyCard(data.champion, "border-slate-300 dark:border-white/15 bg-white dark:bg-slate-900", "text-slate-700 dark:text-slate-200")}
-          {strategyCard(data.challenger, "border-emerald-300 bg-emerald-50", "text-emerald-700")}
+          {strategyCard(
+            data.champion,
+            "border-slate-300 dark:border-white/15 bg-white dark:bg-slate-900",
+            "text-slate-700 dark:text-slate-200",
+            "Today's baseline: a newcomer with no usable credit file is declined, so none are approved.",
+          )}
+          {strategyCard(
+            data.challenger,
+            "border-emerald-300 bg-emerald-50",
+            "text-emerald-700",
+            "This product: assessed on alternative data against the live ruleset.",
+          )}
         </div>
       </div>
 
