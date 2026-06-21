@@ -19,6 +19,7 @@ import type {
   ExplainOutput,
   PolicyCheckResult,
   ScoreFactor,
+  Severity,
   ValidationOutcome,
 } from "./types";
 import type { Ruleset } from "./ruleset";
@@ -34,7 +35,11 @@ export interface ExplainInput {
   risk_band: Decision["risk_band"];
   ruleset_version: string;
   score: { factors: ScoreFactor[]; total_points: number; max_points: number };
-  policy_results: PolicyCheckResult[];
+  // Each result carries its rule severity so the model can tell a hard_fail (forces a decline on
+  // its own) from a refer-trigger (only refers), and its short title so the model can name the
+  // rule in plain words the first time it cites the id (a bare "rule-2" means nothing to a reader
+  // who does not have the rule list, for example the officer's manager).
+  policy_results: (PolicyCheckResult & { severity: Severity; title: string })[];
   counterfactuals: string[];
 }
 
@@ -44,6 +49,9 @@ export function buildExplainInput(
   decision: Decision,
   ruleset: Ruleset,
 ): ExplainInput {
+  const ruleMeta = new Map(
+    ruleset.rules.map((r) => [r.rule_id, { severity: r.severity, title: r.title }]),
+  );
   return {
     applicant: a,
     application: app,
@@ -55,7 +63,10 @@ export function buildExplainInput(
       total_points: decision.score_result.total_points,
       max_points: ruleset.scorecard.length * 20,
     },
-    policy_results: decision.policy_results,
+    policy_results: decision.policy_results.map((r) => {
+      const meta = ruleMeta.get(r.rule_id);
+      return { ...r, severity: meta?.severity ?? "hard_fail", title: meta?.title ?? r.rule_id };
+    }),
     counterfactuals: decision.counterfactuals,
   };
 }
@@ -78,8 +89,10 @@ export function buildGroundingContext(input: ExplainInput): GroundingContext {
 const SYSTEM_PROMPT = `You are drafting a credit decision explanation for a loan officer at a UAE digital bank. The officer also sees the full scorecard and every policy rule with its citation on the same screen, so do not repeat them all.
 
 Using ONLY the fields, score factors, policy results, and counterfactual lines provided, write:
-1. "explanation": a concise paragraph of three to five sentences, in plain, direct language an officer can read aloud. Lead with the recommendation and the one or two factors that decided it. For a decline or refer, name what drove it (by rule_id, or the weak score factor) and what would change it. Do not list every rule; mention only what mattered.
+1. "explanation": a concise paragraph of three to five sentences, in plain, direct language an officer can read aloud. Lead with the recommendation and the one or two factors that decided it. For a decline or refer, name what drove it (by rule_id, or the weak score factor) and what would change it. Do not list every rule; mention only what mattered. The first time you cite a rule by its rule_id, add its short title in parentheses, for example "rule-2 (debt burden ratio cap)", so a reader without the rule list, such as the officer's manager, knows what the rule is.
 2. "reasons": a short list of three to six bullets, each a single driver of the outcome.
+
+Rule severity: each policy result carries a "severity". A "hard_fail" rule forces a decline on its own when it fails. A "refer" rule, when it fails, only sends the case to manual review; it never on its own causes a decline. Describe a failed rule in line with its severity: do not call a "refer" rule a "hard" failure, a "hard stop", or "mandatory", and do not imply a refer-severity failure caused a decline. When the recommendation is decline and no hard_fail rule failed, the decline is driven by the risk band, not by a rule: say so and name the band (for example "the high risk band"), rather than attributing the decline to a refer-severity rule.
 
 Rules: reference only the provided field values and policy results. When you mention a policy rule, refer to it by its rule_id (you need not quote the full rule text). Do not introduce any number, name, rule, or fact that is not in the provided data. Do not soften or change the recommendation. Be concise; no filler, no restating the task. Write without en dashes or em dashes; use commas, colons, parentheses, or separate sentences instead.`;
 
