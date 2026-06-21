@@ -62,9 +62,11 @@ The brief asks specifically for manual verification of each output, not only an 
 | Meets bar | Each output read against ground truth and recorded. |
 | Exceeds | Human read against a written scoring rubric, plus an automated grounding check that enforces the trust-critical dimensions in code. |
 
-**This project: Meets bar, with a gap to close.** The automated validator enforces faithfulness and
-grounding (`validateGrounding`), and `output-scoring-rubric.md` defines the manual read. Close the
-gap by recording a manual pass of the 24 explanations against that rubric in `eval-results.md`.
+**This project: Exceeds.** The automated validator enforces faithfulness and grounding
+(`validateGrounding`), `output-scoring-rubric.md` defines the manual read, and `manual-rubric-pass.md`
+records the completed human read of all 24 explanations on completeness, clarity, and consistency
+(24 pass, with one recurring wording note surfaced for a prompt fix). Evidence: `manual-rubric-pass.md`,
+`eval-explanations.md`.
 
 ### E. Honesty about misses
 Failures and mismatches are surfaced and explained, not hidden or tuned away.
@@ -101,9 +103,10 @@ this folder as the iteration plan.
 | A. Ground-truth quality | Meets | Exceeds |
 | B. Benchmark repeatable | Meets | Exceeds |
 | C. Metrics vs targets | Meets | Exceeds |
-| D. Manual verification | Meets | Meets (record the manual pass to lock it) |
+| D. Manual verification | Meets | Exceeds |
 | E. Honesty about misses | Meets | Exceeds |
 | F. Iteration evidence | Meets | Meets (write the iteration plan to reach Exceeds) |
 
-Every criterion is at or above the bar. The two open items to fully lock the phase: record the
-manual rubric pass of the 24 explanations (D), and write the short iteration plan (F).
+Every criterion is at or above the bar. The manual rubric pass (D) is now recorded in
+`manual-rubric-pass.md`. One open item remains to fully lock the phase: write the short iteration
+plan (F), which should fold in the prompt-severity refinement that the rubric pass surfaced.
