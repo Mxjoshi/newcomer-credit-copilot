@@ -3,11 +3,11 @@
 **Brief deliverable:** *"An MVP, an evals benchmark, and a first set of metrics measured against the
 baseline."*
 
-**Status (2026-06-20):** MVP built and running, the benchmark runs the full pipeline
-(`npm run eval`), and v1 metrics are measured against the Phase 1 targets in `eval-results.md`. Two
-items remain open before the phase is fully locked: record the manual rubric pass of the 24
-explanations (completeness, clarity, consistency) into `eval-results.md`, and write the short
-iteration plan. See `eval-deliverable-rubric.md` for the criterion-by-criterion self-assessment.
+**Status (2026-06-21):** Phase complete. MVP built and running, the benchmark runs the full
+pipeline (`npm run eval`), v1 metrics are measured against the Phase 1 targets in `eval-results.md`,
+the manual rubric pass of the 24 explanations is recorded in `manual-rubric-pass.md`, and the
+prioritized iteration plan is in `iteration-plan.md`. All six criteria in `eval-deliverable-rubric.md`
+now Exceed the bar.
 
 ## Tasks
 1. **Surface and validate risks:** list product risks, then the fastest and cheapest way to test each

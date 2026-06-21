@@ -90,9 +90,10 @@ A v1 baseline exists and the path to improve it is clear.
 | Meets bar | A baseline plus a stated next step. |
 | Exceeds | Baseline plus specific, prioritized changes tied to the measured gaps. |
 
-**This project: Meets bar.** Baseline is set. To reach Exceeds, write the short list of next
-actions (investigate the GT-02 latency outlier, confirm "STAR", primary-source the cited facts) into
-this folder as the iteration plan.
+**This project: Exceeds.** Baseline is set and `iteration-plan.md` lists the next actions, each tied
+to a measured gap and prioritized by leverage (P1: the rule-severity prompt fix and the latency
+outlier; P2: independent judge, repeat sampling, robustness batch; P3: grow and slice the set,
+second labeler). Evidence: `iteration-plan.md`.
 
 ---
 
@@ -105,8 +106,7 @@ this folder as the iteration plan.
 | C. Metrics vs targets | Meets | Exceeds |
 | D. Manual verification | Meets | Exceeds |
 | E. Honesty about misses | Meets | Exceeds |
-| F. Iteration evidence | Meets | Meets (write the iteration plan to reach Exceeds) |
+| F. Iteration evidence | Meets | Exceeds |
 
-Every criterion is at or above the bar. The manual rubric pass (D) is now recorded in
-`manual-rubric-pass.md`. One open item remains to fully lock the phase: write the short iteration
-plan (F), which should fold in the prompt-severity refinement that the rubric pass surfaced.
+Every criterion now Exceeds the bar. The manual rubric pass (D) is recorded in `manual-rubric-pass.md`
+and the iteration plan (F) in `iteration-plan.md`. Phase 4 is fully locked.

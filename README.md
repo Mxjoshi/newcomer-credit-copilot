@@ -16,7 +16,7 @@ to lend to, and explains the decision so a credit officer can defend it. PMCurve
 | 1. Scope & Research | [`01-scope-and-research/`](01-scope-and-research/) | Problem statement, competitor notes, success metrics | **Complete (2026-06-09)** |
 | 2. Design | [`02-design/`](02-design/) | End-to-end UI flow plus first-pass data model | **Complete (2026-06-11)** |
 | 3. Build & AI Integration | [`03-build/`](03-build/) | Working build plus at least one live LLM use case | **Complete (2026-06-14)** |
-| 4. Evaluate & Iterate (ship) | [`04-evaluate-and-ship/`](04-evaluate-and-ship/) | MVP, evals benchmark, metrics vs baseline | In progress |
+| 4. Evaluate & Iterate (ship) | [`04-evaluate-and-ship/`](04-evaluate-and-ship/) | MVP, evals benchmark, metrics vs baseline | **Complete (2026-06-21)** |
 
 ## Repository map
 - **[`00-reference/`](00-reference/):** the course material (the capstone brief PDF and notes).
