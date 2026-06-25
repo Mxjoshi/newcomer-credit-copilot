@@ -24,12 +24,17 @@ lending decision, explainability and defensibility matter more than a marginal a
 we feature is the explanation and decision-reasoning layer.
 
 ## Run it
-The app is a Next.js console in [`03-build/app/`](03-build/app/). From that folder:
+The app is a Next.js console in [`03-build/app/`](03-build/app/). You need **Node.js 20+** and an
+**Anthropic API key** (from [console.anthropic.com](https://console.anthropic.com); only the
+explanation step calls the model, the score and verdict run without it).
+
+From a fresh clone:
 
 ```bash
+cd 03-build/app
 npm install
-cp .env.example .env.local   # add ANTHROPIC_API_KEY (only the explanation step needs it)
-npm run dev                  # http://localhost:3000
+cp .env.example .env.local   # then set ANTHROPIC_API_KEY=sk-ant-... in .env.local
+npm run dev                  # open http://localhost:3000
 ```
 
 Verify the decision logic against the locked answer key:
@@ -39,7 +44,8 @@ npm test          # rule boundaries, scorecard, combination logic, validator
 npm run harness   # runs the 24-profile ground truth, prints match/mismatch per row
 ```
 
-No login and no server database. See the [app README](03-build/app/README.md) for detail.
+No login and no server database, decisions and logs live in the browser. See the
+[app README](03-build/app/README.md) for more.
 
 ## Where the project stands
 All four phases are complete: the MVP is built, type-clean, tested, and evaluated, and the v1 baseline
