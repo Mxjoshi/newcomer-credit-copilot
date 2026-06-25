@@ -9,7 +9,23 @@ to lend to, and explains the decision so a credit officer can defend it. PMCurve
 > consistent, defensible approve, decline, or refer decision on a thin-file applicant, using the
 > alternative-data approach the industry already relies on.
 
-## The build: 4 phases (one per week, self-paced, bar over speed)
+## How the product works (v1, locked in Phase 1)
+The officer enters a newcomer's details (employment, salary, tenure, rent history, a few alt-data
+fields). A rules-based judgmental scorecard assesses repay-vs-default risk. A policy check runs the
+applicant against UAE lending rules. An LLM writes a plain-language explanation the officer can read
+and defend. The output is approve, decline, or refer, and the human makes the final call. The score
+and the verdict are fully deterministic: the LLM writes the explanation only and has no ability to
+alter points, rules, or the recommendation.
+
+The approach is rules plus an LLM, with no trained model. We chose it because for a regulated v1
+lending decision, explainability and defensibility matter more than a marginal accuracy gain. The part
+we feature is the explanation and decision-reasoning layer.
+
+## Where the project stands
+All four phases are complete and the MVP has shipped: the v1 baseline is measured and recorded, and
+the next-version backlog lives in [`04-evaluate-and-ship/iteration-plan.md`](04-evaluate-and-ship/iteration-plan.md).
+
+The build ran in 4 phases, one per week, self-paced, bar over speed:
 
 | Phase | Folder | Deliverable | Status |
 |---|---|---|---|
@@ -22,22 +38,6 @@ to lend to, and explains the decision so a credit officer can defend it. PMCurve
 - **`01` to `04`:** our work, one folder per phase. Each phase folder has a `README.md`, a
   `deliverables/` folder (the graded outputs), and `working/` (the reasoning behind them).
 - **`MEMORY.md`:** the working index (decisions, status, standing rules).
-
-## Where the project stands (one line)
-All four phases are complete and the MVP has shipped: the v1 baseline is measured and recorded, and
-the next-version backlog lives in [`04-evaluate-and-ship/iteration-plan.md`](04-evaluate-and-ship/iteration-plan.md).
-
-## How the product works (v1, locked in Phase 1)
-The officer enters a newcomer's details (employment, salary, tenure, rent history, a few alt-data
-fields). A rules-based judgmental scorecard assesses repay-vs-default risk. A policy check runs the
-applicant against UAE lending rules. An LLM writes a plain-language explanation the officer can read
-and defend. The output is approve, decline, or refer, and the human makes the final call. The score
-and the verdict are fully deterministic: the LLM writes the explanation only and has no ability to
-alter points, rules, or the recommendation.
-
-The approach is rules plus an LLM, with no trained model. We chose it because for a regulated v1
-lending decision, explainability and defensibility matter more than a marginal accuracy gain. The part
-we feature is the explanation and decision-reasoning layer.
 
 ## How this is built
 Product decisions, scope, reviews, and sign-offs are Monika's. The engineering pair is Claude Code,
