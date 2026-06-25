@@ -19,15 +19,13 @@ to lend to, and explains the decision so a credit officer can defend it. PMCurve
 | 4. Evaluate & Iterate (ship) | [`04-evaluate-and-ship/`](04-evaluate-and-ship/) | MVP, evals benchmark, metrics vs baseline | **Complete (2026-06-21)** |
 
 ## Repository map
-- **[`00-reference/`](00-reference/):** the course material (the capstone brief PDF and notes).
-  Read-only reference, not our work.
 - **`01` to `04`:** our work, one folder per phase. Each phase folder has a `README.md`, a
   `deliverables/` folder (the graded outputs), and `working/` (the reasoning behind them).
 - **`MEMORY.md`:** the working index (decisions, status, standing rules).
 
 ## Where the project stands (one line)
-Phases 1 and 2 are signed off; Phase 3 (build and AI integration) is underway. See
-[`02-design/phase-2-signoff.md`](02-design/phase-2-signoff.md) and [`03-build/`](03-build/).
+All four phases are complete and the MVP has shipped: the v1 baseline is measured and recorded, and
+the next-version backlog lives in [`04-evaluate-and-ship/iteration-plan.md`](04-evaluate-and-ship/iteration-plan.md).
 
 ## How the product works (v1, locked in Phase 1)
 The officer enters a newcomer's details (employment, salary, tenure, rent history, a few alt-data

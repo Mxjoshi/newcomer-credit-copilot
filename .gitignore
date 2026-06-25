@@ -9,3 +9,6 @@ venv/
 
 # Local Claude Code settings (machine-specific)
 .claude/settings.local.json
+
+# Course material (kept locally, not tracked)
+00-reference/
