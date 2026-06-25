@@ -2,12 +2,14 @@
 
 A B2B tool for UAE digital banks that decides whether a newcomer with no local credit history is safe
 to lend to, and explains the decision so a credit officer can defend it. PMCurve AI-PM capstone
-(Cohort 6), bring-your-own project, solo. Goal: a deployed, working MVP, presented.
+(Cohort 6), bring-your-own project, solo. Goal: a working, evaluated MVP.
 
 > **The gap we fill:** the UAE is about 88% expat, yet a new arrival starts with a blank AECB credit
 > file. Banks reject good customers or assess them slowly by hand. The tool gives the officer a fast,
 > consistent, defensible approve, decline, or refer decision on a thin-file applicant, using the
 > alternative-data approach the industry already relies on.
+
+> Synthetic data only. No real applicants or bank data. The 24 evaluation profiles are fabricated.
 
 ## How the product works (v1, locked in Phase 1)
 The officer enters a newcomer's details (employment, salary, tenure, rent history, a few alt-data
@@ -21,9 +23,28 @@ The approach is rules plus an LLM, with no trained model. We chose it because fo
 lending decision, explainability and defensibility matter more than a marginal accuracy gain. The part
 we feature is the explanation and decision-reasoning layer.
 
+## Run it
+The app is a Next.js console in [`03-build/app/`](03-build/app/). From that folder:
+
+```bash
+npm install
+cp .env.example .env.local   # add ANTHROPIC_API_KEY (only the explanation step needs it)
+npm run dev                  # http://localhost:3000
+```
+
+Verify the decision logic against the locked answer key:
+
+```bash
+npm test          # rule boundaries, scorecard, combination logic, validator
+npm run harness   # runs the 24-profile ground truth, prints match/mismatch per row
+```
+
+No login and no server database. See the [app README](03-build/app/README.md) for detail.
+
 ## Where the project stands
-All four phases are complete and the MVP has shipped: the v1 baseline is measured and recorded, and
-the next-version backlog lives in [`04-evaluate-and-ship/iteration-plan.md`](04-evaluate-and-ship/iteration-plan.md).
+All four phases are complete: the MVP is built, type-clean, tested, and evaluated, and the v1 baseline
+is measured and recorded. Live deployment is the remaining step. The next-version backlog lives in
+[`04-evaluate-and-ship/iteration-plan.md`](04-evaluate-and-ship/iteration-plan.md).
 
 The build ran in 4 phases, one per week, self-paced, bar over speed:
 
