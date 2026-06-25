@@ -87,5 +87,4 @@ The build ran in 4 phases, one per week, self-paced, bar over speed:
 - **`MEMORY.md`:** the working index (decisions, status, standing rules).
 
 ## How this is built
-Product decisions, scope, reviews, and sign-offs are Monika's. The engineering pair is Claude Code,
-the build tool the course brief itself directs students to (capstone brief, page 14).
+Monika owns the product: scope, decisions, reviews, and sign-offs. Claude Code is the engineering pair.
