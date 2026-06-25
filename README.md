@@ -1,11 +1,15 @@
 # Newcomer Credit Decisioning Copilot
 
 A B2B tool for UAE digital banks that decides whether a newcomer with no local credit history is safe
-to lend to, and explains the decision so a credit officer can defend it. PMCurve AI-PM capstone
-(Cohort 6), bring-your-own project, solo. Goal: a working, evaluated MVP.
+to lend to, and explains the decision so a credit officer can defend it. The output is an approve,
+decline, or refer recommendation with a plain-language rationale, and a human makes the final call.
+
+Built solo as the PMCurve AI-PM capstone (Cohort 6), a bring-your-own project. Goal: a working,
+evaluated MVP.
 
 > **The gap we fill:** the UAE is about 88% expat, yet a new arrival starts with a blank AECB credit
-> file. Banks reject good customers or assess them slowly by hand. The tool gives the officer a fast,
+> file (no record at the Al Etihad Credit Bureau, the UAE credit bureau). Banks reject good customers
+> or assess them slowly by hand. The tool gives the officer a fast,
 > consistent, defensible approve, decline, or refer decision on a thin-file applicant, using the
 > alternative-data approach the industry already relies on.
 
@@ -23,6 +27,19 @@ The approach is rules plus an LLM, with no trained model. We chose it because fo
 lending decision, explainability and defensibility matter more than a marginal accuracy gain. The part
 we feature is the explanation and decision-reasoning layer.
 
+## What a decision looks like
+Take a government employee, 14 months in the UAE, earning AED 20,000 a month with an on-time rent
+record, applying for a 40,000 personal loan over 12 months. The tool returns:
+
+- **Recommendation:** approve. **Risk band:** low. **Score:** 98/100.
+- **Why:** salary is more than double the AED 8,000 product minimum, leaving a debt burden of 18
+  percent (inside the 50 percent cap); government employer at the top stability tier; all six policy
+  rules pass; 6+ months of on-time rent.
+- The officer reads that rationale, can defend it, and makes the final call.
+
+A weaker profile (short tenure, no rent history, or a rule that fails at refer-severity) comes back
+as **refer** for a human to check, or **decline** with the exact rule that failed named.
+
 ## Run it
 The app is a Next.js console in [`03-build/app/`](03-build/app/). You need **Node.js 20+** and an
 **Anthropic API key** (from [console.anthropic.com](https://console.anthropic.com); only the
@@ -36,6 +53,9 @@ npm install
 cp .env.example .env.local   # then set ANTHROPIC_API_KEY=sk-ant-... in .env.local
 npm run dev                  # open http://localhost:3000
 ```
+
+On the assessment screen, load a ready case from the **Load a sample scenario** dropdown (approve,
+decline, refer, or a prompt-injection probe), or enter your own applicant.
 
 Verify the decision logic against the locked answer key:
 
