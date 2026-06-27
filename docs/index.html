@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Newcomer Credit Copilot — Monika Joshi</title>
+<meta name="description" content="A credit-decisioning copilot for UAE digital banks: approve / decline / refer for a thin-file expat, with a defensible rationale and a deterministic score the AI cannot move. Case study by Monika Joshi.">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="Newcomer Credit Copilot — Case Study">
+<meta property="og:description" content="Approve / decline / refer for a thin-file expat, with a plain-language rationale and a deterministic score the AI cannot move. Synthetic data only.">
+<meta property="og:image" content="poster.jpg">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --paper:#F4F1EA;
+    --panel:#FCFBF7;
+    --alt:#F0ECE3;
+    --ink:#17191D;
+    --soft:#5B5D63;
+    --evergreen:#2C6B61;
+    --light:#F4F1EA;
+    --amber:#9C6B15;
+    --brick:#A23B36;
+    --line:rgba(20,22,26,0.12);
+    --line-strong:rgba(20,22,26,0.16);
+    --line-soft:rgba(20,22,26,0.10);
+    --serif:"Newsreader",Georgia,serif;
+    --sans:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,sans-serif;
+    --mono:"IBM Plex Mono",ui-monospace,monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--paper);color:var(--ink);
+    font-family:var(--sans);font-weight:400;line-height:1.6;
+    -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+  }
+  ::selection{background:var(--evergreen);color:var(--light)}
+
+  .wrap{max-width:1100px;margin:0 auto;padding:0 24px}
+  h1,h2,h3{font-family:var(--serif);font-weight:500;letter-spacing:-0.015em;line-height:1.12}
+  em{font-style:italic;color:var(--evergreen)}
+  .eyebrow,.label{font-family:var(--mono);font-weight:500;text-transform:uppercase;letter-spacing:0.14em;font-size:12px;color:var(--soft)}
+
+  /* top bar */
+  .topbar{border-bottom:1px solid var(--line)}
+  .topbar .wrap{display:flex;justify-content:space-between;align-items:center;height:52px}
+  .topbar span{font-family:var(--mono);font-size:11.5px;letter-spacing:0.16em;text-transform:uppercase;color:var(--soft)}
+
+  /* hero */
+  .hero{padding:64px 0 52px}
+  .hero .eyebrow{margin-bottom:20px}
+  .hero h1{font-size:clamp(38px,7vw,68px);margin-bottom:22px}
+  .hero .subhead{font-size:clamp(17px,2.4vw,21px);color:var(--soft);max-width:62ch;margin-bottom:40px}
+
+  /* video */
+  .player{position:relative;width:100%;aspect-ratio:16/9;background:var(--ink);border:1px solid var(--line-strong);border-radius:6px;overflow:hidden}
+  .player video{width:100%;height:100%;display:block;object-fit:cover;background:var(--ink)}
+  .unmute{position:absolute;right:14px;bottom:14px;display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:var(--light);background:rgba(23,25,29,0.78);border:1px solid rgba(244,241,234,0.34);border-radius:999px;padding:9px 16px;cursor:pointer;backdrop-filter:blur(4px);transition:opacity .2s ease, background .2s ease}
+  .unmute:hover{background:rgba(23,25,29,0.95)}
+  .unmute[hidden]{display:none}
+
+  /* pills */
+  .pills{display:flex;flex-wrap:wrap;gap:12px;margin-top:26px}
+  .pill{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:13px;letter-spacing:0.04em;padding:12px 22px;border-radius:999px;text-decoration:none;cursor:pointer;border:1px solid var(--ink);transition:background .18s ease,color .18s ease,border-color .18s ease}
+  .pill--solid{background:var(--ink);color:var(--light);border-color:var(--ink)}
+  .pill--solid:hover{background:#000}
+  .pill--outline{background:transparent;color:var(--ink);border-color:var(--line-strong)}
+  .pill--outline:hover{border-color:var(--ink);background:rgba(20,22,26,0.04)}
+
+  /* sections */
+  section{padding:60px 0}
+  .section--alt{background:var(--alt);border-top:1px solid var(--line-soft);border-bottom:1px solid var(--line-soft)}
+  .block{max-width:62ch}
+  .block + .block{margin-top:44px}
+  .block .label{margin-bottom:12px;display:block}
+  .block h2{font-size:clamp(24px,3.4vw,32px);margin-bottom:14px}
+  .block p{font-size:17px;color:#34363B}
+
+  /* ---- interactive decision panel ---- */
+  .panel-sec .label{display:block;margin-bottom:6px}
+  .panel-sec .panel-head{font-family:var(--serif);font-weight:500;font-size:clamp(22px,3vw,28px);letter-spacing:-0.015em;margin-bottom:8px}
+  .panel-sec .panel-sub{color:var(--soft);font-size:15px;margin-bottom:26px;max-width:56ch}
+  .decision{--dc:var(--evergreen);background:var(--paper);border:1px solid var(--line-strong);border-radius:6px;padding:8px;max-width:680px}
+  .segmented{display:flex;gap:6px;background:rgba(20,22,26,0.04);border-radius:4px;padding:5px}
+  .seg{flex:1;font-family:var(--mono);font-size:13px;letter-spacing:0.06em;text-transform:uppercase;text-align:center;padding:11px 8px;border:0;border-radius:3px;background:transparent;color:var(--soft);cursor:pointer;transition:background .15s ease,color .15s ease,box-shadow .15s ease}
+  .seg:hover{color:var(--ink)}
+  .seg.active{color:#fff;box-shadow:inset 0 0 0 1px rgba(0,0,0,0.04)}
+  .seg[data-seg="approve"].active{background:var(--evergreen)}
+  .seg[data-seg="refer"].active{background:var(--amber)}
+  .seg[data-seg="decline"].active{background:var(--brick)}
+  .card{padding:24px 22px 22px}
+  .card .applicant-label{font-family:var(--mono);font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--soft);margin-bottom:6px}
+  .card .applicant{font-size:15.5px;color:#2A2C30;margin-bottom:22px;line-height:1.55}
+  .verdict-row{display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-bottom:6px}
+  .badge{font-family:var(--mono);font-weight:500;font-size:13px;letter-spacing:0.1em;text-transform:uppercase;color:var(--dc);background:color-mix(in srgb, var(--dc) 12%, transparent);border:1px solid color-mix(in srgb, var(--dc) 35%, transparent);border-radius:999px;padding:7px 15px}
+  .score{font-family:var(--serif);font-weight:500;font-size:40px;line-height:1;color:var(--dc);letter-spacing:-0.01em}
+  .score small{font-size:18px;color:var(--soft);font-family:var(--mono);font-weight:400;letter-spacing:0}
+  .riskline{font-family:var(--mono);font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:var(--soft);margin-bottom:18px}
+  .why-label{font-family:var(--mono);font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--soft);margin-bottom:10px}
+  .why{list-style:none}
+  .why li{position:relative;padding-left:20px;font-size:15.5px;color:#2A2C30;margin-bottom:9px;line-height:1.5}
+  .why li::before{content:"";position:absolute;left:2px;top:9px;width:6px;height:6px;border-radius:50%;background:var(--dc)}
+
+  /* product calls */
+  .calls .label{display:block;margin-bottom:26px}
+  .call{display:flex;gap:22px;padding:22px 0;border-top:1px solid var(--line)}
+  .call:last-child{border-bottom:1px solid var(--line)}
+  .call .num{font-family:var(--mono);font-weight:500;font-size:15px;color:var(--evergreen);flex:0 0 auto;padding-top:3px;letter-spacing:0.04em}
+  .call .text{font-size:17px;color:#2A2C30;max-width:64ch}
+  .call .text b{font-weight:600;color:var(--ink)}
+
+  /* result callout */
+  .result{background:var(--alt);border-left:3px solid var(--evergreen);border-radius:0 6px 6px 0;padding:26px 28px;max-width:72ch}
+  .result .label{display:block;margin-bottom:10px}
+  .result p{font-size:17px;color:#2A2C30}
+  .result .note{font-family:var(--mono);font-size:12px;letter-spacing:0.1em;text-transform:uppercase;color:var(--soft);margin-top:16px}
+
+  /* screenshot slot */
+  .shot{width:100%;aspect-ratio:16/9;border:1.5px dashed var(--line-strong);border-radius:6px;display:flex;align-items:center;justify-content:center;background:var(--panel)}
+  .shot span{font-family:var(--mono);font-size:12px;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);padding:0 20px;text-align:center}
+
+  /* footer */
+  footer{background:var(--ink);color:var(--light);padding:56px 0}
+  footer .ft-label{font-family:var(--mono);font-size:11.5px;letter-spacing:0.16em;text-transform:uppercase;color:rgba(244,241,234,0.55);margin-bottom:22px}
+  .ft-pills{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:34px}
+  .ft-pill{display:inline-flex;align-items:center;font-family:var(--mono);font-size:13px;letter-spacing:0.04em;padding:11px 20px;border-radius:999px;text-decoration:none;color:var(--light);border:1px solid rgba(244,241,234,0.30);transition:background .18s ease,border-color .18s ease}
+  .ft-pill:hover{background:rgba(244,241,234,0.10);border-color:rgba(244,241,234,0.6)}
+  footer .disclaimer{font-size:14px;color:rgba(244,241,234,0.62);max-width:70ch;line-height:1.6}
+
+  @media (max-width:640px){
+    .hero{padding:44px 0 36px}
+    section{padding:46px 0}
+    .call{gap:16px}
+    .verdict-row{gap:12px}
+  }
+</style>
+</head>
+<body>
+
+  <!-- 1. top bar -->
+  <div class="topbar">
+    <div class="wrap">
+      <span>Monika Joshi · Portfolio</span>
+      <span>Case Study 02</span>
+    </div>
+  </div>
+
+  <!-- 2. hero -->
+  <header class="hero">
+    <div class="wrap">
+      <div class="eyebrow">Credit · Judgmental Scorecard</div>
+      <h1>Newcomer <em>Credit Copilot</em></h1>
+      <p class="subhead">An approve / decline / refer decision for a thin-file expat, with a plain-language rationale the credit officer can defend, and a deterministic score the AI cannot move.</p>
+
+      <div class="player" id="player">
+        <video id="film" poster="poster.jpg" muted playsinline preload="metadata" controls>
+          <source src="newcomer-credit-copilot-pitch-film.mp4" type="video/mp4">
+          Your browser does not support the video tag. You can
+          <a href="newcomer-credit-copilot-pitch-film.mp4">download the pitch film</a> instead.
+        </video>
+        <button class="unmute" id="unmute" type="button" aria-label="Unmute the pitch film">Sound off · tap to unmute</button>
+      </div>
+
+      <nav class="pills" aria-label="Primary links">
+        <a class="pill pill--solid" id="watchBtn" href="#player">▶ Watch the pitch film</a>
+        <a class="pill pill--outline" href="https://github.com/Mxjoshi/newcomer-credit-copilot" target="_blank" rel="noopener">GitHub repo ↗</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- interactive decision panel (signature element) -->
+  <section class="panel-sec section--alt">
+    <div class="wrap">
+      <span class="label">The decision, three ways</span>
+      <div class="panel-head">Same engine. One of three honest outcomes.</div>
+      <p class="panel-sub">Pick an outcome. The score and verdict are deterministic; the copilot only writes the words.</p>
+
+      <div class="decision" id="decision">
+        <div class="segmented" role="tablist" aria-label="Decision outcome">
+          <button class="seg active" data-seg="approve" role="tab" aria-selected="true">Approve</button>
+          <button class="seg" data-seg="refer" role="tab" aria-selected="false">Refer</button>
+          <button class="seg" data-seg="decline" role="tab" aria-selected="false">Decline</button>
+        </div>
+        <div class="card" id="card"><!-- filled by JS --></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3a. problem + product -->
+  <section>
+    <div class="wrap">
+      <div class="block">
+        <span class="label">The problem</span>
+        <h2>A newcomer starts with a blank credit file.</h2>
+        <p>A new arrival starts with a blank AECB file, with no record at the UAE credit bureau. Banks reject good customers, or assess them slowly by hand.</p>
+      </div>
+      <div class="block">
+        <span class="label">The product</span>
+        <h2>Rules decide. The model only explains.</h2>
+        <p>The officer enters the applicant's details. A rules-based judgmental scorecard assesses repay-vs-default risk, a policy check runs UAE lending rules, and an LLM writes a plain-language explanation. The score and the verdict are fully deterministic: the LLM writes the explanation only, and cannot move a single point, rule, or recommendation.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3b. product calls -->
+  <section class="section--alt">
+    <div class="wrap calls">
+      <span class="label">The product calls I made</span>
+      <div class="call">
+        <div class="num">01</div>
+        <div class="text"><b>Locked the 24-case ground truth before building the scorecard.</b> So the design could not be tuned to the answer key.</div>
+      </div>
+      <div class="call">
+        <div class="num">02</div>
+        <div class="text"><b>Conservative error stance.</b> A bad loan costs more than a missed one, so v1 leans to refer and decline.</div>
+      </div>
+      <div class="call">
+        <div class="num">03</div>
+        <div class="text"><b>Rules plus an LLM, no trained model.</b> For a regulated v1, explainability and defensibility beat a marginal accuracy gain.</div>
+      </div>
+      <div class="call">
+        <div class="num">04</div>
+        <div class="text"><b>Corrected my own positioning after research,</b> instead of overclaiming what the tool does.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. result callout -->
+  <section>
+    <div class="wrap">
+      <div class="result">
+        <span class="label">Result</span>
+        <p>On the 24-case synthetic set, first-pass weights from domain reasoning alone scored 20 of 24 with zero false approvals. Targets: 80%+ decision accuracy, under 10% false approvals, 100% of claims traceable to policy.</p>
+        <div class="note">PMCurve AI-PM capstone · Cohort 6</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. product screenshot slot -->
+  <section>
+    <div class="wrap">
+      <span class="label" style="display:block;margin-bottom:18px">The product</span>
+      <!-- SWAP ME: replace this whole .shot block with a real screenshot, e.g.
+           <img class="shot" src="screenshot.png" alt="The approve / decline / refer decision view"
+                style="object-fit:cover;border-style:solid;border-color:var(--line-strong)"> -->
+      <div class="shot">
+        <span>Product screenshot: the approve / decline / refer decision view</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. footer -->
+  <footer>
+    <div class="wrap">
+      <div class="ft-label">Get in touch</div>
+      <div class="ft-pills">
+        <a class="ft-pill" href="mailto:monikarjoshi@gmail.com">monikarjoshi@gmail.com</a>
+        <a class="ft-pill" href="https://www.linkedin.com/in/monikarjoshi/" target="_blank" rel="noopener">LinkedIn ↗</a>
+        <a class="ft-pill" href="https://github.com/Mxjoshi" target="_blank" rel="noopener">GitHub ↗</a>
+      </div>
+      <p class="disclaimer">Synthetic data only; banks named are fictional; a human makes the final call. Built solo, end to end.</p>
+    </div>
+  </footer>
+
+<script>
+  (function(){
+    /* ---- interactive decision panel ---- */
+    var STATES = {
+      approve:{
+        color:"var(--evergreen)", verdict:"Approve", score:98, risk:"Low",
+        applicant:"Government employee · 14 months in UAE · AED 20,000/mo · on-time rent · AED 40,000 loan over 12 months",
+        why:[
+          "Salary more than double the AED 8,000 product minimum",
+          "Debt burden 18%, inside the 50% cap",
+          "Government employer in the top stability tier",
+          "All six policy rules pass",
+          "6+ months of on-time rent on record"
+        ]
+      },
+      refer:{
+        color:"var(--amber)", verdict:"Refer", score:64, risk:"Medium",
+        applicant:"Private-sector · 7 months in UAE · AED 11,000/mo · no rent history on file · AED 30,000 loan over 24 months",
+        why:[
+          "Tenure under the 12-month comfort line",
+          "No rent-payment history to corroborate",
+          "Score lands in the refer band, not a clear pass",
+          "Routed to the human review queue, not declined"
+        ]
+      },
+      decline:{
+        color:"var(--brick)", verdict:"Decline", score:31, risk:"High",
+        applicant:"Self-employed · 9 months in UAE · AED 6,500/mo · AED 50,000 loan over 12 months",
+        why:[
+          "Income below the AED 8,000 product minimum, a hard rule",
+          "Debt burden would breach the 50% cap",
+          "A hard policy rule failed at decline severity",
+          "The exact failing rule is named for the officer"
+        ]
+      }
+    };
+    var decision = document.getElementById('decision');
+    var card = document.getElementById('card');
+    var segs = decision.querySelectorAll('.seg');
+
+    function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+    function render(key){
+      var s = STATES[key];
+      decision.style.setProperty('--dc', s.color);
+      var lis = s.why.map(function(w){ return '<li>'+esc(w)+'</li>'; }).join('');
+      card.innerHTML =
+        '<div class="applicant-label">Applicant</div>'+
+        '<div class="applicant">'+esc(s.applicant)+'</div>'+
+        '<div class="verdict-row">'+
+          '<span class="badge">'+esc(s.verdict)+'</span>'+
+          '<span class="score">'+s.score+' <small>/ 100</small></span>'+
+        '</div>'+
+        '<div class="riskline">Risk band · '+esc(s.risk)+'</div>'+
+        '<div class="why-label">Why</div>'+
+        '<ul class="why">'+lis+'</ul>';
+    }
+    segs.forEach(function(btn){
+      btn.addEventListener('click', function(){
+        segs.forEach(function(b){ b.classList.remove('active'); b.setAttribute('aria-selected','false'); });
+        btn.classList.add('active'); btn.setAttribute('aria-selected','true');
+        render(btn.dataset.seg);
+      });
+    });
+    render('approve');
+
+    /* ---- video ---- */
+    var film = document.getElementById('film');
+    var unmute = document.getElementById('unmute');
+    var watch = document.getElementById('watchBtn');
+    if(!film) return;
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function setUnmuted(on){ film.muted = !on; unmute.hidden = on; }
+    unmute.addEventListener('click', function(){ setUnmuted(true); if(film.paused){ film.play().catch(function(){}); } });
+    film.addEventListener('volumechange', function(){ unmute.hidden = !film.muted; });
+    watch.addEventListener('click', function(e){
+      e.preventDefault();
+      document.getElementById('player').scrollIntoView({behavior:'smooth', block:'center'});
+      setUnmuted(true);
+      film.play().catch(function(){ setUnmuted(false); film.play().catch(function(){}); });
+    });
+    if('IntersectionObserver' in window && !reduce){
+      var io = new IntersectionObserver(function(entries){
+        entries.forEach(function(en){
+          if(en.isIntersecting && en.intersectionRatio >= 0.5){ film.play().catch(function(){}); }
+          else if(!film.paused && film.muted){ film.pause(); }
+        });
+      }, {threshold:[0,0.5,1]});
+      io.observe(document.getElementById('player'));
+    }
+  })();
+</script>
+</body>
+</html>
