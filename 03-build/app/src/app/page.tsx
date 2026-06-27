@@ -19,6 +19,7 @@ import {
   ensureSeedUsers,
   firstName,
   getCurrentUser,
+  login,
   logout,
   ROLE_LABEL,
   type User,
@@ -142,7 +143,8 @@ export default function Home() {
       setSummary(data);
       setCases(loadCases());
       ensureSeedUsers();
-      setUser(getCurrentUser());
+      // Public demo: skip the sign-in wall by auto-signing in as the demo superuser.
+      setUser(getCurrentUser() ?? login("monika", "demo"));
       setThemeState(getTheme());
       if (data) {
         ensureBase(data.ruleset_version, data.params);
