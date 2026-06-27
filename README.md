@@ -15,6 +15,14 @@ evaluated MVP.
 
 > Synthetic data only. No real applicants or bank data. The 24 evaluation profiles are fabricated.
 
+## See it in 90 seconds
+Two short films walk the product end to end (synthetic data only):
+
+- **[Product film](04-evaluate-and-ship/Credit%20Copilot%20-%20Product%20Film.mp4):** the deterministic guarantee and the v1 eval results (83.3% decision accuracy, 0% false approvals, 0 of 24 hallucinations, all explanations grounded on the first attempt).
+- **[Pitch film](04-evaluate-and-ship/Newcomer%20Credit%20Copilot%20Pitch%20Film.mp4):** the problem, the market gap, and one approve decision end to end.
+
+GitHub plays each MP4 in the browser. The interactive HTML source for both sits beside them in [`04-evaluate-and-ship/`](04-evaluate-and-ship/).
+
 ## How the product works (v1, locked in Phase 1)
 The officer enters a newcomer's details (employment, salary, tenure, rent history, a few alt-data
 fields). A rules-based judgmental scorecard assesses repay-vs-default risk. A policy check runs the
