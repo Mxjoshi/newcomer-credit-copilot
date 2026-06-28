@@ -99,5 +99,5 @@ is the prompt refinement noted above, retested on the next run.
 
 ## Sign-off
 
-- Reviewed by: _________________ (Monika)  Date: __________
-- Agree with the scoring above: yes / with the changes noted here: ____________________
+- Reviewed by: Monika Joshi  Date: 2026-06-28
+- Agree with the scoring above: yes
