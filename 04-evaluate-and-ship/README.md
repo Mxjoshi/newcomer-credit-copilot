@@ -34,7 +34,7 @@ never edit that file; Phase 4 measures against it unchanged. The Screen 3 impact
 - See `../01-scope-and-research/deliverables/03-success-metrics.md`.
 
 ## Also lives here
-- **Pitch films:** two 96-second walkthroughs on synthetic data, each as an MP4 plus the interactive
+- **Pitch films:** two 90-second walkthroughs on synthetic data, each as an MP4 plus the interactive
   HTML source. `Credit Copilot - Product Film` covers the deterministic guarantee and the v1 eval
   results; `Newcomer Credit Copilot Pitch Film` covers the problem and one live approve decision.
   The root `README.md` links both at the top.

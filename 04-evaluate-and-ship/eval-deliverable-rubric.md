@@ -49,7 +49,7 @@ Every target defined in Phase 1 is measured, and the result is compared to the t
 | Exceeds | Both decision-quality and AI-output metrics measured, met/not-met per target, plus per-profile detail. |
 
 **This project: Exceeds.** Group A (accuracy 83.3% vs 80%, false approval 0% vs under 10%) and
-Group B (hallucination 0/24, grounding 100%, latency avg 8.3s / max 15.3s vs 15s) all measured with
+Group B (hallucination 0/24, grounding 100%, latency avg 8.2s / max 15.3s vs 15s) all measured with
 a met/not-met column and a per-profile table. Evidence: `eval-results.md`,
 `01-scope-and-research/deliverables/03-success-metrics.md`.
 

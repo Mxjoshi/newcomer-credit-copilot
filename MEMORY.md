@@ -1,8 +1,8 @@
-# AI-Capstone, Main Memory (read this first)
+# Newcomer Credit Copilot, Main Memory (read this first)
 
 This is the index for the whole project. It stays short on purpose.
 Each line points to a detailed file you open only when that topic is the task.
-Last updated: 2026-06-11 (Phase 2 signed off, Phase 3 started)
+Last updated: 2026-06-28 (all four phases complete and signed off; the app is deployed live).
 
 ---
 

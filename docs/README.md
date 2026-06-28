@@ -9,10 +9,10 @@ It then publishes at **https://mxjoshi.github.io/newcomer-credit-copilot/**. `.n
 from processing the files.
 
 ## Files
-- `index.html` — the landing page: pitch film in the hero, an interactive approve / refer / decline
+- `index.html`, the landing page: pitch film in the hero, an interactive approve / refer / decline
   decision panel below it, problem / product / the-calls-I-made, a result callout, and a footer.
-- `newcomer-credit-copilot-pitch-film.mp4` — the pitch film shown in the hero.
-- `poster.jpg` — the video poster frame.
+- `newcomer-credit-copilot-pitch-film.mp4`, the pitch film shown in the hero.
+- `poster.jpg`, the video poster frame.
 
 ## Editing
 - **Swap the screenshot:** in `index.html`, find the `<!-- SWAP ME -->` comment and replace the

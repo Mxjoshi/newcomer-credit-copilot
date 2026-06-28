@@ -328,7 +328,7 @@ The repository is organised by capstone phase at the top level, with the applica
 `03-build/app`.
 
 ```
-AI-Capstone/
+newcomer-credit-copilot/
   00-reference/             the course brief
   01-scope-and-research/    Phase 1 deliverables (problem, competitors, metrics)
   02-design/                Phase 2 deliverables (UI flow, data model)

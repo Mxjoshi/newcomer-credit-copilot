@@ -65,7 +65,7 @@ From `eval-results.md`, ruleset uae-v1.0, 24 profiles through the real pipeline:
 | A | False approval rate | under 10% | 0/24 (0%) | yes |
 | B | Hallucination (invented facts shown) | 0 | 0/24 | yes |
 | B | Policy grounding (traceable) | 100% | 100% | yes |
-| B | Latency | under 15s | avg 8.3s, max 15.3s | no (tail) |
+| B | Latency | under 15s | avg 8.2s, max 15.3s | no (tail) |
 
 The four decision misses (GT-08, GT-12, GT-16, GT-21) are boundary cases; none is a false
 approval. Faithfulness and grounding are not only measured, they are **enforced in code**: the

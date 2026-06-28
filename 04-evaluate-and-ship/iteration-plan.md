@@ -71,9 +71,16 @@ aggregate. Verify: a slice table in `eval-results.md`. Effort: small (the data i
 **9. Report accuracy as a range.** State 83.3% with its confidence interval rather than as a point,
 so the small-sample uncertainty is visible. Effort: trivial.
 
+**10. Calibrate the refer rate against review capacity.** v1 refers 41.7% of the engineered 8/8/8
+set, which is a property of the test distribution, not a production rate. Measure the refer rate on
+a market-representative input mix and compare it to the about-15% review-capacity assumption in
+`../01-scope-and-research/deliverables/03-success-metrics.md`; tune the refer band if it overshoots
+capacity. Verify: a refer rate on a realistic mix with the capacity assumption restated. Effort:
+medium (needs a representative input set).
+
 ## Housekeeping before the pitch
 
-**10. Primary-source the cited regulatory facts.** If the deck cites the AECB 3.71M salary figure
+**11. Primary-source the cited regulatory facts.** If the deck cites the AECB 3.71M salary figure
 or the CBUAE minimum-salary removal, confirm them at the primary source. They currently rest on
 solid secondary reporting (`SPEC.md` section 17, and the to-do in this folder's README). Effort:
 small.
@@ -82,4 +89,4 @@ small.
 
 P1 (items 1 and 2) first: they are cheap and close the only missed target and the only rubric note.
 Then P2 to make the evaluation itself harder to fool. P3 when there is time to grow the set and add
-a second labeler. Item 10 is gated by the pitch, not by the build.
+a second labeler. Item 11 is gated by the pitch, not by the build.

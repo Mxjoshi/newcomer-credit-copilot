@@ -163,7 +163,7 @@ the system, then finalized by the officer (D2).
 | risk_band | enum: low, medium, high | Carried from ScoreResult. |
 | explanation | text | The Why paragraph. May reference ONLY applicant fields, score factors, and cited policy text (hallucination metric: zero invented facts). |
 | reasons | list of text | Bullet-form drivers of the outcome. |
-| counterfactuals | list of text | Populated only for decline or refer, empty for approve. Generated deterministically from the failed thresholds (the smallest input change that crosses each one), never by the LLM. |
+| counterfactuals | list of text | Populated only for decline or refer, empty for approve. Generated deterministically from the failed thresholds (the smallest input change that crosses each one), never by the LLM. For a band-driven refer where every rule passes, the binding threshold is the risk-band cutoff, so the counterfactual is the smallest score gain (via salary or tenure) that clears it. |
 | score_result | ScoreResult | Embedded, for traceability. |
 | policy_results | list of PolicyCheckResult | Embedded, for traceability. |
 | officer_action | enum: accepted, overridden, none | U4. Set when the officer clicks. |

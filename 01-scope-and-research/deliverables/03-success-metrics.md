@@ -7,6 +7,10 @@ Format follows the brief's worked example: each line is a named metric with a me
 > are not measured yet. Running the benchmark and computing the baseline is Phase 4. All Group A
 > (credit-quality) metrics will be measured on synthetic sample data, stated plainly. Targets are
 > starting points and will be tightened after the Phase 4 baseline.
+>
+> **Update (Phase 4):** these are now measured. See
+> [`../../04-evaluate-and-ship/eval-results.md`](../../04-evaluate-and-ship/eval-results.md) for the
+> v1 baseline against each target.
 
 ---
 
