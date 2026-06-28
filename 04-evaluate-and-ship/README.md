@@ -1,4 +1,4 @@
-# Phase 4: Evaluate & Iterate (ship MVP). In progress
+# Phase 4: Evaluate & Iterate (ship MVP). Complete
 
 **Brief deliverable:** *"An MVP, an evals benchmark, and a first set of metrics measured against the
 baseline."*
@@ -46,8 +46,20 @@ never edit that file; Phase 4 measures against it unchanged. The Screen 3 impact
 - **Pre-presentation fact to-do:** if the deck cites the AECB 3.71M salary figure or the CBUAE
   minimum-salary removal, primary-source them (both currently rest on solid secondary reporting).
 
-> Phase 3 build is done; this phase is unblocked and underway (see Status above).
+> Phase 3 build is done; this phase is complete (see Status above).
 
-## Note to verify
-"STAR format" for the MVP is a course-specific term. Confirm what STAR stands for in PMCurve's
-framework before using it.
+## The MVP, in STAR format
+The brief asks for the smallest product that tests the key risks, framed in STAR (Situation, Task,
+Action, Result).
+- **Situation:** a UAE bank must decide on a thin-file newcomer who has no AECB record. The call is
+  high-stakes and a wrong approval is the costly error.
+- **Task:** give a credit officer a fast, consistent, defensible approve / decline / refer
+  recommendation with a rationale they can stand behind, without a wrong approval slipping through.
+- **Action:** the smallest product that tests this. A deterministic judgmental scorecard plus a
+  six-rule UAE policy check produce the score and the verdict; an LLM writes the plain-language
+  explanation only and cannot move a point, a rule, or the recommendation. Engineering scaffolding
+  was cut (no login, no bank integration, synthetic data); the credit substance stays real (D9).
+- **Result:** measured on the 24 locked profiles: 83.3% decision accuracy, 0% false approvals,
+  0/24 invented facts shown, 100% policy grounding (see `eval-results.md`).
+
+The risks this MVP tests, and how each was validated, are in `risks-and-validation.md`.

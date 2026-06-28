@@ -77,7 +77,7 @@ No login and no server database, decisions and logs live in the browser. See the
 
 ## Where the project stands
 All four phases are complete: the MVP is built, type-clean, tested, and evaluated, and the v1 baseline
-is measured and recorded. Live deployment is the remaining step. The next-version backlog lives in
+is measured and recorded. The app is also deployed live. The next-version backlog lives in
 [`04-evaluate-and-ship/iteration-plan.md`](04-evaluate-and-ship/iteration-plan.md).
 
 The build ran in 4 phases, one per week, self-paced, bar over speed:

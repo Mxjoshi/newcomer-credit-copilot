@@ -1,4 +1,4 @@
-# Phase 3: Build & AI Integration. In progress (started 2026-06-11)
+# Phase 3: Build & AI Integration. Complete
 
 > Build plan and engineering defaults: [`working/phase-3-plan.md`](working/phase-3-plan.md).
 
@@ -17,10 +17,13 @@
 - MVP cuts are engineering scaffolding only (no login, no real bank integration, synthetic data). The
   credit substance stays real (D9).
 
-## Planned artifacts
-- The app (frontend and backend). To be created here.
-- `deliverables/llm-integration.md`: input, prompt, structured output, and validator spec for
-  the explanation layer. EXISTS, drafted 2026-06-11 during the Phase 2 review (the revised data
-  model fixed every shape it needs); the build implements it.
+## Delivered artifacts
+- The app (frontend and backend): [`app/`](app/), a Next.js officer console implementing the core
+  flow (applicant intake, rules-based score, policy check, recommendation). Type-clean, tested
+  (`npm test`), runs locally (`npm run dev`), and deployed live.
+- `deliverables/llm-integration.md`: input, prompt, structured output, and validator spec for the
+  explanation layer, the live LLM use case. Drafted 2026-06-11 during the Phase 2 review (the
+  revised data model fixed every shape it needs); the build implements it. The model writes the
+  explanation only; the score and verdict stay deterministic.
 
 
